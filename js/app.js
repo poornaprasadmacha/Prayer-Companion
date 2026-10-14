@@ -424,12 +424,10 @@ const App = {
     const quoteText = content?.quote?.text || '';
     const quoteAuthor = content?.quote?.author || '';
 
-    // Check custom image first, then check if the verse_text column contains an image URL (including Google Drive links)
-    const customImg = localStorage.getItem('PRAYERLY_CUSTOM_DEVOTIONAL_IMG');
-    const sheetImgUrl = (typeof extractImageUrl === 'function') 
+    // Check if the verse_text column contains an image URL (including Google Drive links)
+    const imgUrl = (typeof extractImageUrl === 'function') 
       ? extractImageUrl(rawVerseText) 
       : (rawVerseText.startsWith('http') ? rawVerseText : '');
-    const imgUrl = customImg || sheetImgUrl;
 
     if (devotionalImgEl) {
       if (imgUrl) {
@@ -1132,33 +1130,6 @@ const App = {
       };
     }
 
-    // Custom Devotional Image URL
-    const customImgInput = document.getElementById('settings-custom-img-input');
-    const saveCustomImgBtn = document.getElementById('btn-save-custom-img');
-
-    if (customImgInput) {
-      customImgInput.value = localStorage.getItem('PRAYERLY_CUSTOM_DEVOTIONAL_IMG') || '';
-    }
-
-    if (saveCustomImgBtn && customImgInput) {
-      saveCustomImgBtn.onclick = () => {
-        const rawUrl = customImgInput.value.trim();
-        const extracted = (typeof extractImageUrl === 'function') ? extractImageUrl(rawUrl) : rawUrl;
-        if (rawUrl && !extracted) {
-          UI.toast('Please enter a valid image URL or Google Drive link.', 'warning');
-          return;
-        }
-        if (extracted) {
-          localStorage.setItem('PRAYERLY_CUSTOM_DEVOTIONAL_IMG', extracted);
-          UI.toast('Custom devotional image saved!', 'success');
-        } else {
-          localStorage.removeItem('PRAYERLY_CUSTOM_DEVOTIONAL_IMG');
-          UI.toast('Reset to default devotional image.', 'info');
-        }
-        this.renderDailyScripture();
-      };
-    }
-
     if (settingsShareBtn) {
       settingsShareBtn.onclick = () => this.shareApp();
     }
@@ -1333,18 +1304,14 @@ const App = {
 
     const emailStep = document.getElementById('auth-step-email');
     const otpStep = document.getElementById('auth-step-otp');
-    const tabRequest = document.getElementById('auth-tab-btn-request');
-    const tabEnter = document.getElementById('auth-tab-btn-enter');
     const nameInput = document.getElementById('auth-name-input');
     const emailInput = document.getElementById('auth-email-input');
-    const otpEmailInput = document.getElementById('auth-otp-email-confirm');
     const otpInput = document.getElementById('auth-otp-input');
     const btnSendOtp = document.getElementById('btn-send-otp');
     const btnVerifyOtp = document.getElementById('btn-verify-otp');
     const btnContinueLocal = document.getElementById('btn-continue-local');
     const displayEmail = document.getElementById('auth-display-email');
     const authError = document.getElementById('auth-error-msg');
-    const gotoEnterBtn = document.getElementById('btn-goto-enter-otp');
     const backEmailBtn = document.getElementById('btn-auth-back-email');
     const resendBtn = document.getElementById('btn-auth-resend-otp');
 
@@ -1367,18 +1334,16 @@ const App = {
       if (step === 'otp') {
         if (emailStep) emailStep.style.display = 'none';
         if (otpStep) otpStep.style.display = 'block';
-        if (tabRequest) tabRequest.classList.remove('active');
-        if (tabEnter) tabEnter.classList.add('active');
 
-        const activeEmail = (emailInput?.value || '').trim() || localStorage.getItem('prayer_last_attempted_email') || 'poornaprasad12344@gmail.com';
+        const activeEmail = (emailInput?.value || '').trim() || localStorage.getItem('prayer_last_attempted_email') || '';
         if (displayEmail) displayEmail.textContent = activeEmail;
-        if (otpEmailInput && !otpEmailInput.value) otpEmailInput.value = activeEmail;
-        setTimeout(() => { if (otpInput) otpInput.focus(); }, 120);
+        if (otpInput) {
+          otpInput.value = '';
+          setTimeout(() => otpInput.focus(), 120);
+        }
       } else {
         if (emailStep) emailStep.style.display = 'block';
         if (otpStep) otpStep.style.display = 'none';
-        if (tabRequest) tabRequest.classList.add('active');
-        if (tabEnter) tabEnter.classList.remove('active');
         setTimeout(() => { if (emailInput) emailInput.focus(); }, 120);
       }
     };
@@ -1388,12 +1353,7 @@ const App = {
     if (nameInput && !nameInput.value) nameInput.value = savedName;
     const lastEmail = localStorage.getItem('prayer_last_attempted_email') || (Auth.currentUser?.email && !Auth.isLocalMode() ? Auth.currentUser.email : 'poornaprasad12344@gmail.com');
     if (emailInput && !emailInput.value) emailInput.value = lastEmail;
-    if (otpEmailInput && !otpEmailInput.value) otpEmailInput.value = lastEmail;
 
-    // Tabs navigation
-    if (tabRequest) tabRequest.onclick = () => showStep('email');
-    if (tabEnter) tabEnter.onclick = () => showStep('otp');
-    if (gotoEnterBtn) gotoEnterBtn.onclick = () => showStep('otp');
     if (backEmailBtn) backEmailBtn.onclick = () => showStep('email');
 
     // Display modal and activate initial step
@@ -1404,7 +1364,7 @@ const App = {
     if (btnSendOtp) {
       btnSendOtp.onclick = async () => {
         clearAlert();
-        const email = (emailInput.value || '').trim();
+        const email = (emailInput?.value || '').trim();
         const name = nameInput ? (nameInput.value || '').trim() : '';
 
         if (!email || !email.includes('@')) {
@@ -1418,27 +1378,21 @@ const App = {
         }
 
         localStorage.setItem('prayer_last_attempted_email', email);
-        if (otpEmailInput) otpEmailInput.value = email;
 
         btnSendOtp.disabled = true;
-        btnSendOtp.textContent = 'Sending Verification Code...';
+        btnSendOtp.textContent = 'Sending OTP...';
 
         try {
           await Auth.requestOtp(email, name);
           UI.toast(`Verification code sent to ${email}`, 'success');
           showStep('otp');
-          showAlert(`We sent a 6-digit verification code to <strong>${UI.escape(email)}</strong>. Please check your inbox and enter it below.`, 'info');
         } catch (err) {
           console.warn('requestOtp warning:', err);
           const errMsg = err.message || 'Failed to send verification code.';
-          if (errMsg.toLowerCase().includes('rate limit') || errMsg.toLowerCase().includes('cooldown')) {
-            showAlert(`${errMsg} <br><div style="margin-top: 8px;"><button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('auth-tab-btn-enter').click()">Enter Code Already Received &rarr;</button></div>`, 'error');
-          } else {
-            showAlert(errMsg, 'error');
-          }
+          showAlert(errMsg, 'error');
         } finally {
           btnSendOtp.disabled = false;
-          btnSendOtp.textContent = 'Send Verification Code';
+          btnSendOtp.textContent = 'Send OTP';
         }
       };
     }
@@ -1446,9 +1400,9 @@ const App = {
     // Resend OTP in Step 2
     if (resendBtn) {
       resendBtn.onclick = async () => {
-        const email = (otpEmailInput?.value || emailInput?.value || '').trim();
+        const email = (emailInput?.value || '').trim() || localStorage.getItem('prayer_last_attempted_email');
         if (!email) {
-          showAlert('Please enter your email above to resend.');
+          showStep('email');
           return;
         }
         resendBtn.disabled = true;
@@ -1458,11 +1412,11 @@ const App = {
           showAlert(`A fresh verification code has been sent to <strong>${UI.escape(email)}</strong>`, 'success');
           UI.toast('Verification code resent!', 'success');
         } catch (err) {
-          showAlert(err.message, 'error');
+          showAlert(err.message || 'Could not resend code', 'error');
         } finally {
           setTimeout(() => {
             resendBtn.disabled = false;
-            resendBtn.textContent = 'Resend Code';
+            resendBtn.textContent = 'Resend OTP';
           }, 3000);
         }
       };
@@ -1472,12 +1426,12 @@ const App = {
     if (btnVerifyOtp) {
       btnVerifyOtp.onclick = async () => {
         clearAlert();
-        const email = (otpEmailInput?.value || emailInput?.value || '').trim();
+        const email = (emailInput?.value || '').trim() || localStorage.getItem('prayer_last_attempted_email');
         const otp = (otpInput?.value || '').trim().replace(/\D/g, '');
         const name = nameInput ? (nameInput.value || '').trim() : '';
 
         if (!email) {
-          showAlert('Please provide your email address.');
+          showStep('email');
           return;
         }
         if (!otp || otp.length !== 6) {
@@ -1487,7 +1441,7 @@ const App = {
         }
 
         btnVerifyOtp.disabled = true;
-        btnVerifyOtp.textContent = 'Verifying Code...';
+        btnVerifyOtp.textContent = 'Verifying...';
 
         try {
           await Auth.verifyOtp(email, otp);
@@ -1504,7 +1458,7 @@ const App = {
           showAlert(err.message || 'Invalid verification code. Please check and try again.', 'error');
         } finally {
           btnVerifyOtp.disabled = false;
-          btnVerifyOtp.textContent = 'Verify & Enter';
+          btnVerifyOtp.textContent = 'Verify & Sign In';
         }
       };
     }
