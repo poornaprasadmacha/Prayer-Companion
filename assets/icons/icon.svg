@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#023E8A" />
+      <stop offset="100%" stop-color="#0077B6" />
+    </linearGradient>
+    <linearGradient id="crossGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#E0F2FE" />
+    </linearGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- App Icon Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- Subtle Halo Ring -->
+  <circle cx="256" cy="220" r="140" fill="none" stroke="#008080" stroke-width="12" opacity="0.35" />
+  <circle cx="256" cy="220" r="100" fill="none" stroke="#B5E0F2" stroke-width="4" stroke-dasharray="8 8" opacity="0.5" />
+
+  <!-- Christian Cross Motif -->
+  <g filter="url(#softGlow)">
+    <!-- Vertical Cross Beam -->
+    <rect x="236" y="110" width="40" height="260" rx="14" fill="url(#crossGrad)" />
+    <!-- Horizontal Cross Beam -->
+    <rect x="166" y="180" width="180" height="40" rx="14" fill="url(#crossGrad)" />
+  </g>
+
+  <!-- Open Bible / Hands Base Arc -->
+  <path d="M 140 400 Q 256 350 372 400" fill="none" stroke="#B5E0F2" stroke-width="14" stroke-linecap="round" />
+  <path d="M 170 425 Q 256 385 342 425" fill="none" stroke="#008080" stroke-width="10" stroke-linecap="round" opacity="0.75" />
+
+  <!-- Small Dove / Light Star at Top -->
+  <polygon points="256,70 262,85 278,90 264,100 268,116 256,105 244,116 248,100 234,90 250,85" fill="#FDE047" opacity="0.9" />
+</svg>

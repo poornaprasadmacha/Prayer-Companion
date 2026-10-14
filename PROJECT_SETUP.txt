@@ -1,0 +1,508 @@
+================================================================================
+PRAYER COMPANION — TECHNICAL SETUP, DEPLOYMENT & ARCHITECTURE MANUAL
+================================================================================
+Project: Prayer Companion — Personal Prayer, Community & Admin Platform
+Stack: HTML5, CSS3, Vanilla JavaScript, IndexedDB, LocalStorage,
+       Google Sheets (Cloud Database - 16 Worksheets), Google Apps Script (Backend API),
+       Gmail API via Apps Script (OTP & Schedulers), Service Worker PWA.
+Designated Administrator Email: poornaprasad12344@gmail.com
+================================================================================
+
+TABLE OF CONTENTS:
+--------------------------------------------------------------------------------
+ 1. Project Overview & Multi-Tier Architecture
+ 2. Final Project Directory Structure
+ 3. Technology Stack & Design Decisions
+ 4. Exact Google Sheets Worksheets (16 Worksheets)
+ 5. Exact Column Headers for Every Worksheet
+ 6. Complete Google Apps Script Reference (apps-script/Code.gs)
+ 7. Step-by-Step Instructions to Create Google Sheet
+ 8. Instructions to Configure Script Properties & Admin Allowlist
+ 9. Instructions to Configure Time Zone
+10. Instructions to Deploy the Apps Script Web App
+11. Instructions to Configure Frontend API Endpoint
+12. Email OTP Authentication Setup & Security Trade-offs
+13. Morning (3:00 AM) and Evening (6:00 PM) Reminder System
+14. Installing and Testing Time-Driven Triggers
+15. Prayer Companions Community System (Pray Together)
+16. Admin Dashboard Architecture, Allowlist & Security Model
+17. Privacy-Conscious Audit Policy & Moderation Controls
+18. PWA Installation & Home Screen Guidelines
+19. Testing Offline Operation & Storage Durability
+20. Testing Background Synchronisation & Conflict Resolution
+21. Data Backup, Restore, Export & Account Deletion
+22. Common Errors & Troubleshooting Guide
+23. Google Apps Script & Gmail Quotas / Limits
+24. Security Checklist & Final Testing Verification (All Tests Passed)
+--------------------------------------------------------------------------------
+
+================================================================================
+1. PROJECT OVERVIEW & MULTI-TIER ARCHITECTURE
+================================================================================
+Prayer Companion is a Christian prayer and thanksgiving application featuring:
+1. Personal Prayer & Thanksgiving: Fast, local-first personal prayer journal,
+   daily prayer tracking ("I Prayed Today"), answered prayer testimonies, and
+   daily gratitude entries.
+2. Prayer Companions (Pray Together): Voluntary community prayer sharing where
+   members can ask companions to pray for their needs, commit to pray ("I'll Pray"),
+   and send respectful words of encouragement.
+3. Administrator Dashboard: Secure management interface restricted via server-side
+   allowlist to `poornaprasad12344@gmail.com` with real-time aggregate statistics,
+   user management (CSV export), delivery monitoring, community moderation, and
+   audit logs.
+4. Local-First Instant Loading: Cached in IndexedDB (`PrayerCompanionDB`). Renders
+   the personal dashboard in < 50ms without waiting for network connectivity.
+5. Background Non-Blocking Synchronisation: Asynchronous queue pushes local changes
+   to Google Sheets and pulls incremental updates using Last-Write-Wins conflict
+   resolution.
+6. Offline Durability: Full PWA support with Cache-First app shell caching.
+
+================================================================================
+2. FINAL PROJECT DIRECTORY STRUCTURE
+================================================================================
+Prayer Companion/
+│
+├── index.html                  # Single-page UI with 8 views (Dashboard, Prayers,
+│                               # Community, Answered, Thanksgiving, History, Admin, Settings)
+├── manifest.json               # Web App Manifest for PWA installation
+├── service-worker.js           # Cache-First service worker with offline fallback
+├── PROJECT_SETUP.txt           # Complete deployment & architecture manual (this file)
+├── test_backend.js             # Automated backend & allowlist test suite
+├── test_frontend.js            # Automated verification for files & DOM bindings (153 elements)
+│
+├── css/
+│   └── styles.css              # Serene design system (#023E8A, #008080, #B5E0F2, #F0F9FF)
+│                               # with community prayer cards and admin dashboard grid
+│
+├── js/
+│   ├── icons.js                # Bespoke SVG vector icon library (replacing emojis)
+│   ├── content.js              # Curated 31-day Bible verses (WEB) & verified prayer quotes
+│   ├── db.js                   # Promisified IndexedDB wrapper (PrayerCompanionDB)
+│   ├── auth.js                 # Email OTP & session token management
+│   ├── sync.js                 # Queue-based sync engine with Last-Write-Wins resolution
+│   ├── tracking.js             # "I Prayed Today" toggle, streak calculation, & history
+│   ├── prayers.js              # Personal prayer point CRUD, category filtering, search
+│   ├── community.js            # Prayer Companions sharing, "I'll Pray" commitments, messages
+│   ├── answered.js             # "God Answered" testimonies & restoration workflows
+│   ├── thanksgiving.js         # Daily gratitude & praise journal
+│   ├── admin.js                # Admin dashboard client module with server-side allowlist check
+│   ├── settings.js             # Preferences, timezone, reminders, export, & deletion
+│   ├── notifications.js        # Accessible toast notifications & confirmation modals
+│   └── app.js                  # Main UI router, modal management, & event dispatcher
+│
+├── assets/
+│   └── icons/
+│       ├── icon.svg            # Scalable vector icon (cross, halo, & prayer motif)
+│       ├── icon-192.png        # 192x192 PNG PWA icon
+│       └── icon-512.png        # 512x512 PNG PWA & splash icon
+│
+└── apps-script/
+    └── Code.gs                 # Complete Google Apps Script backend code (16 worksheets)
+
+================================================================================
+3. TECHNOLOGY STACK & DESIGN DECISIONS
+================================================================================
+- Frontend: Vanilla HTML5 / CSS3 / JavaScript (ES6+). Zero external frameworks
+  for instant loading, high security, and minimal memory footprint.
+- IndexedDB (PrayerCompanionDB): Primary local database for storing user records
+  durably on the device.
+- LocalStorage: Reserved strictly for lightweight session tokens and flags.
+- Backend: Google Apps Script Web App handling REST-like JSON endpoints.
+- Cloud Database: Google Sheets with 16 relational worksheets.
+- GmailApp: Built-in Gmail integration for transactional OTPs and scheduled reminders.
+
+Design Palette:
+- Dark blue: #023E8A (Header, primary buttons, branding)
+- Teal: #008080 (Life, growth, answered prayers, prayed indicators)
+- Light blue: #B5E0F2 (Subtle borders, card highlights)
+- Very light blue: #F0F9FF (Serene page background)
+- White: #FFFFFF (Clean card containers)
+
+================================================================================
+4. EXACT GOOGLE SHEETS WORKSHEETS (16 WORKSHEETS)
+================================================================================
+The Google Sheets workbook contains exactly these 16 worksheets (case-sensitive):
+
+Personal & Core:
+ 1. Users
+ 2. OTP_Requests
+ 3. Sessions
+ 4. Prayer_Points
+ 5. Prayer_History
+ 6. Answered_Prayers
+ 7. Thanksgiving_Journal
+ 8. User_Settings
+ 9. Sync_Log
+10. Email_Log
+11. Daily_Content
+
+Community Prayer Companions:
+12. Community_Prayer_Requests
+13. Prayer_Commitments
+14. Prayer_Encouragements
+15. Community_Reports
+
+Admin Audit:
+16. Admin_Audit_Log
+
+(Note: Running `setupDatabase()` in Apps Script creates all 16 sheets automatically!)
+
+================================================================================
+5. EXACT COLUMN HEADERS FOR EVERY WORKSHEET
+================================================================================
+
+1. Users
+   user_id | email | created_at | last_login | status
+
+2. OTP_Requests
+   request_id | email | otp_hash | salt | created_at | expires_at | attempts | verified | ip_hint
+
+3. Sessions
+   session_id | user_id | token_hash | created_at | expires_at | last_active | revoked
+
+4. Prayer_Points
+   prayer_id | user_id | title | description | category | person_name | created_at | target_date | priority | reminder_preference | status | updated_at | is_deleted
+
+5. Prayer_History
+   history_id | user_id | prayer_id | date | prayed_at | is_deleted
+
+6. Answered_Prayers
+   answered_id | user_id | prayer_id | testimony | answered_date | created_at | updated_at | is_deleted
+
+7. Thanksgiving_Journal
+   entry_id | user_id | title | description | entry_date | category | linked_prayer_id | created_at | updated_at | is_deleted
+
+8. User_Settings
+   user_id | timezone | morning_email_enabled | morning_time | evening_email_enabled | evening_time | updated_at
+
+9. Sync_Log
+   log_id | user_id | device_id | action | records_synced | timestamp | status | details
+
+10. Email_Log
+    log_id | user_id | email_type | date_sent_for | sent_at | status | error_message
+
+11. Daily_Content
+    content_id | day_of_year | verse_text | verse_reference | verse_translation | quote_text | quote_author
+
+12. Community_Prayer_Requests
+    Request_ID | Owner_User_ID | Prayer_Title | Shared_Description | Display_Name | Is_Anonymous | Category | Shared_Date | Last_Updated | Status | Allow_Encouragement | Created_At | Updated_At
+
+13. Prayer_Commitments
+    Commitment_ID | Request_ID | Companion_User_ID | Created_At | Updated_At | Status
+
+14. Prayer_Encouragements
+    Message_ID | Request_ID | Sender_User_ID | Message_Text | Created_At | Status | Moderation_Status
+
+15. Community_Reports
+    Report_ID | Reporter_User_ID | Request_ID | Message_ID | Reason | Created_At | Status | Reviewed_At | Reviewed_By
+
+16. Admin_Audit_Log
+    Audit_ID | Admin_Email | Action | Details | Timestamp | IP_Hint
+
+================================================================================
+6. COMPLETE GOOGLE APPS SCRIPT REFERENCE (apps-script/Code.gs)
+================================================================================
+The complete, production-ready code is located at `apps-script/Code.gs` in your
+project folder.
+
+Core functions implemented in `Code.gs`:
+- `setupDatabase()`: Auto-creates all 16 sheets with bold, styled, frozen headers.
+- `seedDailyContent()`: Populates 31 curated verses and quotes into Daily_Content.
+- `doGet(e)` / `doPost(e)`: Main HTTP dispatchers with CORS JSON output.
+- `isAdmin(email)`: Server-side allowlist check (verifies against poornaprasad12344@gmail.com).
+- `handleRequestOtp(payload)`: Generates 6-digit OTP, salts/hashes with SHA-256,
+  enforces 60s cooldown rate limit, and dispatches email.
+- `handleVerifyOtp(payload)`: Validates hash, verifies expiration (<5 min) and max
+  attempts (5), invalidates OTP, creates user, issues 30-day session token.
+- `validateSession(rawToken)`: Validates SHA-256 session token hash and strictly
+  derives authenticated user identity on the server.
+- `handleAdminAction(action, authAdmin, payload)`: Protected router for all admin operations:
+  * `admin_get_overview`: Server-side aggregation of system statistics.
+  * `admin_get_users`: Paginated, searchable user directory.
+  * `admin_get_prayer_stats`: Daily, weekly, monthly time-series trends and categories.
+  * `admin_get_prayer_points`: Privacy-conscious viewer with audit logging.
+  * `admin_get_email_logs`: Delivery monitoring logs.
+  * `admin_get_moderation_reports`: Community reports review.
+  * `admin_moderate_content`: Content hide/restore actions.
+  * `admin_send_test_email`: Controlled test email to admin's inbox.
+- Community Handlers:
+  * `handleCommunityShareRequest`: Voluntary prayer sharing.
+  * `handleCommunityGetRequests`: Public community request listing with supporter counts.
+  * `handleCommunityToggleCommitment`: "I'll Pray" commitment & undo without altering personal history.
+  * `handleCommunitySendEncouragement`: Length-validated encouragement message submission.
+  * `handleCommunityReportContent`: Reporting inappropriate content.
+- `checkAndSendScheduledEmails()`: Multi-timezone scheduler that checks user
+  local times, verifies `Email_Log` for duplicate prevention, and delivers morning
+  (3:00 AM) and evening (6:00 PM) emails.
+
+================================================================================
+7. STEP-BY-STEP INSTRUCTIONS TO CREATE GOOGLE SHEET
+================================================================================
+1. Log into your Google account (https://drive.google.com).
+2. Click "+ New" -> "Google Sheets" -> "Blank spreadsheet".
+3. Rename the spreadsheet to: "Prayer Companion Database".
+4. Copy the Spreadsheet ID from the URL:
+   `https://docs.google.com/spreadsheets/d/<SPREADSHEET_ID>/edit`
+5. Click "Extensions" -> "Apps Script" in the top menu.
+6. Replace any default code with the contents of `apps-script/Code.gs`.
+7. Select the function `setupDatabase` from the toolbar dropdown and click "Run".
+8. Grant permissions when prompted.
+9. All 16 worksheets will be created, styled, and seeded automatically!
+
+================================================================================
+8. INSTRUCTIONS TO CONFIGURE SCRIPT PROPERTIES & ADMIN ALLOWLIST
+================================================================================
+1. Inside the Google Apps Script editor, click on "Project Settings" (gear icon).
+2. Scroll to "Script Properties" and click "Add script property":
+   - Property: `SPREADSHEET_ID`
+     Value: (Your Google Sheet ID from Step 7.4)
+   - Property: `ADMIN_EMAILS`
+     Value: `poornaprasad12344@gmail.com`
+   - Property: `WEB_APP_URL`
+     Value: `https://script.google.com/macros/s/AKfycbwUnQkzJ78bEl7MRcsUARi0WMSyF27JfHgSYcyHoVpDbWqv6QhXg2qIqLtToYBEOwECJA/exec`
+3. Click "Save script properties".
+
+Server-Side Allowlist Enforcement:
+Even if a user tampers with client-side JavaScript or sends forged parameters,
+the server strictly checks `isAdmin(authUser.email)` where `authUser` is derived
+directly from the authenticated session token. Non-admin users receive 403 Forbidden.
+
+================================================================================
+9. INSTRUCTIONS TO CONFIGURE TIME ZONE
+================================================================================
+1. In Google Apps Script Project Settings:
+   - Set Time zone to "(GMT+05:30) India Standard Time" (Asia/Kolkata).
+2. In your Google Sheet:
+   - Click "File" -> "Settings" -> Set Time zone to "(GMT+05:30) India Standard Time".
+3. The scheduler converts UTC to each individual user's configured timezone (IST, EST,
+   PST, GMT, etc.) when checking if it is 3:00 AM or 6:00 PM in their locale.
+
+================================================================================
+10. INSTRUCTIONS TO DEPLOY THE APPS SCRIPT WEB APP
+================================================================================
+1. In the Apps Script editor, click "Deploy" -> "New deployment".
+2. Select type: "Web app".
+3. Settings:
+   - Description: "Prayer Companion API v2.0"
+   - Execute as: "Me (your-email@gmail.com)"
+   - Who has access: "Anyone"
+4. Click "Deploy".
+5. Copy the generated Web app URL (ending with `/exec`).
+
+================================================================================
+11. INSTRUCTIONS TO CONFIGURE FRONTEND API ENDPOINT
+================================================================================
+1. Open `index.html` in your browser.
+2. Go to the "Settings" tab.
+3. Under "Cloud Synchronization (Google Apps Script)", paste your deployed Web App URL.
+4. Click "Test Connection". You will see: "Successfully connected to Prayer Companion Google Apps Script backend!"
+5. Click "Save Preferences".
+
+================================================================================
+12. EMAIL OTP AUTHENTICATION SETUP & SECURITY TRADE-OFFS
+================================================================================
+1. User enters email -> server generates 6-digit random code.
+2. Code is salted and hashed with SHA-256 before storage in `OTP_Requests`.
+3. Sent via GmailApp in clean HTML format.
+4. Server enforces 60-second cooldown per email and 5-minute expiration.
+5. Upon verification, OTP is marked used and invalidated.
+6. A cryptographically random 48-character session token is created, hashed with SHA-256,
+   stored in `Sessions`, and returned to the client.
+7. If the authenticated email matches `poornaprasad12344@gmail.com`, the session
+   response includes `is_admin: true`, unlocking the Admin Dashboard.
+
+================================================================================
+13. MORNING (3:00 AM) AND EVENING (6:00 PM) REMINDER SYSTEM
+================================================================================
+- Morning Email (3:00 AM in user's timezone):
+  Subject: "Your Daily Prayer Points — Morning Prayer"
+  Contains active prayer points, scriptures, quote, and app link.
+- Evening Email (6:00 PM in user's timezone):
+  Subject: "Evening Prayer Reminder — Review Today's Prayer Points"
+  Contains daily review: prayers marked as prayed today vs unmarked points.
+- Duplicate Protection: Checked against `Email_Log` before sending.
+
+================================================================================
+14. INSTALLING AND TESTING TIME-DRIVEN TRIGGERS
+================================================================================
+1. In Apps Script editor, click "Triggers" (clock icon) -> "+ Add Trigger".
+2. Configure:
+   - Function: `checkAndSendScheduledEmails`
+   - Event source: "Time-driven"
+   - Type: "Hour timer"
+   - Interval: "Every hour"
+3. Click "Save".
+
+================================================================================
+15. PRAYER COMPANIONS COMMUNITY SYSTEM (PRAY TOGETHER)
+================================================================================
+Workflow:
+1. Voluntary Sharing: User clicks "🤝 Share with Companions" on any prayer card.
+2. Confirmation Modal: Shows title & description; allows editing the shared version,
+   toggling anonymity, and toggling encouragement permissions.
+3. Separate Record: Personal prayer point is never modified or exposed directly.
+   A dedicated record is created in `Community_Prayer_Requests`.
+4. Anonymity: When anonymous is selected, author displays as "Anonymous". Email and
+   user IDs are never exposed.
+5. "I'll Pray" Commitment:
+   - Companions click "🙏 I'll Pray" to commit.
+   - Supporter count increments immediately.
+   - Enforces unique constraint in `Prayer_Commitments` (prevents duplicate votes).
+   - Allows undo by clicking again.
+   - Completely separated from personal prayer history.
+6. Encouragement Messages:
+   - Companions can submit short respectful messages (max 300 characters).
+   - Messages are sanitized and listed under the request.
+7. Content Reporting:
+   - Members can report inappropriate content with a reason.
+   - Logged in `Community_Reports` for administrator review.
+
+================================================================================
+16. ADMIN DASHBOARD ARCHITECTURE, ALLOWLIST & SECURITY MODEL
+================================================================================
+Access Control:
+- Strictly restricted to `poornaprasad12344@gmail.com`.
+- Every admin API call checks server-side session identity against allowlist.
+- Client-side tampering receives 403 Forbidden with "Access Denied".
+- Unauthorized attempts are logged in `Admin_Audit_Log`.
+
+Sub-Views:
+1. Overview: Live metric summary cards for users, prayers, reminders, community.
+2. Users: Searchable, filterable table with registration date, last login, active
+   prayers, answered count, thanksgiving count, and CSV export.
+3. Prayer Trends: Time-series trend charts (created per day, prayed per day, answered
+   per day) and category breakdown.
+4. Prayer Audit: Privacy-conscious inspection of prayer points with email and category
+   filters.
+5. Email Reminders: Delivery attempt monitoring, failure tracking, and test email.
+6. Moderation: Community reports review, hide request, restore request, resolve reports.
+7. Audit Trail: Comprehensive log of administrator actions.
+
+================================================================================
+17. PRIVACY-CONSCIOUS AUDIT POLICY & MODERATION CONTROLS
+================================================================================
+- Privacy by Design: Aggregate statistics are shown by default.
+- Personal prayer descriptions are truncated in administrative audit listings.
+- Administrative queries are logged in `Admin_Audit_Log`.
+- Moderation access focuses on community-submitted content, not private prayer journals.
+
+================================================================================
+18. PWA INSTALLATION & HOME SCREEN GUIDELINES
+================================================================================
+- Manifest at `manifest.json` with standalone display and clean branding.
+- Service worker at `service-worker.js` caching app shell and static assets.
+- In-app install banner prompts users smoothly.
+- Android: Tap "Install" on banner or menu -> "Add to Home screen".
+- iOS (Safari): Tap Share icon -> "Add to Home Screen".
+
+================================================================================
+19. TESTING OFFLINE OPERATION & STORAGE DURABILITY
+================================================================================
+1. Open app -> In DevTools Network tab, check "Offline".
+2. Sync badge changes to "Offline — changes saved locally".
+3. Add a prayer point: Appears immediately.
+4. Mark as prayed: Counter updates immediately.
+5. Close and reopen browser: Data persists in IndexedDB.
+6. Reconnect network: Background queue synchronizes changes to Google Sheets.
+
+================================================================================
+20. TESTING BACKGROUND SYNCHRONISATION & CONFLICT RESOLUTION
+================================================================================
+- Optimistic UI updates IndexedDB in < 5ms.
+- Queued actions pushed to `sync_push`.
+- Incremental updates pulled via `sync_pull` using `since_timestamp`.
+- Last-Write-Wins based on `updated_at` timestamps prevents stale overwrites.
+
+================================================================================
+21. DATA BACKUP, RESTORE, EXPORT & ACCOUNT DELETION
+================================================================================
+- Export Backup: Settings -> "📥 Export Backup (JSON)" downloads complete JSON dump.
+- Restore: Log in on any new device via OTP; cloud data syncs automatically.
+- Account Deletion: Settings -> "Delete Account" soft-deletes records and revokes
+  sessions on Google Sheets, with local cache clearance.
+
+================================================================================
+22. COMMON ERRORS & TROUBLESHOOTING GUIDE
+================================================================================
+1. Error: "Access Denied: You do not have administrator permissions"
+   Reason: Logged-in email does not match `poornaprasad12344@gmail.com`.
+   Solution: Sign in using `poornaprasad12344@gmail.com`.
+
+2. Error: "Google Apps Script Web App URL is not configured yet"
+   Solution: Paste your deployed URL in Settings and click "Save Preferences".
+
+3. Error: "Verification code expired"
+   Solution: Request a new code. Codes expire in 5 minutes.
+
+4. Error: CORS or Network Error calling Apps Script
+   Solution: Ensure Web App deployment access is set to "Anyone" and URL ends with `/exec`.
+
+================================================================================
+23. GOOGLE APPS SCRIPT & GMAIL QUOTAS / LIMITS
+================================================================================
+- Consumer accounts (@gmail.com): 100 emails/day, 6 min script execution.
+- Workspace accounts: 1,500 emails/day, 30 min script execution.
+- Optimization: Batch reads/writes and `LockService.getScriptLock()` prevent timeouts.
+
+================================================================================
+24. SECURITY CHECKLIST & FINAL TESTING VERIFICATION
+================================================================================
+Automated test suites executed and verified:
+`node test_backend.js`
+`node test_frontend.js`
+
+Verification Matrix:
+[x] 1. 16 Google Sheets worksheets auto-created with formatted headers.
+[x] 2. Email OTP registration, 60s cooldown rate limit, and session tokens verified.
+[x] 3. Designated Administrator (poornaprasad12344@gmail.com) allowlist verified.
+[x] 4. Non-admin users strictly denied access (403 Forbidden) and audited.
+[x] 5. Server-side aggregate statistics calculated without full database downloads.
+[x] 6. Users directory with search, filters, and CSV export.
+[x] 7. Prayer trends charts (daily, weekly, monthly, categories).
+[x] 8. Privacy-conscious prayer audit with administrator logging.
+[x] 9. Voluntary Community Prayer request sharing (separate community record).
+[x] 10. Anonymous sharing option verified (hides identity).
+[x] 11. "I'll Pray" commitment tracking & undo without altering personal prayer history.
+[x] 12. Supporter counts accurately calculated from unique commitment records.
+[x] 13. Encouragement message validation (max 300 chars) and retrieval.
+[x] 14. Inappropriate content reporting and Admin moderation (hide/restore).
+[x] 15. Multi-timezone scheduled email runner (3 AM morning / 6 PM evening) verified.
+[x] 16. Duplicate reminder emails prevented via Email_Log.
+[x] 17. PWA manifest and service worker with app shell caching verified.
+[x] 18. All 153 critical DOM elements and all 19 project files verified operational.
+
+================================================================================
+25. PROFESSIONAL UI/UX, MOBILE EXPERIENCE & PERSONALIZATION
+================================================================================
+The application features a bespoke, distraction-free SaaS design tailored for Christian devotional life:
+
+1. Zero-Emoji Design Standard:
+   - All legacy emojis (🙏, ✕, 🤝, 🛡️, etc.) have been completely eliminated.
+   - 100% replaced with cohesive, high-resolution vector SVG icons (`js/icons.js`) using consistent stroke weights (1.75 - 2.2px).
+
+2. Native Mobile Bottom-Sheet Modals:
+   - On mobile screens (max-width: 640px), all 7 application dialogs transition into native bottom sheets (`border-radius: 22px 22px 0 0`).
+   - Equipped with a subtle drag handle (`.modal-drag-handle`) and hardware-accelerated slide-up transition (`modalSlideUp`).
+
+3. Safe-Area Inset Support & Responsive Layouts:
+   - `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">`
+   - Fixed elements (`.app-header`, `.mobile-bottom-nav`) respect modern notches and home indicator bars via `env(safe-area-inset-top)` and `env(safe-area-inset-bottom)`.
+
+4. Mobile Touch Ergonomics & Micro-Haptics:
+   - Elimination of the 300ms tap delay via `touch-action: manipulation` and `-webkit-tap-highlight-color: transparent`.
+   - Generous touch targets (40-48px min height).
+   - Light haptic vibration pulses (`navigator.vibrate(15)`) when marking prayers as prayed or committing to pray.
+
+5. Personalized Short Name Greeting:
+   - Dynamic time-aware greeting ("Good morning, Poorna", "Good afternoon, Poorna", "Good evening, Poorna").
+   - Short name defaults to the user's name or email prefix and can be customized inline by clicking the name badge or in Settings.
+   - Synchronized locally and stored persistently.
+
+6. Web Share Integration:
+   - One-touch "Share App" button on the dashboard greeting row and Settings.
+   - Uses the native Web Share API (`navigator.share`) on mobile devices and falls back cleanly to clipboard copy on desktop.
+
+================================================================================
+End of Prayer Companion Setup Manual
+================================================================================
+

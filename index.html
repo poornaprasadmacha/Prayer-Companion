@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Prayer Companion — Personal Prayer & Thanksgiving</title>
+
+  <!-- PWA & Mobile Meta Tags -->
+  <meta name="description" content="Personal prayer journal, daily prayer tracking, answered prayers, community prayer companions, and thanksgiving.">
+  <meta name="theme-color" content="#023E8A">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Prayer Companion">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand-wrapper" data-tab="dashboard">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 7h10"/></svg>
+        </div>
+        <div class="brand-title-group">
+          <span class="brand-title">Prayer Companion</span>
+          <span class="brand-subtitle">Personal Prayer &amp; Thanksgiving</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <span id="user-email-badge" class="user-badge" title="Active Account">Loading...</span>
+        <div id="sync-status-indicator" class="sync-badge sync-synced" title="Local-First Sync Status">
+          <span class="sync-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <span class="sync-text">Synced</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop Navigation Bar -->
+    <nav class="desktop-nav">
+      <button class="nav-tab-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="nav-tab-btn" data-tab="prayers">My Prayers</button>
+      <button class="nav-tab-btn" data-tab="community">Companions</button>
+      <button class="nav-tab-btn" data-tab="answered">Answered</button>
+      <button class="nav-tab-btn" data-tab="thanksgiving">Thanksgiving</button>
+      <button class="nav-tab-btn" data-tab="history">History</button>
+      <button class="nav-tab-btn" data-tab="settings">Settings</button>
+      <button id="nav-admin-btn" class="nav-tab-btn nav-tab-admin" data-tab="admin" style="display: none;">Admin</button>
+    </nav>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-container">
+
+    <!-- PWA Installation Prompt Banner -->
+    <div id="pwa-install-banner" class="pwa-banner">
+      <div>
+        <strong style="color: #023E8A; font-size: 14px;">Install Prayer Companion</strong>
+        <p style="font-size: 12px; color: #4A5568; margin-top: 2px;">Add to your home screen for quick daily prayer access and offline usage.</p>
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <button id="btn-pwa-dismiss" class="btn btn-secondary btn-sm">Later</button>
+        <button id="btn-pwa-install" class="btn btn-primary btn-sm">Install</button>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         VIEW 1: DASHBOARD
+         ==================================================================== -->
+    <section id="view-dashboard" class="view-panel active">
+      <div class="greeting-section">
+        <div class="greeting-row">
+          <div>
+            <h1 id="dashboard-greeting" class="greeting-title">Good morning</h1>
+            <p id="dashboard-date" class="greeting-date">Today</p>
+          </div>
+          <div class="greeting-actions">
+            <button id="btn-share-app" class="btn btn-secondary btn-sm" title="Share Prayer Companion">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              <span>Share App</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily Scripture & Quote Card -->
+      <div class="scripture-card">
+        <div class="scripture-label">
+          <span>Daily Scripture on Prayer</span>
+          <button id="btn-copy-verse" class="icon-btn" title="Copy Scripture & Quote" style="padding: 3px 8px; font-size: 11px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            <span>Copy</span>
+          </button>
+        </div>
+        <blockquote id="daily-verse-text" class="verse-text">"In nothing be anxious..."</blockquote>
+        <div id="daily-verse-ref" class="verse-ref">— Philippians 4:6 (WEB)</div>
+        <hr class="quote-divider" />
+        <p id="daily-quote-text" class="quote-text">"To be a Christian without prayer is no more possible than to be alive without breathing."</p>
+        <div id="daily-quote-author" class="quote-author">— Martin Luther</div>
+      </div>
+
+      <!-- Summary Statistics Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div id="stat-total-active" class="stat-value">0</div>
+          <div class="stat-label">Active Prayers</div>
+        </div>
+        <div class="stat-card stat-card-prayed">
+          <div id="stat-prayed-today" class="stat-value">0</div>
+          <div class="stat-label">Prayed Today</div>
+        </div>
+        <div class="stat-card">
+          <div id="stat-unprayed-today" class="stat-value">0</div>
+          <div class="stat-label">Unprayed</div>
+        </div>
+        <div class="stat-card">
+          <div id="stat-answered" class="stat-value">0</div>
+          <div class="stat-label">Answered</div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h2 class="section-title">Today's Prayer Points</h2>
+        <button id="btn-quick-add" class="btn btn-primary btn-sm">+ Quick Add</button>
+      </div>
+
+      <div id="dashboard-prayers-container"></div>
+
+      <div id="dashboard-empty-state" class="empty-state-card" style="display: none;">
+        <div class="empty-state-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width: 44px; height: 44px; color: var(--navy-900);"><path d="M7 11V7a2 2 0 0 1 4 0v4M11 7a2 2 0 0 1 4 0v4M15 8a2 2 0 0 1 4 0v5a7 7 0 0 1-7 7H9a7 7 0 0 1-7-7v-3a2 2 0 0 1 4 0v2"/></svg>
+        </div>
+        <h3 style="color: var(--navy-900); margin-bottom: 4px; font-weight: 600;">No active prayer points</h3>
+        <p style="font-size: 13px; max-width: 380px; margin: 0 auto 16px auto; color: var(--text-secondary);">
+          Commit your concerns, family, loved ones, and spiritual growth to the Lord in prayer.
+        </p>
+        <button class="btn btn-primary btn-sm" onclick="App.openPrayerModal()">+ Add Your First Prayer</button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 2: PRAYERS MANAGEMENT
+         ==================================================================== -->
+    <section id="view-prayers" class="view-panel">
+      <div class="section-header">
+        <h2 class="section-title">Manage Prayer Points</h2>
+        <button class="btn btn-primary btn-sm" onclick="App.openPrayerModal()">+ New Prayer</button>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-input-wrapper">
+          <input type="text" id="prayer-search-input" class="form-input" placeholder="Search prayers, names, topics...">
+        </div>
+        <select id="prayer-category-filter" class="form-select" style="max-width: 170px;">
+          <option value="all">All Categories</option>
+          <option value="Personal Life">Personal Life</option>
+          <option value="Family">Family</option>
+          <option value="Health">Health</option>
+          <option value="Education">Education</option>
+          <option value="Career">Career</option>
+          <option value="Church">Church</option>
+          <option value="Ministries">Ministries</option>
+          <option value="Missions">Missions</option>
+          <option value="Friends">Friends</option>
+          <option value="Nation">Nation</option>
+          <option value="Spiritual Growth">Spiritual Growth</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="status-pills-bar">
+        <button class="prayer-status-pill active" data-status="active">Active Prayers</button>
+        <button class="prayer-status-pill" data-status="archived">Archived Prayers</button>
+      </div>
+
+      <div id="prayers-list-container"></div>
+
+      <div id="prayers-empty-state" class="empty-state-card" style="display: none;">
+        <div class="empty-state-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width: 44px; height: 44px; color: var(--navy-900);"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+        </div>
+        <p style="font-size: 13px; color: var(--text-secondary);">No prayer points matching your current filter.</p>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 3: COMMUNITY PRAYER COMPANIONS (PRAY TOGETHER)
+         ==================================================================== -->
+    <section id="view-community" class="view-panel">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Prayer Companions — Pray Together</h2>
+          <p style="font-size: 13px; color: #4A5568;">Bear one another's burdens, and so fulfill the law of Christ.</p>
+        </div>
+      </div>
+
+      <!-- Filters & Search -->
+      <div class="filter-bar">
+        <div class="search-input-wrapper">
+          <input type="text" id="community-search-input" class="form-input" placeholder="Search shared prayer requests...">
+        </div>
+        <select id="community-category-filter" class="form-select" style="max-width: 170px;">
+          <option value="all">All Categories</option>
+          <option value="Personal Life">Personal Life</option>
+          <option value="Family">Family</option>
+          <option value="Health">Health</option>
+          <option value="Career">Career</option>
+          <option value="Church">Church</option>
+          <option value="Missions">Missions</option>
+          <option value="Spiritual Growth">Spiritual Growth</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="status-pills-bar">
+        <button class="prayer-status-pill active" data-community-filter="recent">Recent</button>
+        <button class="prayer-status-pill" data-community-filter="most_supported">Most Supported</button>
+        <button class="prayer-status-pill" data-community-filter="needs_prayer">Needs Prayer</button>
+        <button class="prayer-status-pill" data-community-filter="my_requests">My Shared Requests</button>
+      </div>
+
+      <div id="community-requests-container"></div>
+
+      <div id="community-empty-state" class="empty-state-card" style="display: none;">
+        <div class="empty-state-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width: 44px; height: 44px; color: var(--teal-600);"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3 style="color: var(--navy-900); margin-bottom: 4px; font-weight: 600;">No community prayer requests found</h3>
+        <p style="font-size: 13px; max-width: 400px; margin: 0 auto; color: var(--text-secondary);">
+          You can share a prayer point from your personal list by clicking <strong>"Share with Companions"</strong> on any prayer card.
+        </p>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 4: ANSWERED PRAYERS
+         ==================================================================== -->
+    <section id="view-answered" class="view-panel">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Answered Prayers</h2>
+          <p style="font-size: 13px; color: #4A5568;">"Truly God has listened; He has attended to the voice of my prayer."</p>
+        </div>
+      </div>
+
+      <div id="answered-list-container"></div>
+
+      <div id="answered-empty-state" class="empty-state-card" style="display: none;">
+        <div class="empty-state-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width: 44px; height: 44px; color: var(--amber-600);"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+        </div>
+        <h3 style="color: var(--navy-900); margin-bottom: 4px; font-weight: 600;">No answered prayers recorded yet</h3>
+        <p style="font-size: 13px; max-width: 400px; margin: 0 auto; color: var(--text-secondary);">
+          When God answers a prayer, click <strong>"God Answered"</strong> on any prayer card to record your testimony and celebrate His faithfulness.
+        </p>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 5: THANKSGIVING JOURNAL
+         ==================================================================== -->
+    <section id="view-thanksgiving" class="view-panel">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Thanksgiving Journal</h2>
+          <p style="font-size: 13px; color: #4A5568;">Give thanks to the Lord, for He is good.</p>
+        </div>
+        <button id="btn-add-thanksgiving" class="btn btn-primary btn-sm">+ Add Gratitude</button>
+      </div>
+
+      <div id="thanksgiving-list-container"></div>
+
+      <div id="thanksgiving-empty-state" class="empty-state-card" style="display: none;">
+        <div class="empty-state-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width: 44px; height: 44px; color: var(--rose-600);"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </div>
+        <h3 style="color: var(--navy-900); margin-bottom: 4px; font-weight: 600;">Your gratitude journal is empty</h3>
+        <p style="font-size: 13px; max-width: 400px; margin: 0 auto 12px auto; color: var(--text-secondary);">
+          Record blessings, thankfulness, and praises even when unrelated to a specific petition.
+        </p>
+        <button class="btn btn-primary btn-sm" onclick="App.openThanksgivingModal()">+ Record Today's Thanksgiving</button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 6: PRAYER HISTORY & STREAK
+         ==================================================================== -->
+    <section id="view-history" class="view-panel">
+      <div class="section-header">
+        <h2 class="section-title">Daily Prayer History</h2>
+      </div>
+
+      <div class="streak-box">
+        <div style="font-size: 13px; color: #4A5568; margin-bottom: 4px;">Current Consistent Prayer Streak</div>
+        <div id="history-streak-count" class="streak-number">0 Days</div>
+        <p style="font-size: 12px; color: #718096; margin-top: 4px;">Steadfast in prayer day by day.</p>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <h3 style="font-size: 14px; color: #023E8A; font-weight: 600;">Recent 14-Day Prayer Activity</h3>
+      </div>
+      <div id="history-calendar-chart" class="calendar-chart-wrapper"></div>
+
+      <div class="section-header" style="margin-top: 20px;">
+        <h3 style="font-size: 15px; color: #023E8A; font-weight: 600;">Prayers by Date</h3>
+        <input type="date" id="history-date-picker" class="form-input" style="width: auto; padding: 4px 10px; font-size: 13px;">
+      </div>
+
+      <div id="history-date-prayers"></div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 7: ADMIN DASHBOARD (STRICT SERVER-SIDE ALLOWLIST)
+         ==================================================================== -->
+    <section id="view-admin" class="view-panel">
+      <!-- Access Denied State (Shown to non-admin users) -->
+      <div id="admin-access-denied" class="access-denied-card" style="display: none;">
+        <div class="empty-state-icon" style="color: var(--rose-600); margin-bottom: 12px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px;"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        </div>
+        <h2 style="color: var(--rose-600); margin-bottom: 8px;">Access Denied</h2>
+        <p style="color: #4A5568; max-width: 420px; margin: 0 auto 16px auto; font-size: 14px;">
+          You do not have administrative privileges. This incident has been logged.
+        </p>
+        <button class="btn btn-secondary" onclick="App.switchTab('dashboard')">Return to Dashboard</button>
+      </div>
+
+      <!-- Authorized Admin Content -->
+      <div id="admin-content-container">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Administrator Dashboard</h2>
+            <p style="font-size: 13px; color: #718096;">Admin: <strong>poornaprasad12344@gmail.com</strong></p>
+          </div>
+          <button id="btn-admin-test-email" class="btn btn-secondary btn-sm">Send Test Reminder</button>
+        </div>
+
+        <div class="admin-layout">
+          <!-- Sidebar Menu -->
+          <div class="admin-sidebar">
+            <div class="admin-sidebar-menu">
+              <button class="admin-subnav-btn active" data-admin-tab="overview">Overview</button>
+              <button class="admin-subnav-btn" data-admin-tab="users">Users</button>
+              <button class="admin-subnav-btn" data-admin-tab="prayer_stats">Prayer Trends</button>
+              <button class="admin-subnav-btn" data-admin-tab="prayer_points">Prayer Audit</button>
+              <button class="admin-subnav-btn" data-admin-tab="email_reminders">Email Reminders</button>
+              <button class="admin-subnav-btn" data-admin-tab="moderation">Moderation</button>
+              <button class="admin-subnav-btn" data-admin-tab="audit_logs">Audit Trail</button>
+            </div>
+          </div>
+
+          <!-- Main Admin Content Area -->
+          <div class="admin-main">
+            <!-- 1. Overview Subpanel -->
+            <div id="admin-panel-overview" class="admin-subpanel active">
+              <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 12px;">System Metrics & Activity</h3>
+              <div class="stats-grid" style="margin-bottom: 16px;">
+                <div class="stat-card">
+                  <div id="adm-stat-total-users" class="stat-value">0</div>
+                  <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-new-users-today" class="stat-value">0</div>
+                  <div class="stat-label">New Users Today</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-users-7d" class="stat-value">0</div>
+                  <div class="stat-label">Users Last 7 Days</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-active-prayers" class="stat-value">0</div>
+                  <div class="stat-label">Active Prayers</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-prayers-today" class="stat-value">0</div>
+                  <div class="stat-label">Prayers Created Today</div>
+                </div>
+                <div class="stat-card stat-card-prayed">
+                  <div id="adm-stat-prayed-today" class="stat-value">0</div>
+                  <div class="stat-label">Prayed Today</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-answered" class="stat-value">0</div>
+                  <div class="stat-label">Total Answered</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-thanksgiving" class="stat-value">0</div>
+                  <div class="stat-label">Thanksgiving Entries</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-morning-reminders" class="stat-value">0</div>
+                  <div class="stat-label">Morning Emails On</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-evening-reminders" class="stat-value">0</div>
+                  <div class="stat-label">Evening Emails On</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-emails-sent-today" class="stat-value">0</div>
+                  <div class="stat-label">Emails Delivered Today</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-emails-failed-today" class="stat-value">0</div>
+                  <div class="stat-label">Delivery Failures Today</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-comm-requests" class="stat-value">0</div>
+                  <div class="stat-label">Community Requests</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-comm-active" class="stat-value">0</div>
+                  <div class="stat-label">Active Community</div>
+                </div>
+                <div class="stat-card stat-card-prayed">
+                  <div id="adm-stat-comm-commitments" class="stat-value">0</div>
+                  <div class="stat-label">Total Commitments</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-stat-comm-reports" class="stat-value">0</div>
+                  <div class="stat-label">Pending Reports</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Users Subpanel -->
+            <div id="admin-panel-users" class="admin-subpanel">
+              <div class="section-header">
+                <h3 style="font-size: 15px; color: #023E8A;">User Accounts Management</h3>
+                <button id="btn-admin-export-users" class="btn btn-secondary btn-sm">Export Users to CSV</button>
+              </div>
+
+              <div class="filter-bar">
+                <input type="text" id="admin-user-search" class="form-input search-input-wrapper" placeholder="Search by user email...">
+                <select id="admin-user-status-filter" class="form-select" style="max-width: 140px;">
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="deleted">Deleted</option>
+                </select>
+              </div>
+
+              <div id="admin-users-count" style="font-size: 12px; color: #718096; margin-bottom: 8px;"></div>
+              <div class="admin-table-container">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Email</th>
+                      <th>Registered</th>
+                      <th>Last Login</th>
+                      <th>Active</th>
+                      <th>Answered</th>
+                      <th>Thanks</th>
+                      <th>Reminders</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-users-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 3. Prayer Trends Subpanel -->
+            <div id="admin-panel-prayer_stats" class="admin-subpanel">
+              <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 12px;">Prayer Statistics & Categories</h3>
+              <div class="stats-grid" style="margin-bottom: 16px;">
+                <div class="stat-card">
+                  <div id="adm-dist-active" class="stat-value">0</div>
+                  <div class="stat-label">Active Status</div>
+                </div>
+                <div class="stat-card">
+                  <div id="adm-dist-archived" class="stat-value">0</div>
+                  <div class="stat-label">Archived Status</div>
+                </div>
+                <div class="stat-card stat-card-prayed">
+                  <div id="adm-dist-answered" class="stat-value">0</div>
+                  <div class="stat-label">Answered Status</div>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr; gap: 16px;">
+                <div class="prayer-card">
+                  <h4 style="color: #023E8A; font-size: 14px; margin-bottom: 8px;">Prayer Points by Category</h4>
+                  <div id="admin-categories-breakdown"></div>
+                </div>
+                <div class="prayer-card">
+                  <h4 style="color: #023E8A; font-size: 14px; margin-bottom: 8px;">Recent 14 Days Activity Trends</h4>
+                  <div id="admin-trends-chart"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Prayer Audit Subpanel -->
+            <div id="admin-panel-prayer_points" class="admin-subpanel">
+              <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 8px;">Privacy-Conscious Prayer Audit</h3>
+              <p style="font-size: 12px; color: #718096; margin-bottom: 12px;">
+                Access to detailed records is logged for security and audit purposes.
+              </p>
+
+              <div class="filter-bar">
+                <input type="text" id="admin-pp-email-filter" class="form-input search-input-wrapper" placeholder="Filter by user email...">
+                <select id="admin-pp-category-filter" class="form-select" style="max-width: 140px;">
+                  <option value="all">All Categories</option>
+                  <option value="Personal Life">Personal Life</option>
+                  <option value="Family">Family</option>
+                  <option value="Health">Health</option>
+                  <option value="Career">Career</option>
+                  <option value="Church">Church</option>
+                  <option value="Spiritual Growth">Spiritual Growth</option>
+                </select>
+                <select id="admin-pp-status-filter" class="form-select" style="max-width: 120px;">
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="archived">Archived</option>
+                  <option value="answered">Answered</option>
+                </select>
+              </div>
+
+              <div id="admin-pp-count" style="font-size: 12px; color: #718096; margin-bottom: 8px;"></div>
+              <div class="admin-table-container">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Title</th>
+                      <th>Category</th>
+                      <th>For</th>
+                      <th>Priority</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-pp-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 5. Email Reminders Subpanel -->
+            <div id="admin-panel-email_reminders" class="admin-subpanel">
+              <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 8px;">Email Delivery Monitoring</h3>
+              <div class="filter-bar">
+                <select id="admin-email-status-filter" class="form-select" style="max-width: 150px;">
+                  <option value="all">All Deliveries</option>
+                  <option value="sent">Successful (Sent)</option>
+                  <option value="failed">Failed</option>
+                </select>
+              </div>
+
+              <div class="admin-table-container">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Recipient</th>
+                      <th>Type</th>
+                      <th>Status</th>
+                      <th>Error / Details</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-email-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 6. Community Moderation Subpanel -->
+            <div id="admin-panel-moderation" class="admin-subpanel">
+              <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 8px;">Community Content Moderation</h3>
+              <p style="font-size: 12px; color: #718096; margin-bottom: 14px;">
+                Review flagged prayer requests and inappropriate messages reported by companions.
+              </p>
+              <div id="admin-moderation-list"></div>
+            </div>
+
+            <!-- 7. Audit Trail Subpanel -->
+            <div id="admin-panel-audit_logs" class="admin-subpanel">
+              <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 8px;">Administrative Audit Trail</h3>
+              <div class="admin-table-container">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Administrator</th>
+                      <th>Action</th>
+                      <th>Details</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-audit-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 8: SETTINGS & ACCOUNT
+         ==================================================================== -->
+    <section id="view-settings" class="view-panel">
+      <div class="section-header">
+        <h2 class="section-title">Settings & Preferences</h2>
+      </div>
+
+      <div class="prayer-card" style="margin-bottom: 18px;">
+        <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 8px;">Account Profile</h3>
+        <div style="font-size: 14px; margin-bottom: 4px;">
+          Email: <strong id="settings-user-email">Local Mode</strong>
+        </div>
+        <div style="font-size: 13px; color: #718096; margin-bottom: 14px;">
+          Status: <span id="settings-auth-status">Local Device Storage</span>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" for="settings-short-name-input">Your Preferred Short Name (for greetings)</label>
+          <div style="display: flex; gap: 8px; max-width: 360px;">
+            <input type="text" id="settings-short-name-input" class="form-input" placeholder="e.g. Poorna" maxlength="30">
+            <button id="btn-save-short-name" class="btn btn-primary btn-sm">Save</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btn-switch-account" class="btn btn-secondary btn-sm">Sign In with Email</button>
+          <button id="btn-sign-out" class="btn btn-secondary btn-sm">Sign Out</button>
+          <button id="btn-settings-share-app" class="btn btn-secondary btn-sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <span>Share App</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="prayer-card" style="margin-bottom: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h3 style="font-size: 15px; color: #023E8A; margin: 0;">Cloud Synchronization</h3>
+          <span class="badge" style="background: #E6FFFA; color: #0D9488; border: 1px solid #99F6E4;">Connected</span>
+        </div>
+        <p style="font-size: 13px; color: #4A5568; margin-bottom: 14px; line-height: 1.5;">
+          Your prayer points, journal entries, and community updates synchronize automatically in the background.
+        </p>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btn-manual-sync" class="btn btn-secondary btn-sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>Sync Now</span>
+          </button>
+        </div>
+
+        <!-- Background technical configuration (hidden from end-user) -->
+        <div style="display: none;" aria-hidden="true">
+          <input type="url" id="settings-api-url" value="https://script.google.com/macros/s/AKfycbwUnQkzJ78bEl7MRcsUARi0WMSyF27JfHgSYcyHoVpDbWqv6QhXg2qIqLtToYBEOwECJA/exec">
+          <button id="btn-test-connection" type="button">Test Connection</button>
+        </div>
+      </div>
+
+      <div class="prayer-card" style="margin-bottom: 18px;">
+        <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 8px;">Email Reminder Preferences</h3>
+        <div class="form-group">
+          <label class="form-label">Your Time Zone</label>
+          <select id="settings-timezone" class="form-select">
+            <option value="Asia/Kolkata">Asia/Kolkata (IST - Default)</option>
+            <option value="UTC">UTC</option>
+            <option value="America/New_York">America/New_York (EST)</option>
+            <option value="America/Chicago">America/Chicago (CST)</option>
+            <option value="America/Denver">America/Denver (MST)</option>
+            <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+            <option value="Europe/London">Europe/London (GMT/BST)</option>
+            <option value="Europe/Paris">Europe/Paris (CET)</option>
+            <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+            <option value="Asia/Singapore">Asia/Singapore (SGT)</option>
+            <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <strong style="font-size: 14px; color: #023E8A;">Morning Prayer Email</strong>
+            <p style="font-size: 12px; color: #718096; margin: 0;">Active prayer points & daily verse</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="time" id="settings-morning-time" value="03:00" class="form-input" style="width: 100px; padding: 4px 8px;">
+            <input type="checkbox" id="settings-morning-enabled" checked style="width: 18px; height: 18px;">
+          </div>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 12px;">
+          <div>
+            <strong style="font-size: 14px; color: #023E8A;">Evening Prayer Review Email</strong>
+            <p style="font-size: 12px; color: #718096; margin: 0;">Prayed vs unmarked prayer points summary</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="time" id="settings-evening-time" value="18:00" class="form-input" style="width: 100px; padding: 4px 8px;">
+            <input type="checkbox" id="settings-evening-enabled" checked style="width: 18px; height: 18px;">
+          </div>
+        </div>
+
+        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btn-save-settings" class="btn btn-primary btn-sm">Save Preferences</button>
+          <button id="btn-test-email" class="btn btn-secondary btn-sm">Send Test Email</button>
+        </div>
+      </div>
+
+      <div class="prayer-card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 8px;">Data Backup & Privacy Safeguards</h3>
+        <p style="font-size: 13px; color: #4A5568; margin-bottom: 14px; line-height: 1.5;">
+          Prayer points are sensitive. Private records in IndexedDB and Google Sheets are never shared publicly. Only requests you explicitly choose to share with Prayer Companions are visible to other community members.
+        </p>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btn-export-data" class="btn btn-secondary btn-sm">Export Backup (JSON)</button>
+          <button id="btn-clear-cache" class="btn btn-secondary btn-sm">Clear Local Cache</button>
+          <button id="btn-delete-account" class="btn btn-danger btn-sm">Delete Account</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav">
+    <button class="bottom-nav-item active" data-tab="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="prayers">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+      <span>Prayers</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="community">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Companions</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="answered">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+      <span>Answered</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="thanksgiving">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+      <span>Thanks</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span>Settings</span>
+    </button>
+    <button id="mobile-nav-admin-btn" class="bottom-nav-item" data-tab="admin" style="display: none; color: #B45309;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Admin</span>
+    </button>
+  </nav>
+
+  <!-- ====================================================================
+       MODAL 1: AUTHENTICATION (EMAIL OTP & LOCAL MODE)
+       ==================================================================== -->
+  <div id="modal-auth" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Sign In / Register</h3>
+        <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="auth-step-email">
+          <p style="font-size: 14px; color: #4A5568; margin-bottom: 16px; line-height: 1.5;">
+            Enter your email address to receive a secure, random 6-digit verification code.
+          </p>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="auth-email-input" class="form-input" placeholder="you@example.com" required>
+          </div>
+          <div id="auth-error-msg" style="color: #DC2626; font-size: 13px; margin-bottom: 12px;"></div>
+          <button id="btn-send-otp" class="btn btn-primary" style="width: 100%;">Send Verification Code</button>
+
+          <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;" />
+          <div style="text-align: center;">
+            <p style="font-size: 13px; color: #718096; margin-bottom: 10px;">Or continue on this device:</p>
+            <button id="btn-continue-local" class="btn btn-secondary btn-sm" style="width: 100%;">
+              Continue in Local Mode
+            </button>
+          </div>
+        </div>
+
+        <div id="auth-step-otp" style="display: none;">
+          <p style="font-size: 14px; color: #4A5568; margin-bottom: 14px;">
+            We sent a 6-digit verification code to <strong id="auth-display-email"></strong>.
+          </p>
+          <div class="form-group">
+            <label class="form-label">6-Digit Code</label>
+            <input type="text" id="auth-otp-input" class="form-input" placeholder="123456" maxlength="6" style="font-size: 20px; letter-spacing: 4px; text-align: center;">
+          </div>
+          <button id="btn-verify-otp" class="btn btn-primary" style="width: 100%;">Verify & Enter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 2: ADD / EDIT PRAYER POINT
+       ==================================================================== -->
+  <div id="modal-prayer" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header">
+        <h3 id="prayer-modal-title" class="modal-title">New Prayer Point</h3>
+        <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Prayer Title *</label>
+          <input type="text" id="prayer-form-title" class="form-input" placeholder="e.g. Healing for grandmother, Job transition..." required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="prayer-form-category" class="form-select">
+            <option value="Personal Life">Personal Life</option>
+            <option value="Family">Family</option>
+            <option value="Health">Health</option>
+            <option value="Education">Education</option>
+            <option value="Career">Career</option>
+            <option value="Church">Church</option>
+            <option value="Ministries">Ministries</option>
+            <option value="Missions">Missions</option>
+            <option value="Friends">Friends</option>
+            <option value="Nation">Nation</option>
+            <option value="Spiritual Growth">Spiritual Growth</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Praying For (Optional Name)</label>
+          <input type="text" id="prayer-form-person" class="form-input" placeholder="e.g. Sarah, Pastor David">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select id="prayer-form-priority" class="form-select">
+            <option value="High">High</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description / Scriptural Promises</label>
+          <textarea id="prayer-form-desc" class="form-textarea" placeholder="Add specific petitions or scriptures you are claiming..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Reminder Inclusion</label>
+          <select id="prayer-form-reminder" class="form-select">
+            <option value="both" selected>Both Morning & Evening</option>
+            <option value="morning">Morning Only (3:00 AM)</option>
+            <option value="evening">Evening Only (6:00 PM)</option>
+            <option value="none">None (App Only)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="App.closeAllModals()">Cancel</button>
+        <button id="btn-save-prayer" class="btn btn-primary">Save Prayer Point</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 3: SHARE WITH PRAYER COMPANIONS
+       ==================================================================== -->
+  <div id="modal-share-companion" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Share with Prayer Companions</h3>
+        <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: #4A5568; margin-bottom: 14px; line-height: 1.5;">
+          Allow other community members to lift you up in prayer. You can edit the shared version and choose to remain anonymous.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Shared Prayer Title *</label>
+          <input type="text" id="share-form-title" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Approved Description / Prayer Need</label>
+          <textarea id="share-form-desc" class="form-textarea" placeholder="Describe your prayer need for companions to pray with you..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Your Display Name</label>
+          <input type="text" id="share-form-name" class="form-input" placeholder="e.g. John D. or leave blank">
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="share-form-anon" style="width: 18px; height: 18px;">
+          <label for="share-form-anon" style="font-size: 13px; color: #2D3748; cursor: pointer;">
+            Share anonymously (Displays "Anonymous")
+          </label>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="share-form-allow-enc" checked style="width: 18px; height: 18px;">
+          <label for="share-form-allow-enc" style="font-size: 13px; color: #2D3748; cursor: pointer;">
+            Allow companions to send respectful encouragement messages
+          </label>
+        </div>
+
+        <div style="background: #F0F9FF; border-left: 3px solid #023E8A; padding: 10px 12px; border-radius: 4px; font-size: 12px; color: #2C5282;">
+          <strong>Notice:</strong> Your private prayer point remains private. A separate community request is created. You can stop sharing at any time.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="App.closeAllModals()">Cancel</button>
+        <button id="btn-confirm-share-companion" class="btn btn-primary">Confirm & Share with Community</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 4: ENCOURAGEMENT MESSAGES
+       ==================================================================== -->
+  <div id="modal-encouragement" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Words of Encouragement</h3>
+        <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="encouragement-messages-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 16px;"></div>
+
+        <div class="form-group">
+          <label class="form-label">Send an Encouragement (Max 300 characters)</label>
+          <textarea id="encouragement-msg-input" class="form-textarea" maxlength="300" placeholder="Leave a brief, respectful scripture or encouraging prayer..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="App.closeAllModals()">Close</button>
+        <button id="btn-send-encouragement" class="btn btn-primary">Send Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 5: REPORT CONTENT
+       ==================================================================== -->
+  <div id="modal-report" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Report Inappropriate Content</h3>
+        <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: #4A5568; margin-bottom: 12px;">
+          Please select the reason for reporting this community content to our moderation team:
+        </p>
+        <div class="form-group">
+          <label class="form-label">Reason</label>
+          <select id="report-reason-select" class="form-select">
+            <option value="Spam or advertising">Spam or advertising</option>
+            <option value="Inappropriate or offensive language">Inappropriate or offensive language</option>
+            <option value="Personal attacks or harassment">Personal attacks or harassment</option>
+            <option value="Privacy violation">Privacy violation</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="App.closeAllModals()">Cancel</button>
+        <button id="btn-submit-report" class="btn btn-danger">Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 6: "GOD ANSWERED" TESTIMONY
+       ==================================================================== -->
+  <div id="modal-answered" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header">
+        <h3 class="modal-title">Record Answered Prayer</h3>
+        <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 14px; color: #4A5568; margin-bottom: 12px;">
+          Praising God for answering: <strong id="answered-prayer-title" style="color: #023E8A;"></strong>
+        </p>
+        <div class="form-group">
+          <label class="form-label">Date Answered</label>
+          <input type="date" id="answered-form-date" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Testimony / How God Answered (Optional)</label>
+          <textarea id="answered-form-testimony" class="form-textarea" placeholder="Write a brief testimony of God's faithfulness..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="App.closeAllModals()">Cancel</button>
+        <button id="btn-save-answered" class="btn btn-primary">Record Testimony</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 7: THANKSGIVING JOURNAL ENTRY
+       ==================================================================== -->
+  <div id="modal-thanksgiving" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header">
+        <h3 id="thanksgiving-modal-title" class="modal-title">New Thanksgiving Entry</h3>
+        <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">What are you thankful for? *</label>
+          <input type="text" id="tg-form-title" class="form-input" placeholder="e.g. God's peace during a difficult week..." required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <input type="text" id="tg-form-category" class="form-input" placeholder="e.g. General Praise, Family Blessing" value="General Praise">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" id="tg-form-date" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reflection / Prayer of Praise</label>
+          <textarea id="tg-form-desc" class="form-textarea" placeholder="Detail your gratitude or thanksgiving scriptures..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="App.closeAllModals()">Cancel</button>
+        <button id="btn-save-thanksgiving" class="btn btn-primary">Save Thanksgiving</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/icons.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/sync.js"></script>
+  <script src="js/tracking.js"></script>
+  <script src="js/prayers.js"></script>
+  <script src="js/community.js"></script>
+  <script src="js/answered.js"></script>
+  <script src="js/thanksgiving.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
