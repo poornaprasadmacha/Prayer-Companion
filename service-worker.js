@@ -4,7 +4,7 @@
  * and Cache-First strategy for static assets.
  */
 
-const CACHE_NAME = 'prayerly-v2';
+const CACHE_NAME = 'prayerly-v3';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -53,7 +53,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Event - Cache-First for static assets, Network-First for Apps Script
+// Fetch Event - Network-First for static assets, Pass-through for Apps Script, Cache Fallback when Offline
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
 
@@ -73,14 +73,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static Assets: Cache-First strategy
+  // Static Assets: Network-First strategy (with Cache Fallback for offline)
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        // Cache new local assets dynamically if valid
+    fetch(event.request)
+      .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
           const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -88,12 +84,16 @@ self.addEventListener('fetch', (event) => {
           });
         }
         return networkResponse;
-      }).catch(() => {
-        // Fallback for navigation requests
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+        });
+      })
   );
 });

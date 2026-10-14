@@ -109,13 +109,19 @@ const App = {
     // Quick Add Button
     const quickAddBtn = document.getElementById('btn-quick-add');
     if (quickAddBtn) {
-      quickAddBtn.addEventListener('click', () => this.openPrayerModal());
+      quickAddBtn.onclick = (e) => {
+        if (e) e.preventDefault();
+        this.openPrayerModal();
+      };
     }
 
     // Add Thanksgiving Button
     const addTgBtn = document.getElementById('btn-add-thanksgiving');
     if (addTgBtn) {
-      addTgBtn.addEventListener('click', () => this.openThanksgivingModal());
+      addTgBtn.onclick = (e) => {
+        if (e) e.preventDefault();
+        this.openThanksgivingModal();
+      };
     }
 
     // Modal Close Buttons
@@ -1387,7 +1393,15 @@ const App = {
     }
 
     modal.classList.add('active');
-    if (titleInput) titleInput.focus();
+    if (titleInput) {
+      titleInput.focus();
+      titleInput.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          saveBtn.click();
+        }
+      };
+    }
 
     saveBtn.onclick = async () => {
       const title = (titleInput.value || '').trim();
@@ -1641,7 +1655,10 @@ const App = {
   initPwa() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js')
-        .then(reg => console.log('ServiceWorker registered:', reg.scope))
+        .then(reg => {
+          console.log('ServiceWorker registered:', reg.scope);
+          if (reg) reg.update();
+        })
         .catch(err => console.warn('ServiceWorker registration error:', err));
     }
 
@@ -1703,3 +1720,6 @@ const App = {
 };
 
 window.App = App;
+window.openPrayerModal = (existingPrayer) => App.openPrayerModal(existingPrayer);
+window.openThanksgivingModal = (existingTg) => App.openThanksgivingModal(existingTg);
+window.closeAllModals = () => App.closeAllModals();
