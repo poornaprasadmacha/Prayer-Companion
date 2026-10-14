@@ -34,6 +34,10 @@
       </div>
 
       <div class="header-right">
+        <button id="header-btn-signin" class="btn btn-primary btn-sm header-signin-btn" onclick="App.openAuthModal()" title="Sign in to your account">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 5px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Sign In
+        </button>
         <button id="theme-toggle-btn" class="icon-btn theme-toggle-btn" title="Toggle Light / Night Mode" aria-label="Toggle Night Mode">
           <span class="icon-sun">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
@@ -628,6 +632,15 @@
           </div>
         </div>
 
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" for="settings-custom-img-input">Custom Devotional Header Image (Optional)</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="url" id="settings-custom-img-input" class="form-input" placeholder="Paste image URL (Unsplash, Google Drive link, etc.)">
+            <button id="btn-save-custom-img" class="btn btn-primary btn-sm">Apply Image</button>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Supports any image link or Google Drive file share link. You can also paste image URLs directly in the <em>verse_text</em> column of your Google Sheet.</p>
+        </div>
+
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button id="btn-switch-account" class="btn btn-secondary btn-sm">Sign In with Email</button>
           <button id="btn-sign-out" class="btn btn-secondary btn-sm">Sign Out</button>
@@ -768,22 +781,41 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
+
+      <!-- Segmented Tabs for 1. Send OTP and 2. Enter 6-Digit Code -->
+      <div class="auth-tabs-nav">
+        <button id="auth-tab-btn-request" type="button" class="auth-tab-pill active">
+          1. Send OTP Code
+        </button>
+        <button id="auth-tab-btn-enter" type="button" class="auth-tab-pill">
+          2. Enter 6-Digit Code
+        </button>
+      </div>
+
       <div class="modal-body">
+        <!-- Persistent Global Alert/Error (Visible across both steps!) -->
+        <div id="auth-error-msg" class="auth-alert auth-alert-error" style="display: none;"></div>
+
+        <!-- STEP 1: REQUEST OTP VIA EMAIL -->
         <div id="auth-step-email">
-          <p style="font-size: 14px; color: #4A5568; margin-bottom: 16px; line-height: 1.5;">
+          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
             Enter your email address to receive a secure, random 6-digit verification code.
           </p>
           <div class="form-group">
-            <div class="form-group">
-            <label class="form-label" for="auth-name-input">Your Name</label>
+            <label class="form-label" for="auth-name-input">Your Preferred Name</label>
             <input type="text" id="auth-name-input" class="form-input" placeholder="e.g. Poorna" maxlength="40" autocomplete="name">
           </div>
           <div class="form-group">
-            <label class="form-label" for="auth-email-input">Email Address</label>
-            <input type="email" id="auth-email-input" class="form-input" placeholder="you@example.com" required autocomplete="email">
+            <label class="form-label" for="auth-email-input">Email Address *</label>
+            <input type="email" id="auth-email-input" class="form-input" placeholder="poornaprasad12344@gmail.com" required autocomplete="email">
           </div>
-          <div id="auth-error-msg" style="color: #DC2626; font-size: 13px; margin-bottom: 12px;"></div>
-          <button id="btn-send-otp" class="btn btn-primary" style="width: 100%;">Send Verification Code</button>
+          <button id="btn-send-otp" class="btn btn-primary" style="width: 100%; height: 44px; font-size: 15px; margin-top: 6px;">Send Verification Code</button>
+
+          <div style="margin-top: 14px; text-align: center;">
+            <button id="btn-goto-enter-otp" type="button" class="btn-link" style="background: none; border: none; color: var(--navy-900); font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer;">
+              Already have a 6-digit code in your email? Enter it here &rarr;
+            </button>
+          </div>
 
           <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;" />
           <div style="text-align: center;">
@@ -794,15 +826,32 @@
           </div>
         </div>
 
+        <!-- STEP 2: ENTER OTP INPUT & VERIFY -->
         <div id="auth-step-otp" style="display: none;">
-          <p style="font-size: 14px; color: #4A5568; margin-bottom: 14px;">
-            We sent a 6-digit verification code to <strong id="auth-display-email"></strong>.
+          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 14px;">
+            We sent a 6-digit verification code to <strong id="auth-display-email" style="color: var(--navy-950);">your email</strong>.
           </p>
           <div class="form-group">
-            <label class="form-label">6-Digit Code</label>
-            <input type="text" id="auth-otp-input" class="form-input" placeholder="" maxlength="6" style="font-size: 20px; letter-spacing: 4px; text-align: center;">
+            <label class="form-label" for="auth-otp-email-confirm">Confirm Email Address</label>
+            <input type="email" id="auth-otp-email-confirm" class="form-input" placeholder="poornaprasad12344@gmail.com" autocomplete="email">
           </div>
-          <button id="btn-verify-otp" class="btn btn-primary" style="width: 100%;">Verify & Enter</button>
+          <div class="form-group">
+            <label class="form-label" for="auth-otp-input">6-Digit Verification Code *</label>
+            <input type="text" id="auth-otp-input" class="form-input" placeholder="••••••" maxlength="6" inputmode="numeric" autocomplete="one-time-code" style="font-size: 24px; letter-spacing: 6px; text-align: center; font-weight: 700; height: 50px;">
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px; text-align: center;">Check your inbox and spam/junk folder for the code.</p>
+          </div>
+          <button id="btn-verify-otp" class="btn btn-primary" style="width: 100%; height: 44px; font-size: 15px; margin-top: 6px;">
+            Verify &amp; Enter
+          </button>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 13px;">
+            <button id="btn-auth-back-email" type="button" class="btn-link" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; text-decoration: underline;">
+              &larr; Request New Code
+            </button>
+            <button id="btn-auth-resend-otp" type="button" class="btn-link" style="background: none; border: none; color: var(--navy-900); font-weight: 600; cursor: pointer;">
+              Resend Code
+            </button>
+          </div>
         </div>
       </div>
     </div>

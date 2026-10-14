@@ -636,9 +636,9 @@ body {
    ========================================================================== */
 .prayer-card {
   background: #FFFFFF;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  border-left: 4px solid transparent;
-  border-radius: 16px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-left: 4px solid var(--navy-900);
+  border-radius: 0px !important;
   padding: 18px 20px;
   margin-bottom: 14px;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
@@ -647,13 +647,14 @@ body {
 
 .prayer-card:hover {
   box-shadow: 0 4px 14px rgba(2, 62, 138, 0.08);
-  border-color: #CBD5E1;
+  border-color: #94A3B8;
   transform: translateY(-1px);
 }
 
 .prayer-card.card-prayed {
   border-color: #99F6E4;
   border-left: 4px solid var(--teal-600);
+  border-radius: 0px !important;
   background: linear-gradient(180deg, #FFFFFF 0%, #F8FDFA 100%);
 }
 
@@ -1158,7 +1159,7 @@ body {
   background: #FFFFFF;
   border: 1px solid #CCFBF1;
   border-left: 4px solid var(--teal-600);
-  border-radius: var(--radius-md);
+  border-radius: 0px !important;
   padding: 18px 20px;
   margin-bottom: 14px;
   box-shadow: var(--shadow-xs);
@@ -1179,7 +1180,7 @@ body {
 .testimony-box {
   background: #F0FDF4;
   border: 1px dashed #86EFAC;
-  border-radius: var(--radius-sm);
+  border-radius: 0px !important;
   padding: 12px 14px;
   font-size: 13px;
   color: #14532D;
@@ -1191,7 +1192,7 @@ body {
   background: #FFFFFF;
   border: 1px solid var(--amber-100);
   border-left: 4px solid var(--amber-600);
-  border-radius: var(--radius-md);
+  border-radius: 0px !important;
   padding: 18px 20px;
   margin-bottom: 14px;
   box-shadow: var(--shadow-xs);
@@ -1899,3 +1900,98 @@ body.dark-theme .theme-toggle-btn {
   -webkit-tap-highlight-color: transparent !important;
   cursor: pointer;
 }
+
+/* Header Sign In Button */
+.header-signin-btn {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(2, 62, 138, 0.15);
+  transition: all 0.15s ease;
+}
+
+.header-signin-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(2, 62, 138, 0.25);
+}
+
+/* Auth Modal Tabs & Elements */
+.auth-tabs-nav {
+  display: flex;
+  background: var(--bg-card-subtle);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.auth-tab-pill {
+  flex: 1;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.auth-tab-pill.active {
+  color: var(--navy-900);
+  border-bottom-color: var(--navy-900);
+  background: #FFFFFF;
+}
+
+body.dark-theme .auth-tab-pill.active {
+  color: #38BDF8;
+  border-bottom-color: #38BDF8;
+  background: var(--bg-card);
+}
+
+.auth-alert {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-alert-error {
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  color: #B91C1C;
+}
+
+.auth-alert-success {
+  background: #F0FDF4;
+  border: 1px solid #86EFAC;
+  color: #15803D;
+}
+
+.auth-alert-info {
+  background: #EFF6FF;
+  border: 1px solid #93C5FD;
+  color: #1D4ED8;
+}
+
+body.dark-theme .auth-alert-error {
+  background: rgba(185, 28, 28, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+body.dark-theme .auth-alert-success {
+  background: rgba(21, 128, 61, 0.15);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #86EFAC;
+}
+
+body.dark-theme .auth-alert-info {
+  background: rgba(29, 78, 216, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+

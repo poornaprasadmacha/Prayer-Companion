@@ -19,37 +19,52 @@ const App = {
   async init() {
     console.log('Initializing Prayer Companion with Community & Admin...');
 
-    // 1. Initialize Database & Auth
-    await initDB();
-    const authState = await Auth.init();
-
-    // 2. Initialize Background Sync
-    SyncEngine.init();
-
-    // 3. Register Service Worker & PWA Install handler
-    this.initPwa();
-    this.initTheme();
-
-    // 4. Bind Global Event Listeners & Navigation
+    // 1. Bind Global Event Listeners, Theme & PWA early for instant responsiveness
     this.bindEvents();
+    this.initTheme();
+    this.initPwa();
 
-    // 5. Initialize Admin Module
-    Admin.init();
+    // 2. Initialize Database & Auth with safe fallback
+    let authState = { isAuthenticated: false, isLocal: true };
+    try {
+      await initDB();
+      authState = await Auth.init();
+    } catch (err) {
+      console.warn('DB / Auth initialization note:', err);
+    }
 
-    // 6. Render Local-First Interface Immediately (< 50ms)
+    // 3. Initialize Background Sync
+    try {
+      SyncEngine.init();
+    } catch (err) {
+      console.warn('SyncEngine init note:', err);
+    }
+
+    // 4. Initialize Admin Module
+    try {
+      Admin.init();
+    } catch (err) {
+      console.warn('Admin init note:', err);
+    }
+
+    // 5. Render Local-First Interface Immediately (< 50ms)
     this.renderHeader();
     this.renderDailyScripture();
     await this.renderCurrentView();
 
-    // 7. Seed welcome data on first visit
-    if (Auth.isLocalMode() || !authState.isAuthenticated) {
-      await AppDB.seedWelcomeDataIfEmpty(Auth.getUserId());
-      await this.renderCurrentView();
-    }
+    // 6. Seed welcome data on first visit
+    try {
+      if (Auth.isLocalMode() || !authState.isAuthenticated) {
+        await AppDB.seedWelcomeDataIfEmpty(Auth.getUserId());
+        await this.renderCurrentView();
+      }
+    } catch (_) {}
 
-    // 8. If authenticated, trigger sync & check session
-    if (authState.isAuthenticated) {
-      SyncEngine.syncNow();
+    // 7. If authenticated, trigger background sync
+    if (authState && authState.isAuthenticated) {
+      try {
+        SyncEngine.syncNow();
+      } catch (_) {}
     }
   },
 
@@ -121,6 +136,24 @@ const App = {
       addTgBtn.onclick = (e) => {
         if (e) e.preventDefault();
         this.openThanksgivingModal();
+      };
+    }
+
+    // Header Sign In Button
+    const headerSignInBtn = document.getElementById('header-btn-signin');
+    if (headerSignInBtn) {
+      headerSignInBtn.onclick = (e) => {
+        if (e) e.preventDefault();
+        this.openAuthModal();
+      };
+    }
+
+    // Switch Account / Sign In button
+    const switchAccountBtn = document.getElementById('btn-switch-account');
+    if (switchAccountBtn) {
+      switchAccountBtn.onclick = (e) => {
+        if (e) e.preventDefault();
+        this.openAuthModal();
       };
     }
 
@@ -300,11 +333,19 @@ const App = {
       });
     }
 
+    const headerBtnSignin = document.getElementById('header-btn-signin');
+    const isLoggedIn = Auth.isLoggedIn();
+
+    if (headerBtnSignin) {
+      headerBtnSignin.style.display = isLoggedIn ? 'none' : 'inline-flex';
+    }
+
     if (userBadgeEl) {
-      if (Auth.isLoggedIn()) {
+      if (isLoggedIn) {
         userBadgeEl.style.display = 'inline-flex';
         userBadgeEl.textContent = Auth.getUserEmail();
-        userBadgeEl.title = 'Account: ' + Auth.getUserEmail();
+        userBadgeEl.title = 'Account: ' + Auth.getUserEmail() + ' (Click to manage account)';
+        userBadgeEl.onclick = () => this.switchTab('settings');
       } else {
         userBadgeEl.style.display = 'none';
       }
@@ -362,6 +403,14 @@ const App = {
     const quoteAuthorEl = document.getElementById('daily-quote-author');
     const devotionalImgEl = document.getElementById('daily-devotional-img');
 
+    const DEFAULT_DEVOTIONAL_IMG = 'https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=1200&q=80';
+
+    if (devotionalImgEl) {
+      devotionalImgEl.onerror = () => {
+        devotionalImgEl.src = DEFAULT_DEVOTIONAL_IMG;
+      };
+    }
+
     // Retrieve daily content directly from Google Sheet Daily_Content
     let sheetContent = null;
     try {
@@ -370,25 +419,40 @@ const App = {
     } catch (_) {}
 
     const content = sheetContent || (typeof getDailyContent === 'function' ? getDailyContent() : null);
-    const verseText = content?.verse?.text || '';
+    const rawVerseText = content?.verse?.text || '';
     const verseRef = content?.verse?.reference || '';
     const quoteText = content?.quote?.text || '';
     const quoteAuthor = content?.quote?.author || '';
 
-    if (verseTextEl) verseTextEl.textContent = verseText;
+    // Check custom image first, then check if the verse_text column contains an image URL (including Google Drive links)
+    const customImg = localStorage.getItem('PRAYERLY_CUSTOM_DEVOTIONAL_IMG');
+    const sheetImgUrl = (typeof extractImageUrl === 'function') 
+      ? extractImageUrl(rawVerseText) 
+      : (rawVerseText.startsWith('http') ? rawVerseText : '');
+    const imgUrl = customImg || sheetImgUrl;
+
+    if (devotionalImgEl) {
+      if (imgUrl) {
+        devotionalImgEl.src = imgUrl;
+        devotionalImgEl.alt = verseRef || 'Daily Devotional Inspiration';
+      } else {
+        devotionalImgEl.src = DEFAULT_DEVOTIONAL_IMG;
+      }
+    }
+
+    if (verseTextEl) {
+      verseTextEl.textContent = imgUrl ? (quoteText || 'Daily Inspiration') : rawVerseText;
+    }
     if (verseRefEl) verseRefEl.textContent = verseRef ? `— ${verseRef}` : '';
     if (quoteTextEl) quoteTextEl.textContent = quoteText;
     if (quoteAuthorEl) quoteAuthorEl.textContent = quoteAuthor ? `— ${quoteAuthor}` : '';
 
-    // Show quote image directly from verse_text from sheet Daily_Content
-    if (devotionalImgEl && verseText) {
-      devotionalImgEl.src = verseText.trim();
-    }
-
     const copyBtn = document.getElementById('btn-copy-verse');
     if (copyBtn) {
       copyBtn.onclick = () => {
-        const textToCopy = `${verseText}\n\nVia Prayerly`;
+        const textToCopy = imgUrl 
+          ? `Daily Inspiration: ${imgUrl}\n${verseRef}\n\nVia Prayerly` 
+          : `${rawVerseText}\n${verseRef}\n\nVia Prayerly`;
         navigator.clipboard.writeText(textToCopy).then(() => {
           UI.toast('Daily devotional copied to clipboard', 'success');
         });
@@ -399,11 +463,17 @@ const App = {
     if (typeof fetchDailyContentFromSheet === 'function') {
       fetchDailyContentFromSheet().then(item => {
         if (item && item.verse && item.verse.text) {
-          const freshImg = item.verse.text.trim();
-          if (devotionalImgEl && freshImg && devotionalImgEl.src !== freshImg) {
-            devotionalImgEl.src = freshImg;
+          const freshRaw = item.verse.text.trim();
+          const freshImgUrl = (typeof extractImageUrl === 'function') ? extractImageUrl(freshRaw) : (freshRaw.startsWith('http') ? freshRaw : '');
+          if (devotionalImgEl && freshImgUrl && devotionalImgEl.src !== freshImgUrl) {
+            devotionalImgEl.src = freshImgUrl;
           }
-          if (verseTextEl) verseTextEl.textContent = freshImg;
+          if (verseTextEl && !freshImgUrl) {
+            verseTextEl.textContent = freshRaw;
+          }
+          if (verseRefEl && item.verse.reference) {
+            verseRefEl.textContent = `— ${item.verse.reference}`;
+          }
         }
       }).catch(() => {});
     }
@@ -1062,6 +1132,33 @@ const App = {
       };
     }
 
+    // Custom Devotional Image URL
+    const customImgInput = document.getElementById('settings-custom-img-input');
+    const saveCustomImgBtn = document.getElementById('btn-save-custom-img');
+
+    if (customImgInput) {
+      customImgInput.value = localStorage.getItem('PRAYERLY_CUSTOM_DEVOTIONAL_IMG') || '';
+    }
+
+    if (saveCustomImgBtn && customImgInput) {
+      saveCustomImgBtn.onclick = () => {
+        const rawUrl = customImgInput.value.trim();
+        const extracted = (typeof extractImageUrl === 'function') ? extractImageUrl(rawUrl) : rawUrl;
+        if (rawUrl && !extracted) {
+          UI.toast('Please enter a valid image URL or Google Drive link.', 'warning');
+          return;
+        }
+        if (extracted) {
+          localStorage.setItem('PRAYERLY_CUSTOM_DEVOTIONAL_IMG', extracted);
+          UI.toast('Custom devotional image saved!', 'success');
+        } else {
+          localStorage.removeItem('PRAYERLY_CUSTOM_DEVOTIONAL_IMG');
+          UI.toast('Reset to default devotional image.', 'info');
+        }
+        this.renderDailyScripture();
+      };
+    }
+
     if (settingsShareBtn) {
       settingsShareBtn.onclick = () => this.shareApp();
     }
@@ -1230,40 +1327,89 @@ const App = {
     });
   },
 
-  openAuthModal() {
+  openAuthModal(initialStep = 'email') {
     const modal = document.getElementById('modal-auth');
     if (!modal) return;
 
     const emailStep = document.getElementById('auth-step-email');
     const otpStep = document.getElementById('auth-step-otp');
+    const tabRequest = document.getElementById('auth-tab-btn-request');
+    const tabEnter = document.getElementById('auth-tab-btn-enter');
     const nameInput = document.getElementById('auth-name-input');
     const emailInput = document.getElementById('auth-email-input');
+    const otpEmailInput = document.getElementById('auth-otp-email-confirm');
     const otpInput = document.getElementById('auth-otp-input');
     const btnSendOtp = document.getElementById('btn-send-otp');
     const btnVerifyOtp = document.getElementById('btn-verify-otp');
     const btnContinueLocal = document.getElementById('btn-continue-local');
     const displayEmail = document.getElementById('auth-display-email');
     const authError = document.getElementById('auth-error-msg');
+    const gotoEnterBtn = document.getElementById('btn-goto-enter-otp');
+    const backEmailBtn = document.getElementById('btn-auth-back-email');
+    const resendBtn = document.getElementById('btn-auth-resend-otp');
 
-    if (emailStep) emailStep.style.display = 'block';
-    if (otpStep) otpStep.style.display = 'none';
-    if (authError) authError.textContent = '';
-    if (emailInput) emailInput.value = '';
-    if (otpInput) otpInput.value = '';
-    if (nameInput) {
-      nameInput.value = (typeof Settings !== 'undefined' && Settings.getUserShortName) ? Settings.getUserShortName() : '';
-    }
+    const showAlert = (msg, type = 'error') => {
+      if (!authError) return;
+      if (!msg) {
+        authError.style.display = 'none';
+        authError.textContent = '';
+        return;
+      }
+      authError.className = `auth-alert auth-alert-${type}`;
+      authError.style.display = 'block';
+      authError.innerHTML = msg;
+    };
 
+    const clearAlert = () => showAlert('');
+
+    const showStep = (step) => {
+      clearAlert();
+      if (step === 'otp') {
+        if (emailStep) emailStep.style.display = 'none';
+        if (otpStep) otpStep.style.display = 'block';
+        if (tabRequest) tabRequest.classList.remove('active');
+        if (tabEnter) tabEnter.classList.add('active');
+
+        const activeEmail = (emailInput?.value || '').trim() || localStorage.getItem('prayer_last_attempted_email') || 'poornaprasad12344@gmail.com';
+        if (displayEmail) displayEmail.textContent = activeEmail;
+        if (otpEmailInput && !otpEmailInput.value) otpEmailInput.value = activeEmail;
+        setTimeout(() => { if (otpInput) otpInput.focus(); }, 120);
+      } else {
+        if (emailStep) emailStep.style.display = 'block';
+        if (otpStep) otpStep.style.display = 'none';
+        if (tabRequest) tabRequest.classList.add('active');
+        if (tabEnter) tabEnter.classList.remove('active');
+        setTimeout(() => { if (emailInput) emailInput.focus(); }, 120);
+      }
+    };
+
+    // Pre-fill inputs from storage if available
+    const savedName = (typeof Settings !== 'undefined' && Settings.getUserShortName) ? Settings.getUserShortName() : 'Poorna';
+    if (nameInput && !nameInput.value) nameInput.value = savedName;
+    const lastEmail = localStorage.getItem('prayer_last_attempted_email') || (Auth.currentUser?.email && !Auth.isLocalMode() ? Auth.currentUser.email : 'poornaprasad12344@gmail.com');
+    if (emailInput && !emailInput.value) emailInput.value = lastEmail;
+    if (otpEmailInput && !otpEmailInput.value) otpEmailInput.value = lastEmail;
+
+    // Tabs navigation
+    if (tabRequest) tabRequest.onclick = () => showStep('email');
+    if (tabEnter) tabEnter.onclick = () => showStep('otp');
+    if (gotoEnterBtn) gotoEnterBtn.onclick = () => showStep('otp');
+    if (backEmailBtn) backEmailBtn.onclick = () => showStep('email');
+
+    // Display modal and activate initial step
     modal.classList.add('active');
+    showStep(initialStep);
 
+    // Send OTP Handler
     if (btnSendOtp) {
       btnSendOtp.onclick = async () => {
-        authError.textContent = '';
+        clearAlert();
         const email = (emailInput.value || '').trim();
         const name = nameInput ? (nameInput.value || '').trim() : '';
 
-        if (!email) {
-          authError.textContent = 'Please enter your email.';
+        if (!email || !email.includes('@')) {
+          showAlert('Please enter a valid email address.');
+          if (emailInput) emailInput.focus();
           return;
         }
 
@@ -1271,20 +1417,25 @@ const App = {
           await Settings.setUserShortName(name);
         }
 
+        localStorage.setItem('prayer_last_attempted_email', email);
+        if (otpEmailInput) otpEmailInput.value = email;
+
         btnSendOtp.disabled = true;
-        btnSendOtp.textContent = 'Sending Code...';
+        btnSendOtp.textContent = 'Sending Verification Code...';
 
         try {
           await Auth.requestOtp(email, name);
-          if (displayEmail) displayEmail.textContent = email;
-          emailStep.style.display = 'none';
-          otpStep.style.display = 'block';
-          UI.toast('Verification code sent to ' + email, 'success');
-          setTimeout(() => {
-            if (otpInput) otpInput.focus();
-          }, 100);
+          UI.toast(`Verification code sent to ${email}`, 'success');
+          showStep('otp');
+          showAlert(`We sent a 6-digit verification code to <strong>${UI.escape(email)}</strong>. Please check your inbox and enter it below.`, 'info');
         } catch (err) {
-          authError.textContent = err.message;
+          console.warn('requestOtp warning:', err);
+          const errMsg = err.message || 'Failed to send verification code.';
+          if (errMsg.toLowerCase().includes('rate limit') || errMsg.toLowerCase().includes('cooldown')) {
+            showAlert(`${errMsg} <br><div style="margin-top: 8px;"><button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('auth-tab-btn-enter').click()">Enter Code Already Received &rarr;</button></div>`, 'error');
+          } else {
+            showAlert(errMsg, 'error');
+          }
         } finally {
           btnSendOtp.disabled = false;
           btnSendOtp.textContent = 'Send Verification Code';
@@ -1292,20 +1443,51 @@ const App = {
       };
     }
 
+    // Resend OTP in Step 2
+    if (resendBtn) {
+      resendBtn.onclick = async () => {
+        const email = (otpEmailInput?.value || emailInput?.value || '').trim();
+        if (!email) {
+          showAlert('Please enter your email above to resend.');
+          return;
+        }
+        resendBtn.disabled = true;
+        resendBtn.textContent = 'Sending...';
+        try {
+          await Auth.requestOtp(email, nameInput?.value || '');
+          showAlert(`A fresh verification code has been sent to <strong>${UI.escape(email)}</strong>`, 'success');
+          UI.toast('Verification code resent!', 'success');
+        } catch (err) {
+          showAlert(err.message, 'error');
+        } finally {
+          setTimeout(() => {
+            resendBtn.disabled = false;
+            resendBtn.textContent = 'Resend Code';
+          }, 3000);
+        }
+      };
+    }
+
+    // Verify OTP Handler
     if (btnVerifyOtp) {
       btnVerifyOtp.onclick = async () => {
-        authError.textContent = '';
-        const email = (emailInput.value || '').trim();
-        const otp = (otpInput.value || '').trim();
+        clearAlert();
+        const email = (otpEmailInput?.value || emailInput?.value || '').trim();
+        const otp = (otpInput?.value || '').trim().replace(/\D/g, '');
         const name = nameInput ? (nameInput.value || '').trim() : '';
 
-        if (!otp) {
-          authError.textContent = 'Please enter the 6-digit code.';
+        if (!email) {
+          showAlert('Please provide your email address.');
+          return;
+        }
+        if (!otp || otp.length !== 6) {
+          showAlert('Please enter the complete 6-digit verification code.');
+          if (otpInput) otpInput.focus();
           return;
         }
 
         btnVerifyOtp.disabled = true;
-        btnVerifyOtp.textContent = 'Verifying...';
+        btnVerifyOtp.textContent = 'Verifying Code...';
 
         try {
           await Auth.verifyOtp(email, otp);
@@ -1318,10 +1500,38 @@ const App = {
           await SyncEngine.initialCloudPull();
           await this.renderCurrentView();
         } catch (err) {
-          authError.textContent = err.message;
+          console.warn('verifyOtp error:', err);
+          showAlert(err.message || 'Invalid verification code. Please check and try again.', 'error');
         } finally {
           btnVerifyOtp.disabled = false;
           btnVerifyOtp.textContent = 'Verify & Enter';
+        }
+      };
+    }
+
+    // Auto-advance / Enter key on inputs
+    if (emailInput) {
+      emailInput.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (btnSendOtp) btnSendOtp.click();
+        }
+      };
+    }
+
+    if (otpInput) {
+      otpInput.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (btnVerifyOtp) btnVerifyOtp.click();
+        }
+      };
+      // Auto verify when 6 digits are typed
+      otpInput.oninput = (e) => {
+        const cleaned = e.target.value.replace(/\D/g, '');
+        e.target.value = cleaned;
+        if (cleaned.length === 6) {
+          if (btnVerifyOtp) btnVerifyOtp.click();
         }
       };
     }

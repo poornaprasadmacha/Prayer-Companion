@@ -394,6 +394,56 @@ function getDailyContent(targetDate = new Date()) {
 
 
 /**
+ * Extract and normalize image URLs from any string, cell value, or Google Drive link.
+ * Converts Google Drive share links to direct Google CDN URLs (lh3.googleusercontent.com/d/ID)
+ * so images render immediately without CORS or authentication issues.
+ * @param {string} raw
+ * @returns {string} Clean direct image URL or empty string if not a URL
+ */
+function extractImageUrl(raw) {
+  if (!raw || typeof raw !== 'string') return '';
+  let str = raw.trim();
+
+  // Strip wrapping quotes
+  str = str.replace(/^["']|["']$/g, '').trim();
+
+  // If markdown image format: ![alt](url)
+  const mdMatch = str.match(/!\[.*?\]\((https?:\/\/[^\s)]+)\)/);
+  if (mdMatch) {
+    str = mdMatch[1];
+  }
+
+  // Find http/https URL
+  const urlMatch = str.match(/(https?:\/\/[^\s"'<>]+)/i);
+  if (!urlMatch) {
+    if (str.startsWith('data:image/')) return str;
+    return '';
+  }
+
+  let clean = urlMatch[1].trim();
+
+  // Convert Google Drive share links:
+  // e.g. https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+  // or https://drive.google.com/open?id=FILE_ID
+  // to https://lh3.googleusercontent.com/d/FILE_ID
+  const driveFileMatch = clean.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveFileMatch && driveFileMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${driveFileMatch[1]}`;
+  }
+  const driveIdMatch = clean.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (driveIdMatch && driveIdMatch[1] && clean.includes('drive.google.com')) {
+    return `https://lh3.googleusercontent.com/d/${driveIdMatch[1]}`;
+  }
+
+  // Dropbox link conversion
+  if (clean.includes('dropbox.com') && clean.includes('dl=0')) {
+    return clean.replace('dl=0', 'raw=1');
+  }
+
+  return clean;
+}
+
+/**
  * Fetch daily content row directly from the Google Sheet 'Daily_Content'
  * Uses the image URL from column 'verse_text'
  */
@@ -401,8 +451,53 @@ async function fetchDailyContentFromSheet() {
   const apiUrl = (typeof Auth !== 'undefined' && Auth.getApiUrl) ? Auth.getApiUrl() : 'https://script.google.com/macros/s/AKfycbwUnQkzJ78bEl7MRcsUARi0WMSyF27JfHgSYcyHoVpDbWqv6QhXg2qIqLtToYBEOwECJA/exec';
   if (!apiUrl) return null;
 
+  const today = new Date().getDate();
+
+  // Strategy 1: Authenticated POST if session token exists
+  if (typeof Auth !== 'undefined' && Auth.token) {
+    try {
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'get_daily_content',
+          token: Auth.token,
+          day: today
+        })
+      });
+      if (res && res.ok) {
+        const data = await res.json();
+        if (data && data.success && data.item) {
+          localStorage.setItem('PRAYERLY_SHEET_DAILY_CONTENT', JSON.stringify(data.item));
+          localStorage.setItem('PRAYERLY_SHEET_DAILY_CONTENT_DATE', new Date().toISOString().split('T')[0]);
+          return data.item;
+        }
+      }
+    } catch (_) {}
+  }
+
+  // Strategy 2: Unauthenticated POST
   try {
-    const today = new Date().getDate();
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'get_daily_content',
+        day: today
+      })
+    });
+    if (res && res.ok) {
+      const data = await res.json();
+      if (data && data.success && data.item) {
+        localStorage.setItem('PRAYERLY_SHEET_DAILY_CONTENT', JSON.stringify(data.item));
+        localStorage.setItem('PRAYERLY_SHEET_DAILY_CONTENT_DATE', new Date().toISOString().split('T')[0]);
+        return data.item;
+      }
+    }
+  } catch (_) {}
+
+  // Strategy 3: GET request with action parameter
+  try {
     const url = `${apiUrl}${apiUrl.includes('?') ? '&' : '?'}action=get_daily_content&day=${today}`;
     const res = await fetch(url).catch(() => null);
     if (res && res.ok) {
@@ -416,10 +511,22 @@ async function fetchDailyContentFromSheet() {
   } catch (e) {
     console.warn('Daily content sheet fetch note:', e);
   }
+
+  // Fallback to cached content if previously stored
+  try {
+    const cached = localStorage.getItem('PRAYERLY_SHEET_DAILY_CONTENT');
+    if (cached) return JSON.parse(cached);
+  } catch (_) {}
+
   return null;
 }
 
 // Expose globally for browser and Node.js testing
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { DAILY_CONTENT, getDailyContent, fetchDailyContentFromSheet };
+if (typeof window !== 'undefined') {
+  window.extractImageUrl = extractImageUrl;
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { DAILY_CONTENT, getDailyContent, fetchDailyContentFromSheet, extractImageUrl };
+}
+
