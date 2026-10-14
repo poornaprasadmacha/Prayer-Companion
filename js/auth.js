@@ -26,6 +26,24 @@ const Auth = {
     }
     this.token = storedToken || null;
 
+    // Check 30-day cookie if local storage is missing user or token
+    if (!this.token || !this.currentUser) {
+      if (typeof document !== 'undefined' && document.cookie) {
+        const cookieMatch = document.cookie.match(/(?:^|;\s*)prayerly_session=([^;]*)/);
+        if (cookieMatch && cookieMatch[1]) {
+          try {
+            const parsed = JSON.parse(decodeURIComponent(cookieMatch[1]));
+            if (parsed && parsed.token && parsed.user) {
+              this.token = parsed.token;
+              this.currentUser = parsed.user;
+              localStorage.setItem('PRAYER_SESSION_TOKEN', this.token);
+              localStorage.setItem('PRAYER_USER', JSON.stringify(this.currentUser));
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
     // Default to local mode if no user logged in
     if (!this.currentUser) {
       const isLocalMode = localStorage.getItem('PRAYER_LOCAL_MODE') === 'true';
@@ -74,15 +92,20 @@ const Auth = {
    * Request OTP code via email
    * @param {string} email
    */
-  async requestOtp(email) {
+  async requestOtp(email, name = '') {
     const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanName = (name || '').trim();
     if (!cleanEmail) {
       throw new Error('Please enter a valid email address.');
     }
 
+    if (cleanName) {
+      localStorage.setItem('prayer_user_short_name', cleanName);
+    }
+
     const apiUrl = this.getApiUrl();
     if (!apiUrl) {
-      throw new Error('Google Apps Script Web App URL is not configured yet. You can configure it in Settings or continue in Local / Offline Mode.');
+      throw new Error('Backend URL is not configured yet.');
     }
 
     const response = await fetch(apiUrl, {
@@ -91,7 +114,8 @@ const Auth = {
       body: JSON.stringify({
         action: 'request_otp',
         email: cleanEmail,
-        client_hint: navigator.userAgent
+        name: cleanName,
+        client_hint: typeof navigator !== 'undefined' ? navigator.userAgent : ''
       })
     });
 
@@ -141,6 +165,15 @@ const Auth = {
     localStorage.setItem('PRAYER_SESSION_TOKEN', this.token);
     localStorage.setItem('PRAYER_USER', JSON.stringify(this.currentUser));
     localStorage.removeItem('PRAYER_LOCAL_MODE');
+
+    // 30-Day Session Cookie Persistence
+    try {
+      if (typeof document !== 'undefined') {
+        const sessionPayload = { token: this.token, user: this.currentUser };
+        const maxAge = 30 * 24 * 60 * 60; // 30 days in seconds
+        document.cookie = `prayerly_session=${encodeURIComponent(JSON.stringify(sessionPayload))}; max-age=${maxAge}; path=/; SameSite=Lax`;
+      }
+    } catch (_) {}
 
     return data;
   },
@@ -214,6 +247,13 @@ const Auth = {
     localStorage.removeItem('PRAYER_SESSION_TOKEN');
     localStorage.removeItem('PRAYER_USER');
     localStorage.removeItem('PRAYER_LOCAL_MODE');
+
+    // Clear 30-day session cookie
+    try {
+      if (typeof document !== 'undefined') {
+        document.cookie = 'prayerly_session=; max-age=0; path=/; SameSite=Lax';
+      }
+    } catch (_) {}
 
     if (clearLocalData && oldUserId) {
       await AppDB.clearAllUserData(oldUserId);

@@ -28,6 +28,7 @@ const App = {
 
     // 3. Register Service Worker & PWA Install handler
     this.initPwa();
+    this.initTheme();
 
     // 4. Bind Global Event Listeners & Navigation
     this.bindEvents();
@@ -57,6 +58,36 @@ const App = {
   // ==========================================================================
   // NAVIGATION & ROUTING
   // ==========================================================================
+
+  initTheme() {
+    const savedTheme = localStorage.getItem('PRAYERLY_THEME') || 'light';
+    const isDark = savedTheme === 'dark';
+    this.applyTheme(isDark);
+
+    const toggleBtn = document.getElementById('theme-toggle-btn');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        const currentlyDark = document.body.classList.contains('dark-theme');
+        const nextDark = !currentlyDark;
+        this.applyTheme(nextDark);
+        localStorage.setItem('PRAYERLY_THEME', nextDark ? 'dark' : 'light');
+      });
+    }
+  },
+
+  applyTheme(isDark) {
+    if (isDark) {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
+    const sunIcon = document.querySelector('#theme-toggle-btn .icon-sun');
+    const moonIcon = document.querySelector('#theme-toggle-btn .icon-moon');
+    if (sunIcon && moonIcon) {
+      sunIcon.style.display = isDark ? 'none' : 'inline-flex';
+      moonIcon.style.display = isDark ? 'inline-flex' : 'none';
+    }
+  },
 
   bindEvents() {
     // Navigation Tabs
@@ -98,6 +129,14 @@ const App = {
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') this.closeAllModals();
+    });
+
+    // Dismiss any open prayer card dropdown menus when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.card-menu-container')) {
+        document.querySelectorAll('.card-menu-dropdown.open').forEach(d => d.classList.remove('open'));
+        document.querySelectorAll('.card-menu-btn.active').forEach(b => b.classList.remove('active'));
+      }
     });
 
     // Search prayers debounce
@@ -245,11 +284,7 @@ const App = {
     const shortName = (typeof Settings !== 'undefined' && Settings.getUserShortName) ? Settings.getUserShortName() : 'Poorna';
 
     if (greetingEl) {
-      greetingEl.innerHTML = `${greeting}, <span class="greeting-short-name" id="dashboard-user-name" title="Click to change your display name">${UI.escape(shortName)}</span>`;
-      const nameSpan = document.getElementById('dashboard-user-name');
-      if (nameSpan) {
-        nameSpan.onclick = () => this.promptEditShortName();
-      }
+      greetingEl.innerHTML = `${greeting}, <span class="greeting-short-name" id="dashboard-user-name">${UI.escape(shortName)}</span>`;
     }
 
     if (dateEl) {
@@ -263,11 +298,11 @@ const App = {
 
     if (userBadgeEl) {
       if (Auth.isLoggedIn()) {
+        userBadgeEl.style.display = 'inline-flex';
         userBadgeEl.textContent = Auth.getUserEmail();
-        userBadgeEl.title = 'Signed in with ' + Auth.getUserEmail();
+        userBadgeEl.title = 'Account: ' + Auth.getUserEmail();
       } else {
-        userBadgeEl.textContent = 'Local / Offline Mode';
-        userBadgeEl.title = 'Running on device storage';
+        userBadgeEl.style.display = 'none';
       }
     }
 
@@ -322,18 +357,50 @@ const App = {
     const verseRefEl = document.getElementById('daily-verse-ref');
     const quoteTextEl = document.getElementById('daily-quote-text');
     const quoteAuthorEl = document.getElementById('daily-quote-author');
+    const devotionalImgEl = document.getElementById('daily-devotional-img');
 
-    if (verseTextEl) verseTextEl.textContent = `"${content.verse.text}"`;
-    if (verseRefEl) verseRefEl.textContent = `${content.verse.reference} (${content.verse.translation})`;
-    if (quoteTextEl) quoteTextEl.textContent = `"${content.quote.text}"`;
-    if (quoteAuthorEl) quoteAuthorEl.textContent = `— ${content.quote.author}`;
+    const verseText = content?.verse?.text || '';
+    const verseRef = content?.verse?.reference || '';
+    const quoteText = content?.quote?.text || '';
+    const quoteAuthor = content?.quote?.author || '';
+
+    if (verseTextEl) verseTextEl.textContent = verseText;
+    if (verseRefEl) verseRefEl.textContent = verseRef ? `— ${verseRef}` : '';
+    if (quoteTextEl) quoteTextEl.textContent = quoteText;
+    if (quoteAuthorEl) quoteAuthorEl.textContent = quoteAuthor ? `— ${quoteAuthor}` : '';
+
+    // Devotional Image logic:
+    // If verse text is an image URL (starts with http, https, data:image, /assets/), render it
+    let imageUrl = '';
+    const isUrl = /^(https?:\/\/|data:image\/|\/assets\/)/i.test(verseText.trim());
+    if (isUrl) {
+      imageUrl = verseText.trim();
+    } else if (content?.imageUrl) {
+      imageUrl = content.imageUrl;
+    } else {
+      const devotionalImages = [
+        'https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1200&q=80'
+      ];
+      const dayIdx = (content?.day || new Date().getDate()) % devotionalImages.length;
+      imageUrl = devotionalImages[dayIdx];
+    }
+
+    if (devotionalImgEl && imageUrl) {
+      devotionalImgEl.src = imageUrl;
+    }
 
     const copyBtn = document.getElementById('btn-copy-verse');
     if (copyBtn) {
       copyBtn.onclick = () => {
-        const textToCopy = `"${content.verse.text}"\n— ${content.verse.reference}\n\n"${content.quote.text}"\n— ${content.quote.author}\n\nVia Prayerly`;
+        const textToCopy = isUrl
+          ? `${verseText}\n\nVia Prayerly`
+          : `"${verseText}"\n— ${verseRef}\n\n"${quoteText}"\n— ${quoteAuthor}\n\nVia Prayerly`;
         navigator.clipboard.writeText(textToCopy).then(() => {
-          UI.toast('Scripture and quote copied to clipboard', 'success');
+          UI.toast('Devotional inspiration copied to clipboard', 'success');
         });
       };
     }
@@ -448,17 +515,28 @@ const App = {
             </button>
           </div>
 
-          <div class="prayer-action-buttons">
-            <button class="icon-btn" data-action="share-companion" data-id="${prayer.prayer_id}" title="Share with Prayer Companions">
-              <span class="btn-icon">${Icons.share}</span>
+          <div class="card-menu-container">
+            <button class="card-menu-btn" data-action="toggle-card-menu" title="More options" aria-label="More options">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
             </button>
-            <button class="icon-btn" title="Edit" data-action="edit" data-id="${prayer.prayer_id}">
-              <span class="btn-icon">${Icons.edit}</span>
-            </button>
-            ${prayer.status === 'active'
-              ? `<button class="icon-btn" title="Archive" data-action="archive" data-id="${prayer.prayer_id}"><span class="btn-icon">${Icons.archive}</span></button>`
-              : `<button class="icon-btn" title="Restore" data-action="restore" data-id="${prayer.prayer_id}"><span class="btn-icon">${Icons.restore}</span></button>`}
-            <button class="icon-btn icon-btn-danger" title="Delete" data-action="delete" data-id="${prayer.prayer_id}"><span class="btn-icon">${Icons.trash}</span></button>
+            <div class="card-menu-dropdown">
+              <button class="card-menu-item" data-action="share-companion" data-id="${prayer.prayer_id}">
+                <span class="menu-item-icon">${Icons.share}</span>
+                <span>Ask Others to Pray for You</span>
+              </button>
+              <button class="card-menu-item" data-action="edit" data-id="${prayer.prayer_id}">
+                <span class="menu-item-icon">${Icons.edit}</span>
+                <span>Edit Prayer</span>
+              </button>
+              ${prayer.status === 'active'
+                ? `<button class="card-menu-item" data-action="archive" data-id="${prayer.prayer_id}"><span class="menu-item-icon">${Icons.archive}</span><span>Archive Prayer</span></button>`
+                : `<button class="card-menu-item" data-action="restore" data-id="${prayer.prayer_id}"><span class="menu-item-icon">${Icons.restore}</span><span>Restore to Active</span></button>`}
+              <div class="card-menu-divider"></div>
+              <button class="card-menu-item item-danger" data-action="delete" data-id="${prayer.prayer_id}">
+                <span class="menu-item-icon">${Icons.trash}</span>
+                <span>Delete Prayer</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -466,9 +544,31 @@ const App = {
   },
 
   attachPrayerCardActions(parentEl) {
+    const closeAllCardMenus = () => {
+      document.querySelectorAll('.card-menu-dropdown.open').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.card-menu-btn.active').forEach(b => b.classList.remove('active'));
+    };
+
+    parentEl.querySelectorAll('[data-action="toggle-card-menu"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const container = btn.closest('.card-menu-container');
+        const dropdown = container ? container.querySelector('.card-menu-dropdown') : null;
+        const isOpen = dropdown && dropdown.classList.contains('open');
+
+        closeAllCardMenus();
+
+        if (dropdown && !isOpen) {
+          dropdown.classList.add('open');
+          btn.classList.add('active');
+        }
+      });
+    });
+
     parentEl.querySelectorAll('[data-action="toggle-pray"]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
+        closeAllCardMenus();
         if (window.navigator?.vibrate) {
           try { window.navigator.vibrate(15); } catch (_) {}
         }
@@ -485,6 +585,7 @@ const App = {
     parentEl.querySelectorAll('[data-action="share-companion"]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
+        closeAllCardMenus();
         const id = e.currentTarget.getAttribute('data-id');
         const prayer = await Prayers.get(id);
         if (prayer) this.openShareCompanionModal(prayer);
@@ -494,6 +595,7 @@ const App = {
     parentEl.querySelectorAll('[data-action="answered"]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
+        closeAllCardMenus();
         const id = e.currentTarget.getAttribute('data-id');
         this.openAnsweredModal(id);
       });
@@ -502,6 +604,7 @@ const App = {
     parentEl.querySelectorAll('[data-action="edit"]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
+        closeAllCardMenus();
         const id = e.currentTarget.getAttribute('data-id');
         const prayer = await Prayers.get(id);
         if (prayer) this.openPrayerModal(prayer);
@@ -511,6 +614,7 @@ const App = {
     parentEl.querySelectorAll('[data-action="archive"]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
+        closeAllCardMenus();
         const id = e.currentTarget.getAttribute('data-id');
         const ok = await UI.confirm({
           title: 'Archive Prayer',
@@ -527,6 +631,7 @@ const App = {
     parentEl.querySelectorAll('[data-action="restore"]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
+        closeAllCardMenus();
         const id = e.currentTarget.getAttribute('data-id');
         await Prayers.restore(id);
         UI.toast('Prayer point restored to active', 'success');
@@ -536,6 +641,7 @@ const App = {
     parentEl.querySelectorAll('[data-action="delete"]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
+        closeAllCardMenus();
         const id = e.currentTarget.getAttribute('data-id');
         const ok = await UI.confirm({
           title: 'Delete Prayer Point',
@@ -1074,6 +1180,7 @@ const App = {
     if (!badge) return;
 
     badge.className = `sync-badge sync-${status}`;
+    badge.style.display = 'none';
     let icon = Icons?.check || '';
     let text = message || 'Synced';
 
@@ -1113,6 +1220,7 @@ const App = {
 
     const emailStep = document.getElementById('auth-step-email');
     const otpStep = document.getElementById('auth-step-otp');
+    const nameInput = document.getElementById('auth-name-input');
     const emailInput = document.getElementById('auth-email-input');
     const otpInput = document.getElementById('auth-otp-input');
     const btnSendOtp = document.getElementById('btn-send-otp');
@@ -1126,6 +1234,9 @@ const App = {
     if (authError) authError.textContent = '';
     if (emailInput) emailInput.value = '';
     if (otpInput) otpInput.value = '';
+    if (nameInput) {
+      nameInput.value = (typeof Settings !== 'undefined' && Settings.getUserShortName) ? Settings.getUserShortName() : '';
+    }
 
     modal.classList.add('active');
 
@@ -1133,20 +1244,29 @@ const App = {
       btnSendOtp.onclick = async () => {
         authError.textContent = '';
         const email = (emailInput.value || '').trim();
+        const name = nameInput ? (nameInput.value || '').trim() : '';
+
         if (!email) {
           authError.textContent = 'Please enter your email.';
           return;
+        }
+
+        if (name && typeof Settings !== 'undefined' && Settings.setUserShortName) {
+          await Settings.setUserShortName(name);
         }
 
         btnSendOtp.disabled = true;
         btnSendOtp.textContent = 'Sending Code...';
 
         try {
-          await Auth.requestOtp(email);
+          await Auth.requestOtp(email, name);
           if (displayEmail) displayEmail.textContent = email;
           emailStep.style.display = 'none';
           otpStep.style.display = 'block';
           UI.toast('Verification code sent to ' + email, 'success');
+          setTimeout(() => {
+            if (otpInput) otpInput.focus();
+          }, 100);
         } catch (err) {
           authError.textContent = err.message;
         } finally {
@@ -1161,6 +1281,7 @@ const App = {
         authError.textContent = '';
         const email = (emailInput.value || '').trim();
         const otp = (otpInput.value || '').trim();
+        const name = nameInput ? (nameInput.value || '').trim() : '';
 
         if (!otp) {
           authError.textContent = 'Please enter the 6-digit code.';
@@ -1172,8 +1293,11 @@ const App = {
 
         try {
           await Auth.verifyOtp(email, otp);
+          if (name && typeof Settings !== 'undefined' && Settings.setUserShortName) {
+            await Settings.setUserShortName(name);
+          }
           modal.classList.remove('active');
-          UI.toast('Welcome to Prayerly!', 'success');
+          UI.toast('Signed in successfully! Welcome to Prayerly.', 'success');
           this.renderHeader();
           await SyncEngine.initialCloudPull();
           await this.renderCurrentView();
@@ -1188,6 +1312,10 @@ const App = {
 
     if (btnContinueLocal) {
       btnContinueLocal.onclick = async () => {
+        const name = nameInput ? (nameInput.value || '').trim() : '';
+        if (name && typeof Settings !== 'undefined' && Settings.setUserShortName) {
+          await Settings.setUserShortName(name);
+        }
         await Auth.continueInLocalMode();
         modal.classList.remove('active');
         UI.toast('Using Prayerly in Local Mode', 'info');
@@ -1209,6 +1337,20 @@ const App = {
     const prioritySelect = document.getElementById('prayer-form-priority');
     const reminderSelect = document.getElementById('prayer-form-reminder');
     const saveBtn = document.getElementById('btn-save-prayer');
+    const advancedContainer = document.getElementById('prayer-form-advanced');
+    const toggleAdvBtn = document.getElementById('btn-toggle-prayer-advanced');
+
+    // Reset advanced options to collapsed by default
+    if (advancedContainer) advancedContainer.style.display = 'none';
+    if (toggleAdvBtn) {
+      toggleAdvBtn.classList.remove('expanded');
+      toggleAdvBtn.onclick = (e) => {
+        e.preventDefault();
+        const isHidden = advancedContainer.style.display === 'none';
+        advancedContainer.style.display = isHidden ? 'block' : 'none';
+        toggleAdvBtn.classList.toggle('expanded', isHidden);
+      };
+    }
 
     if (existingPrayer) {
       modalTitle.textContent = 'Edit Prayer Point';
@@ -1218,6 +1360,12 @@ const App = {
       personInput.value = existingPrayer.person_name || '';
       prioritySelect.value = existingPrayer.priority || 'Medium';
       reminderSelect.value = existingPrayer.reminder_preference || 'both';
+
+      // If existing prayer has custom person, non-default category, or priority, expand advanced
+      if (existingPrayer.person_name || existingPrayer.category !== 'Personal Life' || existingPrayer.priority !== 'Medium') {
+        if (advancedContainer) advancedContainer.style.display = 'block';
+        if (toggleAdvBtn) toggleAdvBtn.classList.add('expanded');
+      }
     } else {
       modalTitle.textContent = 'New Prayer Point';
       titleInput.value = '';
@@ -1229,6 +1377,9 @@ const App = {
     }
 
     modal.classList.add('active');
+    setTimeout(() => {
+      if (titleInput) titleInput.focus();
+    }, 100);
 
     saveBtn.onclick = async () => {
       const title = (titleInput.value || '').trim();
@@ -1296,12 +1447,12 @@ const App = {
         });
 
         modal.classList.remove('active');
-        UI.toast('Prayer request shared with Prayer Companions!', 'success');
+        UI.toast('Prayer request shared! Other companions will pray for you.', 'success');
       } catch (err) {
         UI.toast(err.message, 'error');
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Confirm & Share with Community';
+        submitBtn.textContent = 'Ask Companions to Pray';
       }
     };
   },

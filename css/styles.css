@@ -399,18 +399,18 @@ body {
 
 .greeting-short-name {
   color: var(--navy-900);
-  background: linear-gradient(120deg, rgba(2, 62, 138, 0.08) 0%, rgba(0, 128, 128, 0.1) 100%);
-  padding: 1px 9px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-block;
-  border-bottom: 2px dashed var(--teal-600);
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  cursor: default;
+  display: inline;
+  border-bottom: none;
+  font-weight: 700;
 }
 
 .greeting-short-name:hover {
-  background: linear-gradient(120deg, rgba(2, 62, 138, 0.16) 0%, rgba(0, 128, 128, 0.18) 100%);
-  border-bottom-style: solid;
+  background: transparent;
+  border-bottom: none;
 }
 
 .greeting-date {
@@ -1502,4 +1502,394 @@ body {
 
 .toast-warning {
   background: var(--amber-600);
+}
+
+
+/* ==========================================================================
+   DEVOTIONAL IMAGE CARD (DEVOTIONAL-FIRST)
+   ========================================================================== */
+.devotional-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+}
+
+.devotional-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background: #0F172A;
+}
+
+@media (min-width: 640px) {
+  .devotional-img-wrap {
+    height: 280px;
+  }
+}
+
+.devotional-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.devotional-card:hover .devotional-img {
+  transform: scale(1.02);
+}
+
+.devotional-badge-pill {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+.devotional-share-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #0F172A;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 4px 12px;
+  font-size: 11px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.devotional-share-btn:hover {
+  background: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* ==========================================================================
+   CARD 3-DOTS MENU & ADVANCED OPTIONS
+   ========================================================================== */
+.card-menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.card-menu-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.card-menu-btn:hover,
+.card-menu-btn.active {
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.card-menu-dropdown {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 220px;
+  z-index: 60;
+  display: none;
+  flex-direction: column;
+  padding: 6px 0;
+}
+
+.card-menu-dropdown.open {
+  display: flex;
+  animation: cardMenuFadeIn 0.15s ease;
+}
+
+@keyframes cardMenuFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  font-weight: 500;
+}
+
+.card-menu-item:hover {
+  background: var(--bg-hover);
+}
+
+.card-menu-item .menu-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.card-menu-item .menu-item-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.card-menu-item.item-danger {
+  color: var(--rose-600);
+}
+
+.card-menu-item.item-danger .menu-item-icon {
+  color: var(--rose-600);
+}
+
+.card-menu-divider {
+  height: 1px;
+  background: var(--border-light);
+  margin: 4px 0;
+}
+
+/* Modal Advanced Toggle */
+.prayer-advanced-toggle-wrap {
+  margin: 12px 0;
+}
+
+.btn-toggle-advanced {
+  background: var(--bg-card-subtle);
+  border: 1px dashed var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 9px 14px;
+  color: var(--navy-900);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-toggle-advanced:hover {
+  background: var(--bg-hover);
+  border-color: var(--navy-800);
+}
+
+.btn-toggle-advanced .toggle-arrow {
+  transition: transform 0.2s ease;
+  width: 14px;
+  height: 14px;
+}
+
+.btn-toggle-advanced.expanded .toggle-arrow {
+  transform: rotate(180deg);
+}
+
+.prayer-form-advanced {
+  padding-top: 4px;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--navy-800);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-card-subtle);
+  border-color: var(--border-light);
+}
+
+/* ==========================================================================
+   NIGHT / DARK THEME SPECIFICATION
+   ========================================================================== */
+body.dark-theme {
+  --bg-app: #0B1120;
+  --bg-card: #1E293B;
+  --bg-card-subtle: #0F172A;
+  --bg-hover: #334155;
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --text-light: #64748B;
+
+  --border-light: #334155;
+  --border-subtle: #1E293B;
+  --border-focus: #38BDF8;
+
+  --navy-950: #F8FAFC;
+  --navy-900: #38BDF8;
+  --navy-800: #0EA5E9;
+  --navy-700: #0284C7;
+  --navy-50: #0F172A;
+
+  --teal-900: #CCFBF1;
+  --teal-700: #2DD4BF;
+  --teal-600: #14B8A6;
+  --teal-50: #134E4A;
+  --teal-100: #115E59;
+
+  --amber-600: #FBBF24;
+  --amber-50: #451A03;
+  --amber-100: #78350F;
+
+  --rose-600: #FB7185;
+  --rose-50: #4C0519;
+
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+}
+
+body.dark-theme .app-header {
+  background: rgba(15, 23, 42, 0.95);
+  border-bottom-color: var(--border-light);
+}
+
+body.dark-theme .desktop-nav {
+  border-top-color: var(--border-light);
+}
+
+body.dark-theme .nav-tab-btn {
+  color: var(--text-secondary);
+}
+
+body.dark-theme .nav-tab-btn:hover {
+  color: var(--text-primary);
+}
+
+body.dark-theme .nav-tab-btn.active {
+  color: var(--navy-900);
+}
+
+body.dark-theme .mobile-bottom-nav {
+  background: rgba(15, 23, 42, 0.95);
+  border-top-color: var(--border-light);
+}
+
+body.dark-theme .bottom-nav-item {
+  color: var(--text-muted);
+}
+
+body.dark-theme .bottom-nav-item.active {
+  color: var(--navy-900);
+}
+
+body.dark-theme .stat-card,
+body.dark-theme .prayer-card,
+body.dark-theme .community-request-card,
+body.dark-theme .modal-card,
+body.dark-theme .pwa-banner {
+  background: var(--bg-card);
+  border-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+body.dark-theme .form-input,
+body.dark-theme .form-select,
+body.dark-theme .form-textarea {
+  background: var(--bg-card-subtle);
+  border-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+body.dark-theme .form-input:focus,
+body.dark-theme .form-select:focus,
+body.dark-theme .form-textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+body.dark-theme .btn-secondary {
+  background: var(--bg-card-subtle);
+  border-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+body.dark-theme .btn-secondary:hover {
+  background: var(--bg-hover);
+}
+
+body.dark-theme .badge-category {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38BDF8;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+body.dark-theme .badge-person {
+  background: var(--bg-card-subtle);
+  color: var(--text-secondary);
+  border-color: var(--border-light);
+}
+
+body.dark-theme .devotional-share-btn {
+  background: rgba(30, 41, 59, 0.85);
+  color: #F8FAFC;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-theme .devotional-share-btn:hover {
+  background: #334155;
+}
+
+body.dark-theme .theme-toggle-btn {
+  color: #FBBF24;
 }

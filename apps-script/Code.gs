@@ -350,6 +350,7 @@ function generateRandomString(length = 32) {
 
 function handleRequestOtp(payload) {
   const email = (payload.email || '').trim().toLowerCase();
+  const userName = (payload.name || '').trim();
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return createJsonResponse({ success: false, error: 'Please provide a valid email address.' }, 400);
   }
@@ -399,7 +400,7 @@ function handleRequestOtp(payload) {
           <h2 style="color: #023E8A; margin: 0; font-size: 24px;">Prayerly</h2>
           <p style="color: #008080; font-size: 14px; margin-top: 4px;">Personal Prayer & Thanksgiving</p>
         </div>
-        <p style="color: #2D3748; font-size: 16px;">Hello,</p>
+        <p style="color: #2D3748; font-size: 16px;">Hello ${userName ? escapeHtml(userName) : 'Friend'},</p>
         <p style="color: #2D3748; font-size: 15px; line-height: 1.5;">Here is your secure verification code to access your prayer journal:</p>
         <div style="text-align: center; margin: 28px 0;">
           <div style="display: inline-block; padding: 14px 32px; background: #F0F9FF; border: 2px dashed #023E8A; border-radius: 8px; font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #023E8A;">
@@ -1962,7 +1963,8 @@ function checkAndSendScheduledEmails() {
   }
 }
 
-function sendMorningEmail(userId, email, userTz, dateStr) {
+function sendMorningEmail(userId, email, userTz, dateStr, userName = '') {
+    const nameToUse = userName || (email ? email.split('@')[0] : 'Friend');
   try {
     const ss = getDb();
     const prayers = getRowsByUser(ss.getSheetByName(SHEET_NAMES.PRAYER_POINTS), userId, HEADERS.Prayer_Points);
@@ -1991,6 +1993,10 @@ function sendMorningEmail(userId, email, userTz, dateStr) {
           <h2 style="color: #023E8A; margin: 0;">Prayerly</h2>
           <p style="color: #008080; font-size: 14px; margin-top: 4px;">Morning Prayer Points &bull; ${dateStr}</p>
         </div>
+
+        <p style="color: #2D3748; font-size: 15px; margin: 0 0 16px 0;">Hello ${escapeHtml(nameToUse)},</p>
+
+        <p style="color: #2D3748; font-size: 15px; margin: 0 0 16px 0;">Hello ${escapeHtml(nameToUse)},</p>
 
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
           <p style="color: #2D3748; font-style: italic; font-size: 14px; margin: 0 0 6px 0; line-height: 1.5;">"${content.verse_text}"</p>
@@ -2027,7 +2033,8 @@ function sendMorningEmail(userId, email, userTz, dateStr) {
   }
 }
 
-function sendEveningEmail(userId, email, userTz, dateStr) {
+function sendEveningEmail(userId, email, userTz, dateStr, userName = '') {
+    const nameToUse = userName || (email ? email.split('@')[0] : 'Friend');
   try {
     const ss = getDb();
     const prayers = getRowsByUser(ss.getSheetByName(SHEET_NAMES.PRAYER_POINTS), userId, HEADERS.Prayer_Points);
