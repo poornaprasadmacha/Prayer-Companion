@@ -1,10 +1,10 @@
 /**
  * ============================================================================
- * PRAYER COMPANION - GOOGLE APPS SCRIPT BACKEND
+ * PRAYERLY - GOOGLE APPS SCRIPT BACKEND
  * ============================================================================
- * Production-ready backend for Prayer Companion Web App.
+ * Production-ready backend for Prayerly Web App.
  * Handles Email OTP authentication, Session Management, Local-First Sync,
- * Multi-Timezone Scheduled Morning/Evening Emails, Community Prayer Companions,
+ * Multi-Timezone Scheduled Morning/Evening Emails, Community Prayers,
  * Admin Allowlist & Dashboard APIs, Moderation, and Sheets Database.
  * ============================================================================
  */
@@ -129,7 +129,7 @@ function setupDatabase() {
     }
   }
   seedDailyContent();
-  Logger.log('Prayer Companion Database successfully initialized with 16 worksheets!');
+  Logger.log('Prayerly Database successfully initialized with 16 worksheets!');
 }
 
 /**
@@ -283,7 +283,7 @@ function doPost(e) {
       case 'delete_account':
         return handleDeleteAccount(authUser.user_id, token);
 
-      // Community Prayer Companions Endpoints
+      // Community Prayer Endpoints
       case 'community_share_request':
         return handleCommunityShareRequest(authUser, payload);
 
@@ -955,7 +955,7 @@ function softDeleteUserRows(sheet, userId) {
 }
 
 // ============================================================================
-// COMMUNITY PRAYER COMPANIONS (PRAY TOGETHER)
+// COMMUNITY PRAYERS (PRAY TOGETHER)
 // ============================================================================
 
 function handleCommunityShareRequest(authUser, payload) {
@@ -981,7 +981,7 @@ function handleCommunityShareRequest(authUser, payload) {
     authUser.user_id,
     title,
     desc,
-    isAnonymous ? 'Anonymous' : (displayName || 'Prayer Companion'),
+    isAnonymous ? 'Anonymous' : (displayName || 'Prayerly Member'),
     isAnonymous,
     category,
     todayStr,
@@ -994,7 +994,7 @@ function handleCommunityShareRequest(authUser, payload) {
 
   return createJsonResponse({
     success: true,
-    message: 'Your prayer request has been shared with Prayer Companions.',
+    message: 'Your prayer request has been shared with the community.',
     request_id: requestId
   });
 }
@@ -1094,7 +1094,7 @@ function handleCommunityGetRequests(authUser, payload) {
       request_id: rId,
       prayer_title: row[2],
       shared_description: row[3],
-      display_name: Boolean(row[5]) ? 'Anonymous' : (row[4] || 'Prayer Companion'),
+      display_name: Boolean(row[5]) ? 'Anonymous' : (row[4] || 'Prayerly Member'),
       is_anonymous: Boolean(row[5]),
       category: row[6],
       shared_date: row[7],

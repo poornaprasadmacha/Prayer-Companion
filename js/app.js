@@ -437,21 +437,20 @@ const App = {
         ${prayer.description ? `<p class="prayer-desc">${UI.escape(prayer.description)}</p>` : ''}
 
         <div class="prayer-card-footer">
-          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          <div class="prayer-primary-group" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
             <button class="btn btn-pray ${isPrayed ? 'btn-prayed' : ''}" data-action="toggle-pray" data-id="${prayer.prayer_id}">
               <span class="btn-icon">${isPrayed ? Icons.checkCircle : Icons.prayerHands}</span>
-              <span>${isPrayed ? 'Prayed Today' : 'I Prayed Today'}</span>
+              <span>${isPrayed ? 'Prayed' : 'I Prayed'}</span>
             </button>
-            <button class="btn btn-secondary btn-sm" data-action="share-companion" data-id="${prayer.prayer_id}" title="Share with Prayer Companions">
-              <span class="btn-icon">${Icons.share}</span>
-              <span>Share</span>
+            <button class="btn btn-secondary btn-sm" title="God Answered This Prayer" data-action="answered" data-id="${prayer.prayer_id}">
+              <span class="btn-icon">${Icons.sparkles}</span>
+              <span>Answered</span>
             </button>
           </div>
 
           <div class="prayer-action-buttons">
-            <button class="icon-btn" title="God Answered" data-action="answered" data-id="${prayer.prayer_id}">
-              <span class="btn-icon">${Icons.sparkles}</span>
-              <span>Answered</span>
+            <button class="icon-btn" data-action="share-companion" data-id="${prayer.prayer_id}" title="Share with Prayer Companions">
+              <span class="btn-icon">${Icons.share}</span>
             </button>
             <button class="icon-btn" title="Edit" data-action="edit" data-id="${prayer.prayer_id}">
               <span class="btn-icon">${Icons.edit}</span>
@@ -1487,9 +1486,32 @@ const App = {
         .catch(err => console.warn('ServiceWorker registration error:', err));
     }
 
+    // Detect if already installed or running in standalone mode
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                         window.navigator.standalone === true ||
+                         document.referrer.includes('android-app://') ||
+                         localStorage.getItem('PRAYERLY_PWA_INSTALLED') === 'true';
+
+    const banner = document.getElementById('pwa-install-banner');
+    if (isStandalone && banner) {
+      banner.style.display = 'none';
+    }
+
+    window.addEventListener('appinstalled', () => {
+      localStorage.setItem('PRAYERLY_PWA_INSTALLED', 'true');
+      const b = document.getElementById('pwa-install-banner');
+      if (b) b.style.display = 'none';
+      UI.toast('Prayerly added to Home Screen!', 'success');
+    });
+
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       this.installPromptEvent = e;
+
+      // Never show if running standalone, already installed, or previously dismissed
+      if (isStandalone || localStorage.getItem('PRAYERLY_PWA_INSTALLED') === 'true' || localStorage.getItem('PRAYERLY_PWA_DISMISSED') === 'true') {
+        return;
+      }
 
       const installBanner = document.getElementById('pwa-install-banner');
       if (installBanner) {
@@ -1497,9 +1519,11 @@ const App = {
         const installBtn = document.getElementById('btn-pwa-install');
         if (installBtn) {
           installBtn.onclick = () => {
+            if (!this.installPromptEvent) return;
             this.installPromptEvent.prompt();
             this.installPromptEvent.userChoice.then((choice) => {
               if (choice.outcome === 'accepted') {
+                localStorage.setItem('PRAYERLY_PWA_INSTALLED', 'true');
                 UI.toast('Prayerly added to Home Screen!', 'success');
               }
               installBanner.style.display = 'none';
@@ -1510,6 +1534,7 @@ const App = {
         const dismissBtn = document.getElementById('btn-pwa-dismiss');
         if (dismissBtn) {
           dismissBtn.onclick = () => {
+            localStorage.setItem('PRAYERLY_PWA_DISMISSED', 'true');
             installBanner.style.display = 'none';
           };
         }
