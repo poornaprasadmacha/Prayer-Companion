@@ -1317,18 +1317,17 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 23, 42, 0.65);
   display: none;
   align-items: center;
   justify-content: center;
   padding: 16px;
   z-index: 1000;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  touch-action: manipulation;
 }
 
 .modal-backdrop.active {
-  display: flex;
+  display: flex !important;
 }
 
 .modal-card {
@@ -1892,4 +1891,11 @@ body.dark-theme .devotional-share-btn:hover {
 
 body.dark-theme .theme-toggle-btn {
   color: #FBBF24;
+}
+
+/* Global Instant Button & Navigation Responsiveness */
+.btn, .icon-btn, .card-menu-btn, .bottom-nav-item, .nav-tab-btn, .prayer-status-pill, .btn-toggle-advanced {
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  cursor: pointer;
 }

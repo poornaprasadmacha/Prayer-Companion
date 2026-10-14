@@ -392,7 +392,34 @@ function getDailyContent(targetDate = new Date()) {
   return DAILY_CONTENT[index] || DAILY_CONTENT[0];
 }
 
+
+/**
+ * Fetch daily content row directly from the Google Sheet 'Daily_Content'
+ * Uses the image URL from column 'verse_text'
+ */
+async function fetchDailyContentFromSheet() {
+  const apiUrl = (typeof Auth !== 'undefined' && Auth.getApiUrl) ? Auth.getApiUrl() : 'https://script.google.com/macros/s/AKfycbwUnQkzJ78bEl7MRcsUARi0WMSyF27JfHgSYcyHoVpDbWqv6QhXg2qIqLtToYBEOwECJA/exec';
+  if (!apiUrl) return null;
+
+  try {
+    const today = new Date().getDate();
+    const url = `${apiUrl}${apiUrl.includes('?') ? '&' : '?'}action=get_daily_content&day=${today}`;
+    const res = await fetch(url).catch(() => null);
+    if (res && res.ok) {
+      const data = await res.json();
+      if (data && data.success && data.item) {
+        localStorage.setItem('PRAYERLY_SHEET_DAILY_CONTENT', JSON.stringify(data.item));
+        localStorage.setItem('PRAYERLY_SHEET_DAILY_CONTENT_DATE', new Date().toISOString().split('T')[0]);
+        return data.item;
+      }
+    }
+  } catch (e) {
+    console.warn('Daily content sheet fetch note:', e);
+  }
+  return null;
+}
+
 // Expose globally for browser and Node.js testing
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { DAILY_CONTENT, getDailyContent };
+  module.exports = { DAILY_CONTENT, getDailyContent, fetchDailyContentFromSheet };
 }

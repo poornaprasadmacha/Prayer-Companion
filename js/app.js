@@ -50,8 +50,6 @@ const App = {
     // 8. If authenticated, trigger sync & check session
     if (authState.isAuthenticated) {
       SyncEngine.syncNow();
-    } else if (!Auth.isLocalMode()) {
-      this.openAuthModal();
     }
   },
 
@@ -352,13 +350,20 @@ const App = {
   },
 
   renderDailyScripture() {
-    const content = getDailyContent();
     const verseTextEl = document.getElementById('daily-verse-text');
     const verseRefEl = document.getElementById('daily-verse-ref');
     const quoteTextEl = document.getElementById('daily-quote-text');
     const quoteAuthorEl = document.getElementById('daily-quote-author');
     const devotionalImgEl = document.getElementById('daily-devotional-img');
 
+    // Retrieve daily content directly from Google Sheet Daily_Content
+    let sheetContent = null;
+    try {
+      const cached = localStorage.getItem('PRAYERLY_SHEET_DAILY_CONTENT');
+      if (cached) sheetContent = JSON.parse(cached);
+    } catch (_) {}
+
+    const content = sheetContent || (typeof getDailyContent === 'function' ? getDailyContent() : null);
     const verseText = content?.verse?.text || '';
     const verseRef = content?.verse?.reference || '';
     const quoteText = content?.quote?.text || '';
@@ -369,40 +374,32 @@ const App = {
     if (quoteTextEl) quoteTextEl.textContent = quoteText;
     if (quoteAuthorEl) quoteAuthorEl.textContent = quoteAuthor ? `— ${quoteAuthor}` : '';
 
-    // Devotional Image logic:
-    // If verse text is an image URL (starts with http, https, data:image, /assets/), render it
-    let imageUrl = '';
-    const isUrl = /^(https?:\/\/|data:image\/|\/assets\/)/i.test(verseText.trim());
-    if (isUrl) {
-      imageUrl = verseText.trim();
-    } else if (content?.imageUrl) {
-      imageUrl = content.imageUrl;
-    } else {
-      const devotionalImages = [
-        'https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=1200&q=80',
-        'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=1200&q=80',
-        'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?auto=format&fit=crop&w=1200&q=80',
-        'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1200&q=80',
-        'https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=1200&q=80'
-      ];
-      const dayIdx = (content?.day || new Date().getDate()) % devotionalImages.length;
-      imageUrl = devotionalImages[dayIdx];
-    }
-
-    if (devotionalImgEl && imageUrl) {
-      devotionalImgEl.src = imageUrl;
+    // Show quote image directly from verse_text from sheet Daily_Content
+    if (devotionalImgEl && verseText) {
+      devotionalImgEl.src = verseText.trim();
     }
 
     const copyBtn = document.getElementById('btn-copy-verse');
     if (copyBtn) {
       copyBtn.onclick = () => {
-        const textToCopy = isUrl
-          ? `${verseText}\n\nVia Prayerly`
-          : `"${verseText}"\n— ${verseRef}\n\n"${quoteText}"\n— ${quoteAuthor}\n\nVia Prayerly`;
+        const textToCopy = `${verseText}\n\nVia Prayerly`;
         navigator.clipboard.writeText(textToCopy).then(() => {
-          UI.toast('Devotional inspiration copied to clipboard', 'success');
+          UI.toast('Daily devotional copied to clipboard', 'success');
         });
       };
+    }
+
+    // Refresh from Google Sheet Daily_Content in background
+    if (typeof fetchDailyContentFromSheet === 'function') {
+      fetchDailyContentFromSheet().then(item => {
+        if (item && item.verse && item.verse.text) {
+          const freshImg = item.verse.text.trim();
+          if (devotionalImgEl && freshImg && devotionalImgEl.src !== freshImg) {
+            devotionalImgEl.src = freshImg;
+          }
+          if (verseTextEl) verseTextEl.textContent = freshImg;
+        }
+      }).catch(() => {});
     }
   },
 
@@ -418,7 +415,20 @@ const App = {
     if (unprayedEl) unprayedEl.textContent = stats.unprayedToday;
     if (answeredEl) answeredEl.textContent = stats.totalAnswered;
 
-    const activePrayers = await Prayers.query({ status: 'active', sortBy: 'priority' });
+    // Strictly exclude answered prayers from Home page
+    const answeredRecords = await AppDB.getAll('answered_prayers');
+    const answeredIdSet = new Set(
+      answeredRecords.filter(a => !a.is_deleted).map(a => a.prayer_id)
+    );
+
+    const allActive = await Prayers.query({ status: 'active', sortBy: 'priority' });
+    const activePrayers = allActive.filter(p =>
+      p.status === 'active' &&
+      p.status !== 'answered' &&
+      !p.is_deleted &&
+      !answeredIdSet.has(p.prayer_id)
+    );
+
     const prayedSet = await Tracking.getPrayedPrayerIdsForDate();
     const container = document.getElementById('dashboard-prayers-container');
     const emptyState = document.getElementById('dashboard-empty-state');
@@ -1377,9 +1387,7 @@ const App = {
     }
 
     modal.classList.add('active');
-    setTimeout(() => {
-      if (titleInput) titleInput.focus();
-    }, 100);
+    if (titleInput) titleInput.focus();
 
     saveBtn.onclick = async () => {
       const title = (titleInput.value || '').trim();

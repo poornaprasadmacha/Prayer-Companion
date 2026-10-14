@@ -185,6 +185,10 @@ function seedDailyContent() {
  * Handle HTTP GET Requests
  */
 function doGet(e) {
+  const action = (e && e.parameter && e.parameter.action) || '';
+  if (action === 'get_daily_content') {
+    return handleGetDailyContent(e.parameter.day);
+  }
   return createJsonResponse({
     success: true,
     message: 'Prayerly API is live and operational.',
@@ -216,12 +220,15 @@ function doPost(e) {
       return createJsonResponse({ success: false, error: 'Action parameter is required.' }, 400);
     }
 
-    // Public Auth endpoints
+    // Public Auth & Content endpoints
     if (action === 'request_otp') {
       return handleRequestOtp(payload);
     }
     if (action === 'verify_otp') {
       return handleVerifyOtp(payload);
+    }
+    if (action === 'get_daily_content') {
+      return handleGetDailyContent(payload.day);
     }
 
     // Authenticated endpoints - Require valid session token
@@ -523,7 +530,7 @@ function handleVerifyOtp(payload) {
   const rawSessionToken = generateRandomString(48);
   const sessionTokenHash = hashSha256(rawSessionToken);
   const sessionId = 'ses_' + generateRandomString(16);
-  const sessionExpiresIso = new Date(now + 30 * 24 * 60 * 60 * 1000).toISOString();
+  const sessionExpiresIso = new Date(now + 100 * 365 * 24 * 60 * 60 * 1000).toISOString(); // Lifetime session
 
   const sessionsSheet = ss.getSheetByName(SHEET_NAMES.SESSIONS);
   sessionsSheet.appendRow([
@@ -670,6 +677,7 @@ function handleSyncPush(userId, payload) {
 
   if (Array.isArray(payload.answered)) {
     const sheet = ss.getSheetByName(SHEET_NAMES.ANSWERED_PRAYERS);
+    const prayersSheet = ss.getSheetByName(SHEET_NAMES.PRAYER_POINTS);
     for (const item of payload.answered) {
       if (!item.answered_id) continue;
       upsertRecord(sheet, HEADERS.Answered_Prayers, 'answered_id', item.answered_id, {
@@ -682,6 +690,17 @@ function handleSyncPush(userId, payload) {
         updated_at: item.updated_at || nowIso,
         is_deleted: Boolean(item.is_deleted)
       });
+      // Ensure prayer status is marked as answered in Prayer_Points sheet so pull never restores it to active
+      if (item.prayer_id && !item.is_deleted && prayersSheet) {
+        const pData = prayersSheet.getDataRange().getValues();
+        for (let pIdx = 1; pIdx < pData.length; pIdx++) {
+          if (pData[pIdx][0] === item.prayer_id && pData[pIdx][1] === userId) {
+            prayersSheet.getRange(pIdx + 1, 11).setValue('answered');
+            prayersSheet.getRange(pIdx + 1, 12).setValue(nowIso);
+            break;
+          }
+        }
+      }
       syncCount++;
     }
   }
@@ -1867,6 +1886,46 @@ function handleAdminModerateContent(adminEmail, payload) {
 // ============================================================================
 // SCHEDULED EMAIL REMINDERS
 // ============================================================================
+
+
+function handleGetDailyContent(dayOfMonth) {
+  const ss = getDb();
+  const sheet = ss.getSheetByName(SHEET_NAMES.DAILY_CONTENT);
+  if (!sheet) {
+    return createJsonResponse({ success: false, error: 'Daily_Content sheet not found' }, 404);
+  }
+  const data = sheet.getDataRange().getValues();
+  const targetDay = Number(dayOfMonth) || (new Date().getDate());
+  let todayItem = null;
+  const allItems = [];
+
+  for (let i = 1; i < data.length; i++) {
+    const rowDay = Number(data[i][1]) || i;
+    const item = {
+      day: rowDay,
+      verse: {
+        text: String(data[i][2] || ''),
+        reference: String(data[i][3] || ''),
+        translation: String(data[i][4] || '')
+      },
+      quote: {
+        text: String(data[i][5] || ''),
+        author: String(data[i][6] || '')
+      }
+    };
+    allItems.push(item);
+    if (rowDay === targetDay && !todayItem) {
+      todayItem = item;
+    }
+  }
+
+  return createJsonResponse({
+    success: true,
+    day: targetDay,
+    item: todayItem || allItems[0] || null,
+    items: allItems
+  });
+}
 
 function getDailyVerseAndQuote(dateObj) {
   const dayOfMonth = dateObj.getDate();

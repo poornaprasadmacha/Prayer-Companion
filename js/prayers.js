@@ -160,7 +160,11 @@ const Prayers = {
 
     let filtered = all.filter(p => p.user_id === userId && !p.is_deleted);
 
-    if (status !== 'all') {
+    if (status === 'active') {
+      const allAnswered = await AppDB.getAll('answered_prayers');
+      const answeredSet = new Set(allAnswered.filter(a => !a.is_deleted).map(a => a.prayer_id));
+      filtered = filtered.filter(p => p.status === 'active' && !answeredSet.has(p.prayer_id));
+    } else if (status !== 'all') {
       filtered = filtered.filter(p => p.status === status);
     }
 

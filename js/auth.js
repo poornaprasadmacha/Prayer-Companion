@@ -26,21 +26,22 @@ const Auth = {
     }
     this.token = storedToken || null;
 
-    // Check 30-day cookie if local storage is missing user or token
-    if (!this.token || !this.currentUser) {
-      if (typeof document !== 'undefined' && document.cookie) {
-        const cookieMatch = document.cookie.match(/(?:^|;\s*)prayerly_session=([^;]*)/);
-        if (cookieMatch && cookieMatch[1]) {
-          try {
-            const parsed = JSON.parse(decodeURIComponent(cookieMatch[1]));
-            if (parsed && parsed.token && parsed.user) {
-              this.token = parsed.token;
-              this.currentUser = parsed.user;
-              localStorage.setItem('PRAYER_SESSION_TOKEN', this.token);
-              localStorage.setItem('PRAYER_USER', JSON.stringify(this.currentUser));
+    // Lifetime Session Cookie Persistence (Check on start)
+    if (typeof document !== 'undefined' && document.cookie) {
+      const cookieMatch = document.cookie.match(/(?:^|;\s*)prayerly_session=([^;]*)/);
+      if (cookieMatch && cookieMatch[1]) {
+        try {
+          const parsed = JSON.parse(decodeURIComponent(cookieMatch[1]));
+          if (parsed && parsed.token && parsed.user) {
+            this.token = parsed.token;
+            this.currentUser = parsed.user;
+            localStorage.setItem('PRAYER_SESSION_TOKEN', this.token);
+            localStorage.setItem('PRAYER_USER', JSON.stringify(this.currentUser));
+            if (parsed.name) {
+              localStorage.setItem('prayer_user_short_name', parsed.name);
             }
-          } catch (e) {}
-        }
+          }
+        } catch (e) {}
       }
     }
 
@@ -166,11 +167,12 @@ const Auth = {
     localStorage.setItem('PRAYER_USER', JSON.stringify(this.currentUser));
     localStorage.removeItem('PRAYER_LOCAL_MODE');
 
-    // 30-Day Session Cookie Persistence
+    // Lifetime Session Cookie Persistence (Sign in once in lifetime)
     try {
       if (typeof document !== 'undefined') {
-        const sessionPayload = { token: this.token, user: this.currentUser };
-        const maxAge = 30 * 24 * 60 * 60; // 30 days in seconds
+        const userName = localStorage.getItem('prayer_user_short_name') || '';
+        const sessionPayload = { token: this.token, user: this.currentUser, name: userName };
+        const maxAge = 100 * 365 * 24 * 60 * 60; // 100 years in seconds
         document.cookie = `prayerly_session=${encodeURIComponent(JSON.stringify(sessionPayload))}; max-age=${maxAge}; path=/; SameSite=Lax`;
       }
     } catch (_) {}
