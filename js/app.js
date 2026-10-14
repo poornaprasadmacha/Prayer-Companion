@@ -293,15 +293,15 @@ const App = {
     }
     const shareUrl = window.location.origin ? (window.location.origin + window.location.pathname) : window.location.href;
     const shareData = {
-      title: 'Prayer Companion',
-      text: 'Join me in prayer and thanksgiving with Prayer Companion — a peaceful, distraction-free prayer app.',
+      title: 'Prayerly',
+      text: 'Join me in prayer and thanksgiving with Prayerly — a peaceful, distraction-free prayer app.',
       url: shareUrl
     };
 
     if (navigator.share) {
       try {
         await navigator.share(shareData);
-        UI.toast('Prayer Companion shared successfully', 'success');
+        UI.toast('Prayerly shared successfully', 'success');
         return;
       } catch (err) {
         if (err.name === 'AbortError') return;
@@ -331,7 +331,7 @@ const App = {
     const copyBtn = document.getElementById('btn-copy-verse');
     if (copyBtn) {
       copyBtn.onclick = () => {
-        const textToCopy = `"${content.verse.text}"\n— ${content.verse.reference}\n\n"${content.quote.text}"\n— ${content.quote.author}\n\nVia Prayer Companion`;
+        const textToCopy = `"${content.verse.text}"\n— ${content.verse.reference}\n\n"${content.quote.text}"\n— ${content.quote.author}\n\nVia Prayerly`;
         navigator.clipboard.writeText(textToCopy).then(() => {
           UI.toast('Scripture and quote copied to clipboard', 'success');
         });
@@ -1174,7 +1174,7 @@ const App = {
         try {
           await Auth.verifyOtp(email, otp);
           modal.classList.remove('active');
-          UI.toast('Welcome to Prayer Companion!', 'success');
+          UI.toast('Welcome to Prayerly!', 'success');
           this.renderHeader();
           await SyncEngine.initialCloudPull();
           await this.renderCurrentView();
@@ -1191,7 +1191,7 @@ const App = {
       btnContinueLocal.onclick = async () => {
         await Auth.continueInLocalMode();
         modal.classList.remove('active');
-        UI.toast('Using Prayer Companion in Local Mode', 'info');
+        UI.toast('Using Prayerly in Local Mode', 'info');
         this.renderHeader();
         await this.renderCurrentView();
       };
@@ -1500,7 +1500,7 @@ const App = {
             this.installPromptEvent.prompt();
             this.installPromptEvent.userChoice.then((choice) => {
               if (choice.outcome === 'accepted') {
-                UI.toast('Prayer Companion added to Home Screen!', 'success');
+                UI.toast('Prayerly added to Home Screen!', 'success');
               }
               installBanner.style.display = 'none';
               this.installPromptEvent = null;

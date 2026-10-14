@@ -113,7 +113,7 @@ const Settings = {
 
     const data = await response.json();
     if (data && data.success) {
-      return { success: true, message: 'Successfully connected to Prayer Companion Google Apps Script backend!' };
+      return { success: true, message: 'Successfully connected to Prayerly Google Apps Script backend!' };
     }
     throw new Error('Unexpected response from backend.');
   },
@@ -130,7 +130,7 @@ const Settings = {
     const settings = await this.getSettings();
 
     const exportPackage = {
-      app: 'Prayer Companion',
+      app: 'Prayerly',
       version: '1.0.0',
       exported_at: new Date().toISOString(),
       user: {

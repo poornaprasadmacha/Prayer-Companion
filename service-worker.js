@@ -1,10 +1,10 @@
 /**
- * Prayer Companion - Service Worker
+ * Prayerly - Service Worker
  * Implements App Shell caching for full offline capability
  * and Cache-First strategy for static assets.
  */
 
-const CACHE_NAME = 'prayer-companion-v3';
+const CACHE_NAME = 'prayerly-v1';
 const STATIC_ASSETS = [
   './',
   './index.html',

@@ -1,7 +1,7 @@
 ================================================================================
-PRAYER COMPANION — TECHNICAL SETUP, DEPLOYMENT & ARCHITECTURE MANUAL
+PRAYERLY — TECHNICAL SETUP, DEPLOYMENT & ARCHITECTURE MANUAL
 ================================================================================
-Project: Prayer Companion — Personal Prayer, Community & Admin Platform
+Project: Prayerly — Personal Prayer, Community & Admin Platform
 Stack: HTML5, CSS3, Vanilla JavaScript, IndexedDB, LocalStorage,
        Google Sheets (Cloud Database - 16 Worksheets), Google Apps Script (Backend API),
        Gmail API via Apps Script (OTP & Schedulers), Service Worker PWA.

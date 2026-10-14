@@ -187,7 +187,7 @@ function seedDailyContent() {
 function doGet(e) {
   return createJsonResponse({
     success: true,
-    message: 'Prayer Companion API is live and operational.',
+    message: 'Prayerly API is live and operational.',
     timestamp: new Date().toISOString()
   });
 }
@@ -392,11 +392,11 @@ function handleRequestOtp(payload) {
   ]);
 
   try {
-    const emailSubject = "Your Prayer Companion Verification Code";
+    const emailSubject = "Your Prayerly Verification Code";
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; border: 1px solid #B5E0F2; border-radius: 12px; background: #FFFFFF;">
         <div style="text-align: center; margin-bottom: 24px;">
-          <h2 style="color: #023E8A; margin: 0; font-size: 24px;">Prayer Companion</h2>
+          <h2 style="color: #023E8A; margin: 0; font-size: 24px;">Prayerly</h2>
           <p style="color: #008080; font-size: 14px; margin-top: 4px;">Personal Prayer & Thanksgiving</p>
         </div>
         <p style="color: #2D3748; font-size: 16px;">Hello,</p>
@@ -414,7 +414,7 @@ function handleRequestOtp(payload) {
 
     GmailApp.sendEmail(email, emailSubject, `Your verification code is ${otp}. It expires in 5 minutes.`, {
       htmlBody: emailHtml,
-      name: "Prayer Companion"
+      name: "Prayerly"
     });
 
     return createJsonResponse({
@@ -1988,7 +1988,7 @@ function sendMorningEmail(userId, email, userTz, dateStr) {
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #B5E0F2; border-radius: 12px; background: #FFFFFF;">
         <div style="text-align: center; margin-bottom: 20px;">
-          <h2 style="color: #023E8A; margin: 0;">Prayer Companion</h2>
+          <h2 style="color: #023E8A; margin: 0;">Prayerly</h2>
           <p style="color: #008080; font-size: 14px; margin-top: 4px;">Morning Prayer Points &bull; ${dateStr}</p>
         </div>
 
@@ -2007,17 +2007,17 @@ function sendMorningEmail(userId, email, userTz, dateStr) {
         </div>
 
         <div style="text-align: center; margin: 24px 0;">
-          <a href="${webAppUrl}" style="background: #023E8A; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 14px;">Open Prayer Companion</a>
+          <a href="${webAppUrl}" style="background: #023E8A; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 14px;">Open Prayerly</a>
         </div>
 
         <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 20px 0;" />
-        <p style="color: #A0AEC0; font-size: 11px; text-align: center; margin: 0;">You are receiving this daily morning reminder because you enabled it in Prayer Companion. Manage reminder settings anytime in the app.</p>
+        <p style="color: #A0AEC0; font-size: 11px; text-align: center; margin: 0;">You are receiving this daily morning reminder because you enabled it in Prayerly. Manage reminder settings anytime in the app.</p>
       </div>
     `;
 
     GmailApp.sendEmail(email, "Your Daily Prayer Points — Morning Prayer", `Good morning. Here are your active prayer points for ${dateStr}.`, {
       htmlBody: emailHtml,
-      name: "Prayer Companion"
+      name: "Prayerly"
     });
 
     logEmailDelivery(userId, 'morning', dateStr, 'sent');
@@ -2084,7 +2084,7 @@ function sendEveningEmail(userId, email, userTz, dateStr) {
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #B5E0F2; border-radius: 12px; background: #FFFFFF;">
         <div style="text-align: center; margin-bottom: 20px;">
-          <h2 style="color: #023E8A; margin: 0;">Prayer Companion</h2>
+          <h2 style="color: #023E8A; margin: 0;">Prayerly</h2>
           <p style="color: #008080; font-size: 14px; margin-top: 4px;">Evening Prayer Reminder &bull; ${dateStr}</p>
         </div>
 
@@ -2103,13 +2103,13 @@ function sendEveningEmail(userId, email, userTz, dateStr) {
         </div>
 
         <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 20px 0;" />
-        <p style="color: #A0AEC0; font-size: 11px; text-align: center; margin: 0;">You received this evening prayer review based on your Prayer Companion reminder preferences.</p>
+        <p style="color: #A0AEC0; font-size: 11px; text-align: center; margin: 0;">You received this evening prayer review based on your Prayerly reminder preferences.</p>
       </div>
     `;
 
     GmailApp.sendEmail(email, "Evening Prayer Reminder — Review Today's Prayer Points", `Good evening. Review your daily prayer points for ${dateStr}.`, {
       htmlBody: emailHtml,
-      name: "Prayer Companion"
+      name: "Prayerly"
     });
 
     logEmailDelivery(userId, 'evening', dateStr, 'sent');

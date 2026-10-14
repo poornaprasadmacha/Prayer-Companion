@@ -1,7 +1,7 @@
 {
-  "name": "Prayer Companion — Personal Prayer & Thanksgiving",
-  "short_name": "Prayers",
-  "description": "Personal prayer journal, daily prayer tracking, answered prayers, and thanksgiving with local-first offline support.",
+  "name": "Prayerly — Personal Prayer & Thanksgiving",
+  "short_name": "Prayerly",
+  "description": "Prayerly: Personal prayer journal, daily prayer tracking, answered prayers, community companions, and thanksgiving.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
