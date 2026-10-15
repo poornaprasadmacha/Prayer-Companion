@@ -70,7 +70,7 @@
   --radius-pill: 9999px;
 
   /* Container — Optimized for high-end Desktop experience */
-  --max-width: 980px;
+  --max-width: 1100px;
 }
 
 *, *::before, *::after {
@@ -93,7 +93,7 @@ body {
    APP HEADER & NAVIGATION
    ========================================================================== */
 .app-header {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-top: 3px solid var(--navy-900);
@@ -101,16 +101,18 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: max(10px, env(safe-area-inset-top)) 20px 10px 20px;
+  padding: max(10px, env(safe-area-inset-top)) 24px 10px 24px;
   transition: border-top-color 0.25s ease;
 }
 
 .header-content {
   max-width: var(--max-width);
   margin: 0 auto;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
 .brand-wrapper {
@@ -264,16 +266,13 @@ body.dark-theme .user-badge-icon {
 /* Desktop Navigation Bar */
 .desktop-nav {
   display: none;
-  gap: 4px;
-  margin-top: 10px;
-  border-top: 1px solid var(--border-subtle);
-  padding-top: 8px;
-  flex-wrap: wrap;
 }
 
 @media (min-width: 720px) {
   .desktop-nav {
     display: flex;
+    align-items: center;
+    gap: 4px;
   }
   body {
     padding-bottom: 32px;
@@ -283,10 +282,48 @@ body.dark-theme .user-badge-icon {
   }
 }
 
+/* Tablet & Intermediate Desktop (720px - 1079px): Centered secondary row inside header-content */
+@media (min-width: 720px) and (max-width: 1079px) {
+  .header-content {
+    flex-wrap: wrap;
+  }
+  .desktop-nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-subtle);
+    flex-wrap: wrap;
+  }
+}
+
+/* Full Desktop (>= 1080px): Brand on Left, Centered Nav in Middle, Actions on Right */
+@media (min-width: 1080px) {
+  .header-content {
+    flex-wrap: nowrap;
+  }
+  .brand-wrapper {
+    flex-shrink: 0;
+  }
+  .desktop-nav {
+    order: 2;
+    flex: 1;
+    justify-content: center;
+    margin: 0 12px;
+    flex-wrap: nowrap;
+    border: none;
+    padding: 0;
+  }
+  .header-right {
+    flex-shrink: 0;
+  }
+}
+
 .nav-tab-btn {
   background: none;
   border: none;
-  padding: 8px 14px;
+  padding: 7px 12px;
   border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
@@ -295,6 +332,7 @@ body.dark-theme .user-badge-icon {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
   transition: all 0.15s ease;
 }
 
@@ -396,7 +434,19 @@ body.dark-theme .user-badge-icon {
 .app-container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 24px 16px calc(80px + env(safe-area-inset-bottom)) 16px;
+  width: 100%;
+  padding: 24px 24px calc(80px + env(safe-area-inset-bottom)) 24px;
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .app-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
 
 /* ==========================================================================
@@ -1959,11 +2009,13 @@ body.dark-theme .nav-tab-btn {
 }
 
 body.dark-theme .nav-tab-btn:hover {
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  color: #F8FAFC;
 }
 
 body.dark-theme .nav-tab-btn.active {
-  color: var(--navy-900);
+  background: #0284C7;
+  color: #FFFFFF;
 }
 
 body.dark-theme .mobile-bottom-nav {
@@ -3135,7 +3187,7 @@ body.dark-theme .brand-lang-badge {
 
 .all-prayed-banner-img {
   width: 100%;
-  max-width: 580px;
+  max-width: 100%;
   height: auto;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-light);

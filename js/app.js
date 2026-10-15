@@ -1119,7 +1119,7 @@ const App = {
 
   getPrayersCompletedBannerSvg() {
     return `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 130" class="all-prayed-banner-img" style="width: 100%; max-width: 580px; height: auto; display: block; border-radius: 8px; border: 1px solid var(--border-light); margin: 0 auto;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 130" class="all-prayed-banner-img" style="width: 100%; max-width: 100%; height: auto; display: block; border-radius: 8px; border: 1px solid var(--border-light); margin: 0 auto;">
         <defs>
           <linearGradient id="compGradInline" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#F0FDF4"/>
