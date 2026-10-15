@@ -230,6 +230,9 @@ function doPost(e) {
     if (action === 'get_daily_content') {
       return handleGetDailyContent(payload.day);
     }
+    if (action === 'email_app_to_friend') {
+      return handleEmailAppToFriend(payload);
+    }
 
     // Authenticated endpoints - Require valid session token
     const token = payload.token || (e.parameter && e.parameter.token);
@@ -2192,6 +2195,59 @@ function handleSendTestEmail(authUser) {
     success: true,
     message: 'Test morning reminder email sent successfully to ' + authUser.email
   });
+}
+
+function handleEmailAppToFriend(payload) {
+  const friendEmail = (payload && payload.friend_email ? payload.friend_email : '').trim();
+  const friendName = (payload && payload.friend_name ? payload.friend_name : '').trim() || 'Friend';
+  const senderName = (payload && payload.sender_name ? payload.sender_name : '').trim() || 'A friend';
+
+  if (!friendEmail || !friendEmail.includes('@')) {
+    return createJsonResponse({ success: false, error: 'A valid email address is required.' }, 400);
+  }
+
+  const subject = `${senderName} shared Prayerly with you`;
+  const htmlBody = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 28px; color: #0F172A; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;">
+      <h2 style="color: #023E8A; margin-top: 0; font-size: 20px;">You are invited to Prayerly</h2>
+      <p style="font-size: 15px; line-height: 1.6; color: #334155;">Hello ${escapeHtml(friendName)},</p>
+      <p style="font-size: 15px; line-height: 1.6; color: #334155;">
+        <strong>${escapeHtml(senderName)}</strong> thought you would appreciate <strong>Prayerly</strong> — a peaceful, distraction-free companion for daily prayer, scripture reflection, and thanksgiving.
+      </p>
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin: 20px 0;">
+        <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.7; color: #475569;">
+          <li>Daily scripture inspiration & personal prayer management</li>
+          <li>Encouraging faith community & prayer intercession</li>
+          <li>100% private and offline-first</li>
+        </ul>
+      </div>
+      <div style="text-align: center; margin: 28px 0 16px;">
+        <a href="https://poornaprasadmacha.github.io/Prayer-Companion/" style="background: #023E8A; color: #FFFFFF; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
+          Open Prayerly
+        </a>
+      </div>
+      <p style="font-size: 12px; color: #94A3B8; text-align: center; margin-top: 24px; border-top: 1px solid #F1F5F9; padding-top: 14px;">
+        Sent via Prayerly Daily Companion
+      </p>
+    </div>
+  `;
+
+  try {
+    MailApp.sendEmail({
+      to: friendEmail,
+      subject: subject,
+      htmlBody: htmlBody
+    });
+    return createJsonResponse({
+      success: true,
+      message: `Invitation email sent successfully to ${friendEmail}!`
+    });
+  } catch (err) {
+    return createJsonResponse({
+      success: false,
+      error: 'Failed to send invitation email: ' + err.message
+    }, 500);
+  }
 }
 
 function escapeHtml(str) {

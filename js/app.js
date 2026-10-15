@@ -67,6 +67,9 @@ const App = {
         SyncEngine.syncNow();
       } catch (_) {}
     }
+
+    // 8. Check Landing Screen / Welcome Window State
+    this.checkLandingState();
   },
 
   // ==========================================================================
@@ -128,12 +131,12 @@ const App = {
     const savedFontScale = localStorage.getItem('prayerly_font_scale') || 'md';
     this.setTextSize(savedFontScale, false);
 
-    // 2. Theme Accent Color
-    const savedThemeColor = localStorage.getItem('prayerly_theme_color') || 'olive';
+    // 2. Theme Accent Color (Default: Classic Navy Blue)
+    const savedThemeColor = localStorage.getItem('prayerly_theme_color') || 'navy';
     this.setThemeColor(savedThemeColor, false);
   },
 
-  setTextSize(scale, showToast = true) {
+  setTextSize(scale, showToast = false) {
     const validScales = ['sm', 'md', 'lg', 'xl'];
     if (!validScales.includes(scale)) scale = 'md';
 
@@ -168,9 +171,9 @@ const App = {
     }
   },
 
-  setThemeColor(color, showToast = true) {
-    const validColors = ['olive', 'navy', 'emerald', 'amber', 'purple'];
-    if (!validColors.includes(color)) color = 'olive';
+  setThemeColor(color, showToast = false) {
+    const validColors = ['navy', 'olive', 'emerald', 'amber', 'purple'];
+    if (!validColors.includes(color)) color = 'navy';
 
     document.documentElement.setAttribute('data-theme-color', color);
     document.body.setAttribute('data-theme-color', color);
@@ -187,8 +190,8 @@ const App = {
 
     if (showToast && typeof UI !== 'undefined' && UI.toast) {
       const names = {
-        olive: 'Olive Green',
         navy: 'Classic Navy',
+        olive: 'Olive Green',
         emerald: 'Emerald Forest',
         amber: 'Warm Amber',
         purple: 'Royal Purple'
@@ -207,6 +210,16 @@ const App = {
         adminLink.style.display = (typeof Admin !== 'undefined' && Admin.isAdminUser()) ? 'flex' : 'none';
       }
 
+      // Install button visibility (show only if not already installed)
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                           window.navigator.standalone === true ||
+                           document.referrer.includes('android-app://') ||
+                           localStorage.getItem('PRAYERLY_PWA_INSTALLED') === 'true';
+      const moreInstallBtn = document.getElementById('more-btn-install-app');
+      if (moreInstallBtn) {
+        moreInstallBtn.style.display = !isStandalone ? 'flex' : 'none';
+      }
+
       // Night mode label
       const isDark = document.body.classList.contains('dark-theme');
       const moreNightLabel = document.getElementById('more-nightmode-label');
@@ -218,10 +231,25 @@ const App = {
       const currentScale = localStorage.getItem('prayerly_font_scale') || 'md';
       this.setTextSize(currentScale, false);
 
-      const currentColor = localStorage.getItem('prayerly_theme_color') || 'olive';
+      const currentColor = localStorage.getItem('prayerly_theme_color') || 'navy';
       this.setThemeColor(currentColor, false);
 
       modal.classList.add('active');
+    }
+  },
+
+  installFromMoreMenu() {
+    this.closeAllModals();
+    if (this.installPromptEvent) {
+      this.installPromptEvent.prompt();
+      this.installPromptEvent.userChoice.then((choice) => {
+        if (choice && choice.outcome === 'accepted') {
+          localStorage.setItem('PRAYERLY_PWA_INSTALLED', 'true');
+        }
+        this.installPromptEvent = null;
+      });
+    } else {
+      alert('To install Prayerly:\n\n• On iOS / Safari: Tap Share and choose "Add to Home Screen".\n• On Android / Chrome: Tap the browser menu (⋮) and choose "Install app" or "Add to Home screen".\n• On Desktop Chrome/Edge: Click the install icon in the URL address bar.');
     }
   },
 
@@ -238,6 +266,108 @@ const App = {
       const modal = document.getElementById('modal-manual');
       if (modal) modal.classList.add('active');
     }
+  },
+
+  openEmailFriendModal() {
+    this.closeAllModals();
+    const modal = document.getElementById('modal-email-friend');
+    if (modal) {
+      const alertEl = document.getElementById('friend-email-alert');
+      if (alertEl) {
+        alertEl.style.display = 'none';
+        alertEl.textContent = '';
+      }
+
+      const emailInput = document.getElementById('friend-email-input');
+      const friendNameInput = document.getElementById('friend-name-input');
+      const senderNameInput = document.getElementById('friend-sender-name-input');
+
+      if (emailInput) emailInput.value = '';
+      if (friendNameInput) friendNameInput.value = '';
+      if (senderNameInput && typeof Settings !== 'undefined') {
+        senderNameInput.value = Settings.getUserShortName() || '';
+      }
+
+      modal.classList.add('active');
+      if (emailInput) emailInput.focus();
+    }
+  },
+
+  async sendEmailToFriend() {
+    const emailInput = document.getElementById('friend-email-input');
+    const friendNameInput = document.getElementById('friend-name-input');
+    const senderNameInput = document.getElementById('friend-sender-name-input');
+    const alertEl = document.getElementById('friend-email-alert');
+    const sendBtn = document.getElementById('btn-send-friend-email');
+
+    const email = (emailInput ? emailInput.value : '').trim();
+    const friendName = (friendNameInput ? friendNameInput.value : '').trim();
+    const senderName = (senderNameInput ? senderNameInput.value : '').trim();
+
+    const showAlert = (msg, type = 'error') => {
+      if (alertEl) {
+        alertEl.textContent = msg;
+        alertEl.className = `auth-alert auth-alert-${type}`;
+        alertEl.style.display = 'block';
+      }
+    };
+
+    if (!email || !email.includes('@')) {
+      showAlert('Please enter a valid email address for your friend.');
+      return;
+    }
+
+    try {
+      if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Sending Invitation...';
+      }
+      await Settings.sendFriendInvitation(email, friendName, senderName);
+      showAlert('Invitation email sent successfully to ' + email + '!', 'success');
+      setTimeout(() => {
+        this.closeAllModals();
+        if (sendBtn) {
+          sendBtn.disabled = false;
+          sendBtn.textContent = 'Send Invitation Email';
+        }
+      }, 1500);
+    } catch (err) {
+      showAlert(err.message || 'Failed to send email. Please check backend connection.');
+      if (sendBtn) {
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Send Invitation Email';
+      }
+    }
+  },
+
+  checkLandingState() {
+    const landing = document.getElementById('landing-screen');
+    if (!landing) return;
+    const modeSelected = localStorage.getItem('prayerly_mode_selected') === 'true';
+    const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn();
+    if (!modeSelected && !isLoggedIn) {
+      landing.style.display = 'flex';
+    } else {
+      landing.style.display = 'none';
+    }
+  },
+
+  startLandingSignIn() {
+    const landing = document.getElementById('landing-screen');
+    if (landing) landing.style.display = 'none';
+    localStorage.setItem('prayerly_mode_selected', 'true');
+    this.openAuthModal();
+  },
+
+  async startLandingOffline() {
+    const landing = document.getElementById('landing-screen');
+    if (landing) landing.style.display = 'none';
+    localStorage.setItem('prayerly_mode_selected', 'true');
+    if (typeof Auth !== 'undefined' && Auth.continueInLocalMode) {
+      await Auth.continueInLocalMode();
+    }
+    this.renderHeader();
+    await this.renderCurrentView();
   },
 
   bindEvents() {
@@ -939,12 +1069,7 @@ const App = {
           card.style.opacity = '0.35';
         }
         try {
-          const res = await Tracking.togglePrayedToday(id);
-          if (res.prayed) {
-            UI.toast('Moved to Prayed list so you can focus on remaining prayers!', 'success');
-          } else {
-            UI.toast('Moved back to To-Pray list.', 'info');
-          }
+          await Tracking.togglePrayedToday(id);
         } catch (err) {
           UI.toast(err.message, 'error');
           if (card) {
@@ -998,7 +1123,6 @@ const App = {
         });
         if (ok) {
           await Prayers.archive(id);
-          UI.toast('Prayer point archived', 'info');
         }
       });
     });
@@ -1009,7 +1133,6 @@ const App = {
         closeAllCardMenus();
         const id = e.currentTarget.getAttribute('data-id');
         await Prayers.restore(id);
-        UI.toast('Prayer point restored to active', 'success');
       });
     });
 
@@ -1026,7 +1149,6 @@ const App = {
         });
         if (ok) {
           await Prayers.delete(id);
-          UI.toast('Prayer point deleted', 'info');
         }
       });
     });
@@ -1444,6 +1566,29 @@ const App = {
       authStatusEl.textContent = Auth.isLoggedIn() ? 'Active Cloud Session' : 'Local / Offline Mode';
     }
 
+    // Avatar Initial
+    const avatarEl = document.getElementById('settings-avatar-initial');
+    if (avatarEl) {
+      const name = (Settings.getUserShortName() || Auth.getUserEmail() || 'P').trim();
+      avatarEl.textContent = name ? name.charAt(0).toUpperCase() : 'P';
+    }
+
+    // Last Sync Display
+    const lastSyncEl = document.getElementById('settings-last-sync-time');
+    if (lastSyncEl) {
+      const lastSyncRaw = localStorage.getItem('prayerly_last_sync_time');
+      if (lastSyncRaw) {
+        try {
+          const d = new Date(lastSyncRaw);
+          lastSyncEl.textContent = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } catch (_) {
+          lastSyncEl.textContent = lastSyncRaw;
+        }
+      } else {
+        lastSyncEl.textContent = 'Not yet synced';
+      }
+    }
+
     if (apiUrlInput) apiUrlInput.value = Auth.getApiUrl();
 
     const settings = await Settings.getSettings();
@@ -1466,7 +1611,9 @@ const App = {
       saveShortNameBtn.onclick = async () => {
         const val = shortNameInput.value.trim();
         await Settings.setUserShortName(val);
-        UI.toast(`Preferred name updated to "${Settings.getUserShortName()}"`, 'success');
+        if (avatarEl) {
+          avatarEl.textContent = val ? val.charAt(0).toUpperCase() : 'P';
+        }
         this.renderHeader();
       };
     }
@@ -1494,7 +1641,6 @@ const App = {
         }
 
         await Settings.saveSettings(newSettings);
-        UI.toast('Settings saved successfully', 'success');
       };
     }
 
@@ -1528,7 +1674,11 @@ const App = {
     if (syncNowBtn) {
       syncNowBtn.onclick = () => {
         SyncEngine.syncNow();
-        UI.toast('Triggered background synchronisation...', 'info');
+        localStorage.setItem('prayerly_last_sync_time', new Date().toISOString());
+        if (lastSyncEl) {
+          const now = new Date();
+          lastSyncEl.textContent = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
       };
     }
 
@@ -1940,10 +2090,8 @@ const App = {
       try {
         if (existingPrayer) {
           await Prayers.update(existingPrayer.prayer_id, payload);
-          UI.toast('Prayer point updated', 'success');
         } else {
           await Prayers.create(payload);
-          UI.toast('Prayer point added', 'success');
         }
         modal.classList.remove('active');
       } catch (err) {
@@ -2125,10 +2273,8 @@ const App = {
       try {
         if (existingRecord) {
           await Answered.updateTestimony(existingRecord.answered_id, testimonyInput.value);
-          UI.toast('Testimony updated', 'success');
         } else {
           await Answered.recordAnswer(prayerId, testimonyInput.value, dateInput.value);
-          UI.toast('Glory to God! Answered prayer recorded.', 'success');
         }
         modal.classList.remove('active');
       } catch (err) {
@@ -2182,10 +2328,8 @@ const App = {
       try {
         if (existingEntry) {
           await Thanksgiving.update(existingEntry.entry_id, payload);
-          UI.toast('Thanksgiving entry updated', 'success');
         } else {
           await Thanksgiving.create(payload);
-          UI.toast('Thanksgiving recorded', 'success');
         }
         modal.classList.remove('active');
       } catch (err) {

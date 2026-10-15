@@ -162,6 +162,9 @@ const SyncEngine = {
       // Reset backoff on success
       this.retryDelay = 3000;
       this.updateStatus('synced', 'Synced.');
+      try {
+        localStorage.setItem('prayerly_last_sync_time', new Date().toISOString());
+      } catch (_) {}
 
       // Dispatch event to refresh views without full-page reloads
       window.dispatchEvent(new CustomEvent('prayer-data-changed', { detail: { source: 'sync' } }));

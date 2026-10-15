@@ -29,6 +29,76 @@
 </head>
 <body>
 
+  <!-- ====================================================================
+       LANDING SCREEN (WELCOME & ONBOARDING WINDOW)
+       ==================================================================== -->
+  <div id="landing-screen" class="landing-screen" style="display: none;">
+    <div class="landing-content">
+      <div class="landing-header">
+        <div class="landing-brand">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="landing-logo-svg"><path d="M12 2v20M7 7h10"/></svg>
+          <span class="landing-brand-name">Prayerly</span>
+        </div>
+        <span class="landing-tag-pill">Private &amp; Offline-First</span>
+      </div>
+
+      <div class="landing-hero">
+        <h1 class="landing-title">A Peaceful Space for Your Daily Prayers</h1>
+        <p class="landing-subtitle">
+          Distraction-free personal devotional journal, daily scripture reflection, and faith fellowship. Designed with executive simplicity and dignity.
+        </p>
+      </div>
+
+      <div class="landing-grid">
+        <div class="landing-feature-card">
+          <div class="landing-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+          </div>
+          <h3>Daily Prayer Tracking</h3>
+          <p>Organize prayer points, reflect on daily scriptures, and track completed prayers.</p>
+        </div>
+
+        <div class="landing-feature-card">
+          <div class="landing-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>Prayer Companions</h3>
+          <p>Intercede for fellow believers anonymously and exchange faith encouragement.</p>
+        </div>
+
+        <div class="landing-feature-card">
+          <div class="landing-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <h3>Thanksgiving Journal</h3>
+          <p>Record answered prayers with testimonies and cultivate daily gratitude.</p>
+        </div>
+
+        <div class="landing-feature-card">
+          <div class="landing-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>100% Private &amp; Offline</h3>
+          <p>Your records live safely on your device, with optional private Google Sheet backup.</p>
+        </div>
+      </div>
+
+      <div class="landing-actions-card">
+        <div class="landing-actions-buttons">
+          <button id="btn-landing-signin" class="btn btn-primary btn-lg" onclick="App.startLandingSignIn()">
+            Sign In with Email
+          </button>
+          <button id="btn-landing-offline" class="btn btn-secondary btn-lg" onclick="App.startLandingOffline()">
+            Continue in Offline Mode
+          </button>
+        </div>
+        <p class="landing-footnote">
+          No password needed. Works immediately offline without registration.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- Top App Header -->
   <header class="app-header">
     <div class="header-content">
@@ -626,83 +696,68 @@
 
     <section id="view-settings" class="view-panel">
       <div class="section-header">
-        <h2 class="section-title">Settings & Preferences</h2>
+        <h2 class="section-title">Settings</h2>
       </div>
 
-      <!-- App User Manual & Guide Card -->
-      <div class="prayer-card" style="margin-bottom: 18px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <h3 style="font-size: 15px; color: #023E8A; margin: 0; display: inline-flex; align-items: center; gap: 8px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px; color: var(--olive-700, #4B6324);"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            <span>App User Manual & Guide</span>
-          </h3>
-          <span class="badge" style="background: var(--olive-50, #F4F6EC); color: var(--olive-700, #4B6324); border: 1px solid var(--olive-200, #C2D5A4);">Help & Guide</span>
-        </div>
-        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.5;">
-          Everything you need to know about Prayer Companion — daily praying, companions, testimonies, and eye-friendly navigation explained simply.
-        </p>
-        <button id="btn-open-manual" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          <span>Open User Manual</span>
-        </button>
-      </div>
-
-      <div class="prayer-card" style="margin-bottom: 18px;">
-        <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 8px;">Account Profile</h3>
-        <div style="font-size: 14px; margin-bottom: 4px;">
-          Email: <strong id="settings-user-email">Local Mode</strong>
-        </div>
-        <div style="display: none;" aria-hidden="true">Status: <span id="settings-auth-status">Local Device Storage</span></div>
-
-        <div class="form-group" style="margin-bottom: 14px;">
-          <label class="form-label" for="settings-short-name-input">Your Preferred Short Name (for greetings)</label>
-          <div style="display: flex; gap: 8px; max-width: 360px;">
-            <input type="text" id="settings-short-name-input" class="form-input" placeholder="e.g. Poorna" maxlength="30">
-            <button id="btn-save-short-name" class="btn btn-primary btn-sm">Save</button>
+      <!-- 1. ACCOUNT PROFILE (TOP) -->
+      <div class="settings-card" style="margin-bottom: 14px;">
+        <div class="settings-profile-row">
+          <div class="settings-profile-avatar" id="settings-avatar-initial">P</div>
+          <div class="settings-profile-info">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="text" id="settings-short-name-input" class="form-input settings-name-input" placeholder="Your Name" maxlength="30">
+              <button id="btn-save-short-name" class="btn btn-secondary btn-sm" title="Save Name">Save</button>
+            </div>
+            <div class="settings-email-row">
+              <span class="settings-email-label">Email:</span>
+              <strong id="settings-user-email">Local Mode</strong>
+            </div>
           </div>
         </div>
 
+        <div style="display: none;" aria-hidden="true">Status: <span id="settings-auth-status">Local Device Storage</span></div>
 
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button id="btn-switch-account" class="btn btn-secondary btn-sm">Sign In with Email</button>
+        <div class="settings-profile-actions">
+          <button id="btn-switch-account" class="btn btn-secondary btn-sm">Sign In / Switch</button>
           <button id="btn-sign-out" class="btn btn-secondary btn-sm">Sign Out</button>
-          <button id="btn-settings-share-app" class="btn btn-secondary btn-sm">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-            <span>Share App</span>
-          </button>
         </div>
       </div>
 
-      <div class="prayer-card" style="margin-bottom: 18px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <h3 style="font-size: 15px; color: #023E8A; margin: 0;">Cloud Synchronization</h3>
-          <span class="badge" style="background: #E6FFFA; color: #0D9488; border: 1px solid #99F6E4;">Connected</span>
-        </div>
-        <p style="font-size: 13px; color: #4A5568; margin-bottom: 14px; line-height: 1.5;">
-          Your prayer points, journal entries, and community updates synchronize automatically in the background.
-        </p>
-
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <!-- 2. CLOUD SYNCHRONIZATION -->
+      <div class="settings-card" style="margin-bottom: 14px;">
+        <div class="settings-sync-header">
+          <div class="settings-sync-title-group">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="settings-section-icon"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <div>
+              <h3 class="settings-card-title">Cloud Sync</h3>
+              <p class="settings-sync-time" id="settings-sync-status-text">Last synced: <span id="settings-last-sync-time">Just now</span></p>
+            </div>
+          </div>
           <button id="btn-manual-sync" class="btn btn-secondary btn-sm">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
             <span>Sync Now</span>
           </button>
         </div>
 
-        <!-- Background technical configuration (hidden from end-user) -->
+        <!-- Hidden technical configuration for backend compatibility -->
         <div style="display: none;" aria-hidden="true">
           <input type="url" id="settings-api-url" value="https://script.google.com/macros/s/AKfycbwUnQkzJ78bEl7MRcsUARi0WMSyF27JfHgSYcyHoVpDbWqv6QhXg2qIqLtToYBEOwECJA/exec">
           <button id="btn-test-connection" type="button">Test Connection</button>
         </div>
       </div>
 
-      <div class="prayer-card" style="margin-bottom: 18px;">
-        <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 8px;">Email Reminder Preferences</h3>
-        <div class="form-group">
-          <label class="form-label">Your Time Zone</label>
+      <!-- 3. TIME ZONE & EMAIL REMINDERS -->
+      <div class="settings-card" style="margin-bottom: 14px;">
+        <div class="settings-card-header-simple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="settings-section-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <h3 class="settings-card-title">Time Zone &amp; Reminders</h3>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" for="settings-timezone" style="font-size: 12px; color: var(--text-muted);">Time Zone</label>
           <select id="settings-timezone" class="form-select">
-            <option value="Asia/Kolkata">Asia/Kolkata (IST - Default)</option>
-            <option value="UTC">UTC</option>
+            <option value="Asia/Kolkata" selected>Asia/Kolkata (India - IST Default)</option>
+            <option value="UTC">UTC (Universal Coordinated Time)</option>
             <option value="America/New_York">America/New_York (EST)</option>
             <option value="America/Chicago">America/Chicago (CST)</option>
             <option value="America/Denver">America/Denver (MST)</option>
@@ -715,44 +770,65 @@
           </select>
         </div>
 
-        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+        <div class="settings-reminder-row">
           <div>
-            <strong style="font-size: 14px; color: #023E8A;">Morning Prayer Email</strong>
-            <p style="font-size: 12px; color: #718096; margin: 0;">Active prayer points & daily verse</p>
+            <strong style="font-size: 13.5px; color: var(--navy-900);">Morning Prayer Email</strong>
+            <p style="font-size: 11.5px; color: var(--text-muted); margin: 0;">Daily verse &amp; active prayer points</p>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <input type="time" id="settings-morning-time" value="03:00" class="form-input" style="width: 100px; padding: 4px 8px;">
-            <input type="checkbox" id="settings-morning-enabled" checked style="width: 18px; height: 18px;">
+            <input type="time" id="settings-morning-time" value="03:00" class="form-input" style="width: 95px; padding: 4px 6px; font-size: 13px;">
+            <input type="checkbox" id="settings-morning-enabled" checked style="width: 18px; height: 18px; cursor: pointer;">
           </div>
         </div>
 
-        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 12px;">
+        <div class="settings-reminder-row" style="border-top: 1px solid var(--border-light); padding-top: 10px; margin-top: 10px;">
           <div>
-            <strong style="font-size: 14px; color: #023E8A;">Evening Prayer Review Email</strong>
-            <p style="font-size: 12px; color: #718096; margin: 0;">Prayed vs unmarked prayer points summary</p>
+            <strong style="font-size: 13.5px; color: var(--navy-900);">Evening Review Email</strong>
+            <p style="font-size: 11.5px; color: var(--text-muted); margin: 0;">Prayed vs unmarked points summary</p>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <input type="time" id="settings-evening-time" value="18:00" class="form-input" style="width: 100px; padding: 4px 8px;">
-            <input type="checkbox" id="settings-evening-enabled" checked style="width: 18px; height: 18px;">
+            <input type="time" id="settings-evening-time" value="18:00" class="form-input" style="width: 95px; padding: 4px 6px; font-size: 13px;">
+            <input type="checkbox" id="settings-evening-enabled" checked style="width: 18px; height: 18px; cursor: pointer;">
           </div>
         </div>
 
-        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <div style="margin-top: 14px; display: flex; gap: 8px;">
           <button id="btn-save-settings" class="btn btn-primary btn-sm">Save Preferences</button>
-          <button id="btn-test-email" class="btn btn-secondary btn-sm">Send Test Email</button>
+          <button id="btn-test-email" class="btn btn-secondary btn-sm">Test Email</button>
         </div>
       </div>
 
-      <div class="prayer-card" style="margin-bottom: 24px;">
-        <h3 style="font-size: 15px; color: #023E8A; margin-bottom: 8px;">Data Backup & Privacy Safeguards</h3>
-        <p style="font-size: 13px; color: #4A5568; margin-bottom: 14px; line-height: 1.5;">
-          Prayer points are sensitive. Private records in IndexedDB and Google Sheets are never shared publicly. Only requests you explicitly choose to share with Prayer Companions are visible to other community members.
+      <!-- 4. DATA BACKUP & PRIVACY -->
+      <div class="settings-card" style="margin-bottom: 14px;">
+        <div class="settings-card-header-simple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="settings-section-icon"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10M7 12h10M7 17h6"/></svg>
+          <h3 class="settings-card-title">Data &amp; Privacy</h3>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+          All prayer records are stored privately on your local device.
         </p>
-
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button id="btn-export-data" class="btn btn-secondary btn-sm">Export Backup (JSON)</button>
-          <button id="btn-clear-cache" class="btn btn-secondary btn-sm">Clear Local Cache</button>
+          <button id="btn-export-data" class="btn btn-secondary btn-sm">Export JSON</button>
+          <button id="btn-clear-cache" class="btn btn-secondary btn-sm">Clear Cache</button>
           <button id="btn-delete-account" class="btn btn-danger btn-sm">Delete Account</button>
+          <button id="btn-open-manual" class="btn btn-secondary btn-sm">User Manual</button>
+        </div>
+      </div>
+
+      <!-- 5. SHARE & EMAIL A FRIEND (END OF SETTINGS) -->
+      <div class="settings-card" style="margin-bottom: 24px;">
+        <div class="settings-share-footer-row">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="btn-settings-share-app" class="icon-btn" title="Share Prayerly" aria-label="Share Prayerly">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            </button>
+            <span style="font-size: 13px; font-weight: 500; color: var(--text-secondary);">Share Prayerly with Friends</span>
+          </div>
+
+          <button id="btn-open-email-friend" class="btn btn-primary btn-sm" onclick="App.openEmailFriendModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 6px;"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span>Email App to a Friend</span>
+          </button>
         </div>
       </div>
     </section>
@@ -1136,99 +1212,83 @@
        MODAL 8: APP USER MANUAL & GUIDE
        ==================================================================== -->
   <div id="modal-manual" class="modal-backdrop">
-    <div class="modal-card" style="max-width: 640px; max-height: 90vh; display: flex; flex-direction: column;">
+    <div class="modal-card" style="max-width: 620px; max-height: 90vh; display: flex; flex-direction: column;">
       <div class="modal-drag-handle"></div>
       <div class="modal-header" style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--olive-50, #F4F6EC); display: flex; align-items: center; justify-content: center; color: var(--olive-700, #4B6324);">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          </div>
-          <h3 class="modal-title" style="margin: 0; font-size: 17px;">Prayer Companion — User Guide & Manual</h3>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: var(--navy-900);"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <h3 class="modal-title" style="margin: 0; font-size: 16px;">Prayerly — User Guide</h3>
         </div>
         <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
-      <div class="modal-body" style="overflow-y: auto; padding: 18px 20px; font-size: 13.5px; line-height: 1.6; color: var(--text-primary);">
-        <p style="margin-top: 0; margin-bottom: 16px; color: var(--text-secondary); font-size: 13.5px;">
-          Welcome to <strong>Prayer Companion</strong>! This app is your peaceful, quiet sanctuary for daily prayer and communion with God. Here is everything you need to know explained in simple and easy steps:
-        </p>
+      <div class="modal-body" style="overflow-y: auto; padding: 18px 20px;">
+        <div class="manual-cards-grid">
+          <div class="manual-card">
+            <div class="manual-card-icon" style="color: var(--navy-900);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="manual-card-body">
+              <strong>1. Daily Devotion &amp; Scripture</strong>
+              <p>Curated Bible verses, reflection quotes, and active prayer priorities at a glance.</p>
+            </div>
+          </div>
 
-        <!-- Guide Item 1 -->
-        <div style="border: 1px solid var(--border-light); padding: 14px; margin-bottom: 12px; background: var(--bg-card);">
-          <h4 style="font-size: 14px; font-weight: 700; color: var(--navy-900); margin: 0 0 6px 0; display: flex; align-items: center; gap: 6px;">
-            <span>1. Daily Praying & Focused Prayed Dropdown</span>
-          </h4>
-          <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
-            <li><strong>To Pray Today:</strong> On the Home screen, you see all active prayer points waiting for your prayer today.</li>
-            <li><strong>Tap "Pray":</strong> When you finish praying for a point, tap the <strong>Pray</strong> button. It turns into a sight-friendly olive green <strong>Prayed ✓</strong> badge.</li>
-            <li><strong>Toggled Down by Default:</strong> Once marked as prayed, the card immediately moves down into the collapsed <strong>"Prayed Today"</strong> section. It stays toggled off (closed) by default so you won't accidentally pray for it twice and can keep 100% of your concentration on the remaining prayer points.</li>
-            <li><strong>Reviewing Prayed Points:</strong> Want to see what you prayed today? Simply tap <strong>▶ Prayed Today</strong> anytime to expand the list.</li>
-          </ul>
+          <div class="manual-card">
+            <div class="manual-card-icon" style="color: #10B981;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="manual-card-body">
+              <strong>2. Pray &amp; Focus</strong>
+              <p>Tap "I Prayed" to complete a point; it moves down so you stay focused on remaining needs.</p>
+            </div>
+          </div>
+
+          <div class="manual-card">
+            <div class="manual-card-icon" style="color: #6366F1;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="manual-card-body">
+              <strong>3. Prayer Companions</strong>
+              <p>Intercede for fellow believers anonymously, send encouragement notes, and commit in prayer.</p>
+            </div>
+          </div>
+
+          <div class="manual-card">
+            <div class="manual-card-icon" style="color: #F59E0B;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="manual-card-body">
+              <strong>4. Testimonies &amp; Gratitude</strong>
+              <p>Record answered prayers with testimonies and keep a daily gratitude praise journal.</p>
+            </div>
+          </div>
+
+          <div class="manual-card">
+            <div class="manual-card-icon" style="color: #0284C7;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            </div>
+            <div class="manual-card-body">
+              <strong>5. 100% Offline &amp; Private</strong>
+              <p>Runs locally on your device with IndexedDB. Automatically syncs with Google Sheets when connected.</p>
+            </div>
+          </div>
+
+          <div class="manual-card">
+            <div class="manual-card-icon" style="color: #8B5CF6;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </div>
+            <div class="manual-card-body">
+              <strong>6. Automated Reminders</strong>
+              <p>Set custom morning and evening times to receive gentle reminder emails with active prayer points.</p>
+            </div>
+          </div>
         </div>
-
-        <!-- Guide Item 2 -->
-        <div style="border: 1px solid var(--border-light); padding: 14px; margin-bottom: 12px; background: var(--bg-card);">
-          <h4 style="font-size: 14px; font-weight: 700; color: var(--navy-900); margin: 0 0 6px 0; display: flex; align-items: center; gap: 6px;">
-            <span>2. Adding & Managing Prayer Points</span>
-          </h4>
-          <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
-            <li><strong>Add New Point:</strong> Click <strong>+ New Prayer Point</strong> (or Quick Add) to add a prayer with a title and optional details.</li>
-            <li><strong>Clean Layout:</strong> Cards show the <strong>Title first</strong> and <strong>Description below</strong> without clutter or distracting badges.</li>
-            <li><strong>Card Menu (···):</strong> Click the 3 dots on any card to <em>Edit</em>, <em>Archive</em>, <em>Delete</em>, or ask community companions to pray for you.</li>
-          </ul>
-        </div>
-
-        <!-- Guide Item 3 -->
-        <div style="border: 1px solid var(--border-light); padding: 14px; margin-bottom: 12px; background: var(--bg-card);">
-          <h4 style="font-size: 14px; font-weight: 700; color: var(--navy-900); margin: 0 0 6px 0; display: flex; align-items: center; gap: 6px;">
-            <span>3. Prayer Companions (Community Tab)</span>
-          </h4>
-          <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
-            <li><strong>Instant & Seamless:</strong> Community prayer points are saved in your device's local database (IndexedDB). When you open the Companions tab, points show up instantly with zero loading delay!</li>
-            <li><strong>"I'll Pray" Commitment:</strong> Click <em>I'll Pray</em> to let a fellow believer know you are standing with them in prayer.</li>
-            <li><strong>Encourage:</strong> Send a short scripture or word of comfort.</li>
-            <li><strong>Ask for Prayer:</strong> Choose <em>Ask Others to Pray for You</em> on your prayer card. You can share with your name or 100% anonymously.</li>
-          </ul>
-        </div>
-
-        <!-- Guide Item 4 -->
-        <div style="border: 1px solid var(--border-light); padding: 14px; margin-bottom: 12px; background: var(--bg-card);">
-          <h4 style="font-size: 14px; font-weight: 700; color: var(--navy-900); margin: 0 0 6px 0; display: flex; align-items: center; gap: 6px;">
-            <span>4. God's Answers & Thanksgiving Journal</span>
-          </h4>
-          <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
-            <li><strong>Mark as Answered:</strong> When God answers a prayer, tap the menu and choose <em>Mark as Answered</em>. Write down your testimony to remember God's faithfulness!</li>
-            <li><strong>Thanksgiving Tab:</strong> Use the <em>Thanks</em> tab to write down daily blessings and reasons to give thanks to the Lord.</li>
-          </ul>
-        </div>
-
-        <!-- Guide Item 5 -->
-        <div style="border: 1px solid var(--border-light); padding: 14px; margin-bottom: 12px; background: var(--bg-card);">
-          <h4 style="font-size: 14px; font-weight: 700; color: var(--navy-900); margin: 0 0 6px 0; display: flex; align-items: center; gap: 6px;">
-            <span>5. Eye Comfort (Olive Green) & Dark Mode</span>
-          </h4>
-          <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
-            <li><strong>Sight-Friendly Olive Green:</strong> The app uses an eye-comforting olive green color palette designed specifically to protect your vision and reduce eye fatigue.</li>
-            <li><strong>Dark Mode Toggle:</strong> Tap the Moon/Sun icon in the top header anytime to switch between peaceful light and dark viewing modes.</li>
-          </ul>
-        </div>
-
-        <!-- Guide Item 6 -->
-        <div style="border: 1px solid var(--border-light); padding: 14px; background: var(--bg-card);">
-          <h4 style="font-size: 14px; font-weight: 700; color: var(--navy-900); margin: 0 0 6px 0; display: flex; align-items: center; gap: 6px;">
-            <span>6. Offline-First & Daily Email Reminders</span>
-          </h4>
-          <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
-            <li><strong>Works 100% Offline:</strong> Everything is stored safely on your phone/computer. When online, changes sync automatically to your Google Sheets database.</li>
-            <li><strong>Email Reminders:</strong> In Settings, choose your preferred morning and evening times to receive gentle reminder emails with your active prayer points.</li>
-          </ul>
-        </div>
-
       </div>
       <div class="modal-footer" style="border-top: 1px solid var(--border-light); padding: 12px 20px;">
-        <button class="btn btn-primary" onclick="App.closeAllModals()" style="width: 100%;">Close Manual</button>
+        <button class="btn btn-primary" onclick="App.closeAllModals()" style="width: 100%;">Close Guide</button>
       </div>
     </div>
   </div>
@@ -1320,52 +1380,105 @@
         <div class="more-menu-section" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
           <span class="more-section-title" style="display: block; margin-bottom: 10px;">Quick Access</span>
           <div class="more-menu-links">
+            <!-- Install App Button (Visible only when not installed) -->
+            <button id="more-btn-install-app" class="more-menu-link-item" onclick="App.installFromMoreMenu()" style="display: none;">
+              <span class="more-link-icon" style="color: var(--navy-900);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </span>
+              <div class="more-link-content">
+                <span class="more-link-title">Install Prayerly App</span>
+                <span class="more-link-desc">Add to Home Screen for quick offline access</span>
+              </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
             <button class="more-menu-link-item" onclick="App.openMoreLink('history')">
-              <span class="more-link-icon" style="background: rgba(2, 62, 138, 0.08); color: var(--navy-900);">
+              <span class="more-link-icon" style="color: var(--navy-900);">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               </span>
               <div class="more-link-content">
-                <span class="more-link-title">Prayer History & Streaks</span>
-                <span class="more-link-desc">View prayer logs, daily streaks & calendar records</span>
+                <span class="more-link-title">Prayer History &amp; Streaks</span>
+                <span class="more-link-desc">View prayer logs, daily streaks &amp; calendar records</span>
               </div>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
 
             <button class="more-menu-link-item" onclick="App.openMoreLink('settings')">
-              <span class="more-link-icon" style="background: rgba(107, 142, 35, 0.12); color: var(--olive-700);">
+              <span class="more-link-icon" style="color: var(--navy-900);">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
               </span>
               <div class="more-link-content">
                 <span class="more-link-title">App Settings</span>
-                <span class="more-link-desc">Manage account, reminders, sync & preferences</span>
+                <span class="more-link-desc">Manage account, reminders, sync &amp; preferences</span>
               </div>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
 
             <button class="more-menu-link-item" onclick="App.openMoreManual()">
-              <span class="more-link-icon" style="background: rgba(217, 119, 6, 0.12); color: #B45309;">
+              <span class="more-link-icon" style="color: var(--navy-900);">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               </span>
               <div class="more-link-content">
-                <span class="more-link-title">User Manual & Guide</span>
-                <span class="more-link-desc">Explore features, offline usage & guidance</span>
+                <span class="more-link-title">User Manual &amp; Guide</span>
+                <span class="more-link-desc">Explore features, offline usage &amp; guidance</span>
               </div>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
 
             <button id="more-link-admin" class="more-menu-link-item" onclick="App.openMoreLink('admin')" style="display: none;">
-              <span class="more-link-icon" style="background: rgba(225, 29, 72, 0.1); color: #E11D48;">
+              <span class="more-link-icon" style="color: #E11D48;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </span>
               <div class="more-link-content">
                 <span class="more-link-title">Admin Console</span>
-                <span class="more-link-desc">System monitoring, users & audit logs</span>
+                <span class="more-link-desc">System monitoring, users &amp; audit logs</span>
               </div>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           </div>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL: EMAIL APP TO A FRIEND
+       ==================================================================== -->
+  <div id="modal-email-friend" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; color: var(--navy-900);"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          Email Prayerly to a Friend
+        </h3>
+        <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 18px 20px 24px;">
+        <div id="friend-email-alert" class="auth-alert" style="display: none;"></div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" for="friend-email-input">Friend's Email Address *</label>
+          <input type="email" id="friend-email-input" class="form-input" placeholder="friend@example.com" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" for="friend-name-input">Friend's Name (Optional)</label>
+          <input type="text" id="friend-name-input" class="form-input" placeholder="e.g. John" maxlength="40">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label class="form-label" for="friend-sender-name-input">Your Name (Shown in Invitation)</label>
+          <input type="text" id="friend-sender-name-input" class="form-input" placeholder="e.g. Poorna" maxlength="40">
+        </div>
+
+        <button id="btn-send-friend-email" class="btn btn-primary" style="width: 100%; height: 44px; font-weight: 600;" onclick="App.sendEmailToFriend()">
+          Send Invitation Email
+        </button>
       </div>
     </div>
   </div>

@@ -1,20 +1,20 @@
 /* ==========================================================================
-   PRAYER COMPANION — BESPOKE EXECUTIVE DESIGN SYSTEM
+   PRAYERLY — BESPOKE EXECUTIVE DESIGN SYSTEM
    Crafted with editorial typography, dignified Christian aesthetics,
-   subtle elevation, and purposeful micro-interactions.
+   zero clutter, flat borders, and purposeful micro-interactions.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Core Palette */
+  /* Core Palette — Default Navy Blue */
   --navy-950: #0A1128;
   --navy-900: #023E8A;
   --navy-800: #00509D;
   --navy-700: #0077B6;
   --navy-50: #F0F7FF;
 
-  /* Eye-Friendly Soothing Olive Green Palette */
+  /* Soothing Olive Green Palette */
   --olive-900: #2C3916;
   --olive-800: #3E511E;
   --olive-700: #4B6324;
@@ -25,12 +25,12 @@
   --olive-50: #F4F6EC;
 
   /* Aliased for smooth compatibility across app */
-  --teal-900: #2C3916;
-  --teal-700: #4B6324;
-  --teal-600: #59772B;
-  --teal-500: #6B8E23;
-  --teal-50: #F4F6EC;
-  --teal-100: #DCE8CB;
+  --teal-900: #0F766E;
+  --teal-700: #0D9488;
+  --teal-600: #14B8A6;
+  --teal-500: #2DD4BF;
+  --teal-50: #F0FDFA;
+  --teal-100: #CCFBF1;
 
   --amber-600: #D97706;
   --amber-50: #FFFBEB;
@@ -56,12 +56,12 @@
   --border-subtle: #F1F5F9;
   --border-focus: #023E8A;
 
-  /* Shadows (Multi-layered, soft, executive) */
-  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
-  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.06), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
-  --shadow-modal: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
+  /* Shadows — Disabled for crisp executive flat design */
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-modal: none;
 
   /* Radii */
   --radius-sm: 6px;
@@ -69,8 +69,8 @@
   --radius-lg: 14px;
   --radius-pill: 9999px;
 
-  /* Container */
-  --max-width: 880px;
+  /* Container — Optimized for high-end Desktop experience */
+  --max-width: 980px;
 }
 
 *, *::before, *::after {
@@ -120,20 +120,18 @@ body {
 }
 
 .brand-icon {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 100%);
-  color: #FFFFFF;
-  border-radius: var(--radius-sm);
+  width: 32px;
+  height: 32px;
+  background: transparent !important;
+  color: var(--navy-900);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(2, 62, 138, 0.2);
 }
 
 .brand-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
 }
 
 .brand-title-group {
@@ -173,7 +171,6 @@ body {
   background: var(--bg-card);
   color: var(--text-secondary);
   border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-xs);
   transition: all 0.2s ease;
 }
 
@@ -513,27 +510,18 @@ body.dark-theme .user-badge-icon {
    EDITORIAL DAILY SCRIPTURE & QUOTE CARD
    ========================================================================== */
 .scripture-card {
-  background: #FFFFFF;
+  background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-left: 4px solid var(--navy-900);
   border-radius: var(--radius-lg);
-  padding: 24px;
-  margin-bottom: 28px;
-  box-shadow: var(--shadow-sm);
+  padding: 22px 24px;
+  margin-bottom: 24px;
   position: relative;
   overflow: hidden;
 }
 
 .scripture-card::before {
-  content: "“";
-  position: absolute;
-  top: -10px;
-  right: 20px;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 120px;
-  color: rgba(2, 62, 138, 0.04);
-  line-height: 1;
-  pointer-events: none;
+  display: none;
 }
 
 .scripture-label {
@@ -541,7 +529,7 @@ body.dark-theme .user-badge-icon {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 700;
-  color: var(--teal-700);
+  color: var(--navy-700);
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -549,9 +537,9 @@ body.dark-theme .user-badge-icon {
 }
 
 .verse-text {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 18px;
-  font-style: italic;
+  font-family: inherit;
+  font-size: 17px;
+  font-style: normal;
   font-weight: 500;
   color: var(--navy-950);
   line-height: 1.65;
@@ -2631,5 +2619,367 @@ body.dark-theme .theme-color-dot.active {
   color: var(--text-light);
   flex-shrink: 0;
 }
+
+/* ==========================================================================
+   LANDING / WELCOME SCREEN
+   ========================================================================== */
+.landing-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg-app);
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.landing-content {
+  max-width: 680px;
+  width: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.landing-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.landing-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.landing-brand-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.landing-brand-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--navy-900);
+  letter-spacing: -0.4px;
+}
+
+.landing-tag-pill {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+  color: var(--navy-900);
+  border: 1px solid var(--border-light);
+}
+
+.landing-hero {
+  text-align: center;
+  padding: 12px 8px 0;
+}
+
+.landing-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+  margin-bottom: 10px;
+}
+
+.landing-subtitle {
+  font-size: 14.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.landing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 580px) {
+  .landing-grid {
+    grid-template-columns: 1fr;
+  }
+  .landing-title {
+    font-size: 22px;
+  }
+}
+
+.landing-feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.15s ease;
+}
+
+.landing-feature-card:hover {
+  border-color: var(--navy-900);
+}
+
+.landing-feature-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--navy-900);
+  background: transparent !important;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.landing-feature-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.landing-feature-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.landing-feature-card p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.landing-actions-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  text-align: center;
+}
+
+.landing-actions-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-lg {
+  padding: 12px 22px;
+  font-size: 14.5px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+}
+
+.landing-footnote {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+/* ==========================================================================
+   SETTINGS VIEW CARDS & PROFILE
+   ========================================================================== */
+.settings-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+}
+
+.settings-profile-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.settings-profile-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--navy-900);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.settings-profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-name-input {
+  font-weight: 600;
+  font-size: 15px;
+  max-width: 240px;
+}
+
+.settings-email-row {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-email-label {
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.settings-profile-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.settings-sync-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-sync-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-section-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--navy-900);
+  flex-shrink: 0;
+  background: transparent !important;
+}
+
+.settings-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.settings-sync-time {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 2px 0 0 0;
+}
+
+.settings-card-header-simple {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.settings-reminder-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-share-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   USER MANUAL ICON CARDS GRID
+   ========================================================================== */
+.manual-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.manual-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: border-color 0.15s ease;
+}
+
+.manual-card:hover {
+  border-color: var(--navy-900);
+}
+
+.manual-card-icon {
+  width: 36px;
+  height: 36px;
+  color: var(--navy-900);
+  flex-shrink: 0;
+  background: transparent !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.manual-card-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.manual-card-body {
+  flex: 1;
+}
+
+.manual-card-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.manual-card-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ==========================================================================
+   GLOBAL ZERO SHADOW & TRANSPARENT ICONS (STRICT EXECUTIVE FLAT STYLING)
+   ========================================================================== */
+*, *::before, *::after {
+  box-shadow: none !important;
+}
+
+.icon-btn, .stat-icon, .more-link-icon, .manual-card-icon, .badge-icon, .brand-icon, .landing-feature-icon, .settings-section-icon, .user-badge-icon {
+  background: transparent !important;
+}
+
 
 

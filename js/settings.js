@@ -180,6 +180,44 @@ const Settings = {
     }
 
     await Auth.logout(true);
+  },
+
+  /**
+   * Send app invitation email to a friend via Apps Script backend
+   */
+  async sendFriendInvitation(friendEmail, friendName, senderName) {
+    const email = (friendEmail || '').trim();
+    if (!email || !email.includes('@')) {
+      throw new Error('Please enter a valid email address for your friend.');
+    }
+
+    const apiUrl = Auth.getApiUrl();
+    if (!apiUrl) {
+      throw new Error('Google Apps Script Web App URL is not configured.');
+    }
+
+    const payload = {
+      action: 'email_app_to_friend',
+      friend_email: email,
+      friend_name: (friendName || '').trim(),
+      sender_name: (senderName || this.getUserShortName() || 'A Friend').trim()
+    };
+
+    if (Auth.isLoggedIn() && Auth.token) {
+      payload.token = Auth.token;
+    }
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to send friend invitation.');
+    }
+    return data;
   }
 };
 
