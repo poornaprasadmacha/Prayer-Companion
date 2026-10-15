@@ -17,6 +17,15 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/styles.css">
+  <script>
+    (function() {
+      try {
+        if (localStorage.getItem('PRAYERLY_THEME') === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
 

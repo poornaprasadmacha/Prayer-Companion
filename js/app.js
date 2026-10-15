@@ -90,8 +90,10 @@ const App = {
 
   applyTheme(isDark) {
     if (isDark) {
+      document.documentElement.classList.add('dark-theme');
       document.body.classList.add('dark-theme');
     } else {
+      document.documentElement.classList.remove('dark-theme');
       document.body.classList.remove('dark-theme');
     }
     const sunIcon = document.querySelector('#theme-toggle-btn .icon-sun');
@@ -99,6 +101,10 @@ const App = {
     if (sunIcon && moonIcon) {
       sunIcon.style.display = isDark ? 'none' : 'inline-flex';
       moonIcon.style.display = isDark ? 'inline-flex' : 'none';
+    }
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute('content', isDark ? '#0B1120' : '#023E8A');
     }
   },
 
@@ -525,10 +531,9 @@ const App = {
 
     if (toPrayPrayers.length > 0) {
       html += `
-        <div class="prayer-section-group" style="margin-bottom: 24px;">
+        <div class="prayer-section-group" style="margin-bottom: 16px;">
           <div class="prayer-section-header-sub">
-            <span class="prayer-section-title">Focus: To Pray Today</span>
-            <span class="badge-inspire" style="background: var(--navy-900);">${toPrayPrayers.length} to pray</span>
+            <span class="prayer-section-title">To Pray Today (${toPrayPrayers.length})</span>
           </div>
           <div class="to-pray-cards-list">
             ${toPrayPrayers.map(p => this.renderPrayerCardHtml(p, false, true)).join('')}
@@ -540,11 +545,11 @@ const App = {
       html += `
         <div class="all-prayed-banner">
           <div class="all-prayed-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px; color: #059669;"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: #059669;"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div>
-            <h4 style="font-size: 15px; font-weight: 700; color: #065F46; margin: 0 0 4px 0;">All Prayer Points Completed Today!</h4>
-            <p style="font-size: 13px; color: #047857; margin: 0; line-height: 1.4;">
+            <h4 style="font-size: 14px; font-weight: 700; color: #065F46; margin: 0 0 2px 0;">All Prayer Points Completed Today!</h4>
+            <p style="font-size: 12px; color: #047857; margin: 0; line-height: 1.4;">
               You have prayed through all your active requests. Focus on resting in God's peace.
             </p>
           </div>
@@ -554,10 +559,9 @@ const App = {
 
     if (prayedPrayers.length > 0) {
       html += `
-        <div class="prayer-section-group prayed-section-group" style="margin-top: 10px;">
+        <div class="prayer-section-group prayed-section-group" style="margin-top: 12px;">
           <div class="prayer-section-header-sub">
-            <span class="prayer-section-title" style="color: #059669;">Prayed Today</span>
-            <span class="badge-inspire" style="background: #10B981;">${prayedPrayers.length} completed</span>
+            <span class="prayer-section-title" style="color: #059669;">Prayed Today (${prayedPrayers.length})</span>
           </div>
           <div class="prayed-cards-list">
             ${prayedPrayers.map(p => this.renderPrayerCardHtml(p, true, true)).join('')}
@@ -663,25 +667,15 @@ const App = {
 
   renderPrayerCardHtml(prayer, isPrayed, isDashboard = false) {
     const cardStatusClass = isPrayed ? 'card-prayed' : '';
-    const dateFormatted = new Date(prayer.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     const hasDesc = Boolean(prayer.description && prayer.description.trim());
-    const mainText = hasDesc ? prayer.description.trim() : prayer.title;
-    const refTitle = hasDesc ? prayer.title : '';
 
     return `
       <div class="prayer-card ${cardStatusClass}" data-id="${prayer.prayer_id}">
-        <div class="prayer-main-text">${UI.escape(mainText)}</div>
-
-        <div class="prayer-meta-row">
-          ${refTitle ? `<span class="prayer-ref-title">${UI.escape(refTitle)}</span>` : ''}
-          <span class="badge-inspire badge-category">${UI.escape(prayer.category)}</span>
-          ${prayer.person_name ? `<span class="badge-inspire badge-person">${UI.escape(prayer.person_name)}</span>` : ''}
-          ${prayer.priority === 'High' ? `<span class="badge-inspire badge-priority-high">High Priority</span>` : ''}
-          <span class="prayer-date-subtle">${dateFormatted}</span>
-        </div>
+        <h3 class="prayer-title">${UI.escape(prayer.title)}</h3>
+        ${hasDesc ? `<div class="prayer-desc">${UI.escape(prayer.description.trim())}</div>` : ''}
 
         <div class="prayer-card-footer">
-          <div class="prayer-primary-group" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <div class="prayer-primary-group">
             <button class="btn btn-pray ${isPrayed ? 'btn-prayed' : ''}" data-action="toggle-pray" data-id="${prayer.prayer_id}" title="${isPrayed ? 'Click to move back to To-Pray' : 'Mark as prayed and move to Prayed list'}">
               <span class="btn-icon">${isPrayed ? Icons.checkCircle : Icons.prayerHands}</span>
               <span>${isPrayed ? 'Prayed ✓' : 'I Prayed'}</span>
@@ -694,7 +688,7 @@ const App = {
 
           <div class="card-menu-container">
             <button class="card-menu-btn" data-action="toggle-card-menu" title="More options" aria-label="More options">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
             </button>
             <div class="card-menu-dropdown">
               <button class="card-menu-item" data-action="share-companion" data-id="${prayer.prayer_id}">
