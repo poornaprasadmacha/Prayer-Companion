@@ -642,6 +642,47 @@ body {
   letter-spacing: -0.3px;
 }
 
+.companion-header {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.companion-title-heading {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.companion-title-img {
+  height: 52px;
+  max-height: 58px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+  filter: brightness(0.12);
+  transition: filter 0.2s ease;
+}
+
+body.dark-theme .companion-title-img {
+  filter: brightness(1) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* ==========================================================================
    PRAYER CARDS (REFINED & CLUTTER-FREE)
    ========================================================================== */
