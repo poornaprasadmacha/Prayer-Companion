@@ -248,7 +248,7 @@ const AppDB = {
       user_id: userId,
       title: 'God’s Unfailing Faithfulness',
       description: 'Praising God for new mercies this morning and for His peace that surpasses all understanding.',
-      entry_date: new Date().toISOString().split('T')[0],
+      entry_date: (typeof Tracking !== 'undefined' ? Tracking.getLocalDateString() : new Date().toISOString().split('T')[0]),
       category: 'Spiritual Growth',
       linked_prayer_id: '',
       created_at: now,
@@ -275,6 +275,14 @@ const AppDB = {
         }
       }
     }
+    try {
+      await this.deleteSetting('community_requests_cache');
+    } catch (_) {}
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('PRAYERLY_COMMUNITY_CACHE');
+      }
+    } catch (_) {}
   }
 };
 

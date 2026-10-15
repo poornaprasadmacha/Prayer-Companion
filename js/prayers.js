@@ -169,7 +169,7 @@ const Prayers = {
     }
 
     if (category && category !== 'all') {
-      filtered = filtered.filter(p => p.category.toLowerCase() === category.toLowerCase());
+      filtered = filtered.filter(p => (p.category || '').toLowerCase() === category.toLowerCase());
     }
 
     if (priority && priority !== 'all') {
@@ -195,7 +195,7 @@ const Prayers = {
         return new Date(a.created_at) - new Date(b.created_at);
       }
       if (sortBy === 'title') {
-        return a.title.localeCompare(b.title);
+        return (a.title || '').localeCompare(b.title || '');
       }
       if (sortBy === 'priority') {
         const priorityRank = { 'High': 3, 'Medium': 2, 'Low': 1 };

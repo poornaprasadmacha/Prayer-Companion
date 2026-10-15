@@ -469,6 +469,8 @@ const App = {
           : `${rawVerseText}\n${verseRef}\n\nVia Prayerly`;
         navigator.clipboard.writeText(textToCopy).then(() => {
           UI.toast('Daily devotional copied to clipboard', 'success');
+        }).catch(() => {
+          UI.toast('Unable to access clipboard automatically.', 'warning');
         });
       };
     }
@@ -777,6 +779,9 @@ const App = {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
         closeAllCardMenus();
+        if (btn.disabled) return;
+        btn.disabled = true;
+
         if (window.navigator?.vibrate) {
           try { window.navigator.vibrate(15); } catch (_) {}
         }
@@ -787,11 +792,21 @@ const App = {
           card.style.transform = 'scale(0.97) translateY(-4px)';
           card.style.opacity = '0.35';
         }
-        const res = await Tracking.togglePrayedToday(id);
-        if (res.prayed) {
-          UI.toast('Moved to Prayed list so you can focus on remaining prayers!', 'success');
-        } else {
-          UI.toast('Moved back to To-Pray list.', 'info');
+        try {
+          const res = await Tracking.togglePrayedToday(id);
+          if (res.prayed) {
+            UI.toast('Moved to Prayed list so you can focus on remaining prayers!', 'success');
+          } else {
+            UI.toast('Moved back to To-Pray list.', 'info');
+          }
+        } catch (err) {
+          UI.toast(err.message, 'error');
+          if (card) {
+            card.style.transform = '';
+            card.style.opacity = '';
+          }
+        } finally {
+          btn.disabled = false;
         }
       });
     });
@@ -1037,6 +1052,28 @@ const App = {
       });
     });
 
+    // Edit Community Request
+    parentEl.querySelectorAll('[data-action="edit-community-req"]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const reqId = e.currentTarget.getAttribute('data-req-id');
+        const cached = await Community.getCachedRequests();
+        const reqList = (cached && cached.requests) ? cached.requests : [];
+        const req = reqList.find(r => r.request_id === reqId);
+        if (req) {
+          this.openShareCompanionModal({
+            title: req.prayer_title,
+            description: req.shared_description,
+            category: req.category,
+            display_name: req.display_name,
+            is_anonymous: req.is_anonymous,
+            allow_encouragement: req.allow_encouragement
+          }, reqId);
+        } else {
+          UI.toast('Could not find request details to edit.', 'warning');
+        }
+      });
+    });
+
     // Stop Sharing
     parentEl.querySelectorAll('[data-action="stop-sharing"]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
@@ -1215,8 +1252,10 @@ const App = {
     }
 
     const targetDate = datePickerInput ? (datePickerInput.value || Tracking.getLocalDateString()) : Tracking.getLocalDateString();
-    if (datePickerInput && !datePickerInput.value) {
-      datePickerInput.value = targetDate;
+    if (datePickerInput) {
+      if (!datePickerInput.value) {
+        datePickerInput.value = targetDate;
+      }
       datePickerInput.onchange = () => this.renderHistoryView();
     }
 
@@ -1228,10 +1267,10 @@ const App = {
         selectedDatePrayersEl.innerHTML = dayRecords.map(r => `
           <div class="history-record-card">
             <div>
-              <div style="font-weight: bold; color: #023E8A;">${UI.escape(r.title)}</div>
+              <div style="font-weight: bold; color: var(--text-primary);">${UI.escape(r.title)}</div>
               <span class="badge badge-category" style="margin-top: 4px;">${UI.escape(r.category || 'General')}</span>
             </div>
-            <div style="font-size: 12px; color: #718096;">
+            <div style="font-size: 12px; color: var(--text-muted);">
               ${new Date(r.prayed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </div>
           </div>
@@ -1293,12 +1332,15 @@ const App = {
     const saveBtn = document.getElementById('btn-save-settings');
     if (saveBtn) {
       saveBtn.onclick = async () => {
+        const existingSettings = await Settings.getSettings();
         const newSettings = {
+          ...existingSettings,
           timezone: timezoneSelect ? timezoneSelect.value : 'Asia/Kolkata',
           morning_email_enabled: morningCheck ? morningCheck.checked : true,
           morning_time: morningTimeInput ? morningTimeInput.value : '03:00',
           evening_email_enabled: eveningCheck ? eveningCheck.checked : true,
-          evening_time: eveningTimeInput ? eveningTimeInput.value : '18:00'
+          evening_time: eveningTimeInput ? eveningTimeInput.value : '18:00',
+          short_name: Settings.getUserShortName() || existingSettings.short_name || ''
         };
 
         if (apiUrlInput) {
@@ -1387,7 +1429,9 @@ const App = {
         if (ok) {
           await Auth.logout(false);
           UI.toast('Signed out', 'info');
+          this.switchView('dashboard');
           this.renderHeader();
+          this.renderDashboard();
           this.openAuthModal();
         }
       };
@@ -1763,10 +1807,11 @@ const App = {
   },
 
   // Share with Prayer Companions Modal
-  openShareCompanionModal(prayer) {
+  openShareCompanionModal(prayer, existingRequestId = null) {
     const modal = document.getElementById('modal-share-companion');
     if (!modal) return;
 
+    const modalTitle = modal.querySelector('.modal-title');
     const titleInput = document.getElementById('share-form-title');
     const descInput = document.getElementById('share-form-desc');
     const nameInput = document.getElementById('share-form-name');
@@ -1774,11 +1819,16 @@ const App = {
     const allowEncCheck = document.getElementById('share-form-allow-enc');
     const submitBtn = document.getElementById('btn-confirm-share-companion');
 
-    titleInput.value = prayer.title || '';
-    descInput.value = prayer.description || '';
-    nameInput.value = '';
-    anonCheck.checked = false;
-    allowEncCheck.checked = true;
+    if (modalTitle) {
+      modalTitle.textContent = existingRequestId ? 'Edit Community Prayer Request' : 'Share with Prayer Companions';
+    }
+
+    titleInput.value = prayer.title || prayer.prayer_title || '';
+    descInput.value = prayer.description || prayer.shared_description || '';
+    nameInput.value = prayer.display_name || '';
+    anonCheck.checked = Boolean(prayer.is_anonymous);
+    allowEncCheck.checked = prayer.allow_encouragement !== undefined ? Boolean(prayer.allow_encouragement) : true;
+    submitBtn.textContent = existingRequestId ? 'Save Changes' : 'Ask Companions to Pray';
 
     modal.classList.add('active');
 
@@ -1787,22 +1837,37 @@ const App = {
       submitBtn.textContent = 'Submitting...';
 
       try {
-        await Community.shareRequest({
-          prayer_title: titleInput.value,
-          shared_description: descInput.value,
-          display_name: nameInput.value,
-          is_anonymous: anonCheck.checked,
-          category: prayer.category || 'General',
-          allow_encouragement: allowEncCheck.checked
-        });
+        if (existingRequestId) {
+          await Community.updateRequest(existingRequestId, {
+            prayer_title: titleInput.value,
+            shared_description: descInput.value,
+            display_name: nameInput.value,
+            is_anonymous: anonCheck.checked,
+            category: prayer.category || 'General',
+            allow_encouragement: allowEncCheck.checked
+          });
+          UI.toast('Community prayer request updated!', 'success');
+        } else {
+          await Community.shareRequest({
+            prayer_title: titleInput.value,
+            shared_description: descInput.value,
+            display_name: nameInput.value,
+            is_anonymous: anonCheck.checked,
+            category: prayer.category || 'General',
+            allow_encouragement: allowEncCheck.checked
+          });
+          UI.toast('Prayer request shared! Other companions will pray for you.', 'success');
+        }
 
         modal.classList.remove('active');
-        UI.toast('Prayer request shared! Other companions will pray for you.', 'success');
+        if (this.currentView === 'community') {
+          await this.renderCommunityView();
+        }
       } catch (err) {
         UI.toast(err.message, 'error');
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Ask Companions to Pray';
+        submitBtn.textContent = existingRequestId ? 'Save Changes' : 'Ask Companions to Pray';
       }
     };
   },
@@ -1827,14 +1892,14 @@ const App = {
           listContainer.innerHTML = '<div style="color: #718096; font-style: italic; padding: 10px;">No messages yet. Be the first to send a word of prayerful encouragement!</div>';
         } else {
           listContainer.innerHTML = res.messages.map(m => `
-            <div style="background: #F0F9FF; border-left: 3px solid #008080; border-radius: 4px; padding: 8px 12px; margin-bottom: 8px; font-size: 13px;">
-              <p style="margin: 0 0 4px 0; color: #2D3748;">${UI.escape(m.message_text)}</p>
-              <span style="font-size: 10px; color: #718096;">${new Date(m.created_at).toLocaleDateString()}</span>
+            <div style="background: var(--bg-hover); border-left: 3px solid var(--olive-600); border-radius: 0px; padding: 8px 12px; margin-bottom: 8px; font-size: 13px;">
+              <p style="margin: 0 0 4px 0; color: var(--text-primary);">${UI.escape(m.message_text)}</p>
+              <span style="font-size: 11px; color: var(--text-muted);">${new Date(m.created_at).toLocaleDateString()}</span>
             </div>
           `).join('');
         }
       } catch (e) {
-        listContainer.innerHTML = '<div style="color: #DC2626;">Could not load messages.</div>';
+        listContainer.innerHTML = '<div style="color: var(--danger);">Could not load messages.</div>';
       }
     };
 
@@ -1898,12 +1963,14 @@ const App = {
       titleEl.textContent = prayer.title;
     }
 
+    const localToday = typeof Tracking !== 'undefined' ? Tracking.getLocalDateString() : new Date().toISOString().split('T')[0];
+
     if (existingRecord) {
       testimonyInput.value = existingRecord.testimony || '';
-      dateInput.value = existingRecord.answered_date || new Date().toISOString().split('T')[0];
+      dateInput.value = existingRecord.answered_date || localToday;
     } else {
       testimonyInput.value = '';
-      dateInput.value = new Date().toISOString().split('T')[0];
+      dateInput.value = localToday;
     }
 
     modal.classList.add('active');
@@ -1934,19 +2001,20 @@ const App = {
     const categoryInput = document.getElementById('tg-form-category');
     const dateInput = document.getElementById('tg-form-date');
     const saveBtn = document.getElementById('btn-save-thanksgiving');
+    const localToday = typeof Tracking !== 'undefined' ? Tracking.getLocalDateString() : new Date().toISOString().split('T')[0];
 
     if (existingEntry) {
       modalTitle.textContent = 'Edit Thanksgiving Entry';
       titleInput.value = existingEntry.title || '';
       descInput.value = existingEntry.description || '';
       categoryInput.value = existingEntry.category || 'General Praise';
-      dateInput.value = existingEntry.entry_date || new Date().toISOString().split('T')[0];
+      dateInput.value = existingEntry.entry_date || localToday;
     } else {
       modalTitle.textContent = 'New Thanksgiving Entry';
       titleInput.value = '';
       descInput.value = '';
       categoryInput.value = 'General Praise';
-      dateInput.value = new Date().toISOString().split('T')[0];
+      dateInput.value = localToday;
     }
 
     modal.classList.add('active');

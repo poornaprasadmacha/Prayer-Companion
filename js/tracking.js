@@ -47,25 +47,27 @@ const Tracking = {
     const nowIso = new Date().toISOString();
 
     const allHistory = await AppDB.getAll('prayer_history');
-    const existing = allHistory.find(h =>
+    const matching = allHistory.filter(h =>
       h.user_id === userId &&
       h.prayer_id === prayerId &&
       h.date === dateStr &&
       !h.is_deleted
     );
 
-    if (existing) {
-      // Undo mark
-      existing.is_deleted = true;
-      existing.updated_at = nowIso;
-      await AppDB.put('prayer_history', existing);
-      await SyncEngine.enqueue('history', 'delete', existing);
+    if (matching.length > 0) {
+      // Undo mark for all matching records
+      for (const item of matching) {
+        item.is_deleted = true;
+        item.updated_at = nowIso;
+        await AppDB.put('prayer_history', item);
+        await SyncEngine.enqueue('history', 'delete', item);
+      }
 
       window.dispatchEvent(new CustomEvent('prayer-data-changed', {
         detail: { action: 'unprayed', prayerId: prayerId }
       }));
 
-      return { prayed: false, historyItem: existing };
+      return { prayed: false, historyItem: matching[0] };
     } else {
       // Mark as prayed today
       const newHistoryItem = {
@@ -145,7 +147,7 @@ const Tracking = {
       checkDate.setDate(checkDate.getDate() - 1);
     }
 
-    while (true) {
+    while (streak < 1000) {
       const dStr = this.getLocalDateString(checkDate);
       if (validDates.has(dStr)) {
         streak++;

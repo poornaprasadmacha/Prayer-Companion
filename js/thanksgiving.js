@@ -19,7 +19,7 @@ const Thanksgiving = {
       user_id: userId,
       title: (data.title || '').trim(),
       description: (data.description || '').trim(),
-      entry_date: (data.entry_date || new Date().toISOString().split('T')[0]).trim(),
+      entry_date: (data.entry_date || (typeof Tracking !== 'undefined' ? Tracking.getLocalDateString() : new Date().toISOString().split('T')[0])).trim(),
       category: (data.category || 'General Praise').trim(),
       linked_prayer_id: (data.linked_prayer_id || '').trim(),
       created_at: nowIso,
@@ -106,7 +106,7 @@ const Thanksgiving = {
     let filtered = all.filter(e => e.user_id === userId && !e.is_deleted);
 
     if (category && category !== 'all') {
-      filtered = filtered.filter(e => e.category.toLowerCase() === category.toLowerCase());
+      filtered = filtered.filter(e => (e.category || '').toLowerCase() === category.toLowerCase());
     }
 
     if (searchQuery && searchQuery.trim()) {

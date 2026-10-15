@@ -13,7 +13,7 @@ const Auth = {
    * Initialize Authentication State on App Load
    */
   async init() {
-    this.apiUrl = localStorage.getItem('PRAYER_API_URL') || '';
+    this.apiUrl = this.getApiUrl();
     const storedToken = localStorage.getItem('PRAYER_SESSION_TOKEN');
     const storedUser = localStorage.getItem('PRAYER_USER');
 
@@ -201,10 +201,11 @@ const Auth = {
    * Verify active session with backend
    */
   async checkSession() {
-    if (!this.token || !this.apiUrl || this.isLocalMode()) return false;
+    const apiUrl = this.getApiUrl();
+    if (!this.token || !apiUrl || this.isLocalMode()) return false;
 
     try {
-      const response = await fetch(this.apiUrl, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
@@ -230,9 +231,10 @@ const Auth = {
    * @param {boolean} clearLocalData
    */
   async logout(clearLocalData = false) {
-    if (this.token && this.apiUrl) {
+    const apiUrl = this.getApiUrl();
+    if (this.token && apiUrl) {
       try {
-        fetch(this.apiUrl, {
+        fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({

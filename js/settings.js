@@ -12,7 +12,7 @@ const Settings = {
     let name = localStorage.getItem('prayer_user_short_name');
     if (name && name.trim()) return name.trim();
 
-    const email = Auth.getUserEmail();
+    const email = (Auth.getUserEmail() || '').trim();
     if (email && email.includes('@')) {
       if (email.toLowerCase().includes('poorna')) {
         name = 'Poorna';

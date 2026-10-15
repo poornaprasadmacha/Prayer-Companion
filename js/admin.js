@@ -11,7 +11,7 @@ const Admin = {
   cachedUsers: [],
 
   isAdminUser() {
-    return Auth.isLoggedIn() && Auth.getUserEmail().toLowerCase() === this.adminEmail.toLowerCase();
+    return Auth.isLoggedIn() && (Auth.getUserEmail() || '').toLowerCase() === this.adminEmail.toLowerCase();
   },
 
   async init() {

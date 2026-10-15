@@ -14,7 +14,7 @@ const Answered = {
   async recordAnswer(prayerId, testimony = '', answeredDate = null) {
     const userId = Auth.getUserId();
     const nowIso = new Date().toISOString();
-    const targetDate = answeredDate || new Date().toISOString().split('T')[0];
+    const targetDate = answeredDate || (typeof Tracking !== 'undefined' ? Tracking.getLocalDateString() : new Date().toISOString().split('T')[0]);
 
     const prayer = await AppDB.get('prayers', prayerId);
     if (!prayer) {
@@ -133,7 +133,7 @@ const Answered = {
     });
 
     if (category && category !== 'all') {
-      list = list.filter(item => item.prayer_category.toLowerCase() === category.toLowerCase());
+      list = list.filter(item => (item.prayer_category || '').toLowerCase() === category.toLowerCase());
     }
 
     if (searchQuery && searchQuery.trim()) {

@@ -63,7 +63,7 @@ const UI = {
             <h3 class="modal-title">${this.escape(title)}</h3>
           </div>
           <div class="modal-body">
-            <p style="color: #4A5568; margin: 0; line-height: 1.5;">${this.escape(message)}</p>
+            <p style="color: var(--text-secondary); margin: 0; line-height: 1.5;">${this.escape(message)}</p>
           </div>
           <div class="modal-footer">
             <button class="btn btn-secondary cancel-btn">${this.escape(cancelText)}</button>
@@ -96,7 +96,8 @@ const UI = {
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 };
 
