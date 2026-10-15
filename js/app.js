@@ -81,11 +81,21 @@ const App = {
     const toggleBtn = document.getElementById('theme-toggle-btn');
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
-        const currentlyDark = document.body.classList.contains('dark-theme');
-        const nextDark = !currentlyDark;
-        this.applyTheme(nextDark);
-        localStorage.setItem('PRAYERLY_THEME', nextDark ? 'dark' : 'light');
+        this.toggleTheme();
       });
+    }
+
+    this.initPreferences();
+  },
+
+  toggleTheme() {
+    const currentlyDark = document.body.classList.contains('dark-theme');
+    const nextDark = !currentlyDark;
+    this.applyTheme(nextDark);
+    localStorage.setItem('PRAYERLY_THEME', nextDark ? 'dark' : 'light');
+    const moreNightLabel = document.getElementById('more-nightmode-label');
+    if (moreNightLabel) {
+      moreNightLabel.textContent = nextDark ? 'Light Mode' : 'Night Mode';
     }
   },
 
@@ -103,9 +113,130 @@ const App = {
       sunIcon.style.display = isDark ? 'none' : 'inline-flex';
       moonIcon.style.display = isDark ? 'inline-flex' : 'none';
     }
+    const moreNightLabel = document.getElementById('more-nightmode-label');
+    if (moreNightLabel) {
+      moreNightLabel.textContent = isDark ? 'Light Mode' : 'Night Mode';
+    }
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
       metaTheme.setAttribute('content', isDark ? '#0B1120' : '#023E8A');
+    }
+  },
+
+  initPreferences() {
+    // 1. Font Size Scaling
+    const savedFontScale = localStorage.getItem('prayerly_font_scale') || 'md';
+    this.setTextSize(savedFontScale, false);
+
+    // 2. Theme Accent Color
+    const savedThemeColor = localStorage.getItem('prayerly_theme_color') || 'olive';
+    this.setThemeColor(savedThemeColor, false);
+  },
+
+  setTextSize(scale, showToast = true) {
+    const validScales = ['sm', 'md', 'lg', 'xl'];
+    if (!validScales.includes(scale)) scale = 'md';
+
+    // Remove all previous scale classes
+    validScales.forEach(s => document.body.classList.remove(`font-scale-${s}`));
+    document.body.classList.add(`font-scale-${scale}`);
+    localStorage.setItem('prayerly_font_scale', scale);
+
+    // Update buttons in modal
+    document.querySelectorAll('.text-size-btn').forEach(btn => {
+      if (btn.getAttribute('data-scale') === scale) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // Update indicator label
+    const indicator = document.getElementById('font-scale-indicator');
+    if (indicator) {
+      const labels = {
+        sm: 'Small (90%)',
+        md: 'Default (100%)',
+        lg: 'Large (115%)',
+        xl: 'X-Large (130%)'
+      };
+      indicator.textContent = labels[scale] || 'Default (100%)';
+    }
+
+    if (showToast && typeof UI !== 'undefined' && UI.toast) {
+      UI.toast('Reading text size updated', 'info');
+    }
+  },
+
+  setThemeColor(color, showToast = true) {
+    const validColors = ['olive', 'navy', 'emerald', 'amber', 'purple'];
+    if (!validColors.includes(color)) color = 'olive';
+
+    document.documentElement.setAttribute('data-theme-color', color);
+    document.body.setAttribute('data-theme-color', color);
+    localStorage.setItem('prayerly_theme_color', color);
+
+    // Update buttons in modal
+    document.querySelectorAll('.theme-color-dot').forEach(btn => {
+      if (btn.getAttribute('data-theme') === color) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    if (showToast && typeof UI !== 'undefined' && UI.toast) {
+      const names = {
+        olive: 'Olive Green',
+        navy: 'Classic Navy',
+        emerald: 'Emerald Forest',
+        amber: 'Warm Amber',
+        purple: 'Royal Purple'
+      };
+      UI.toast(`Theme set to ${names[color] || color}`, 'info');
+    }
+  },
+
+  openMoreMenu() {
+    this.closeAllModals();
+    const modal = document.getElementById('modal-more-menu');
+    if (modal) {
+      // Admin link visibility
+      const adminLink = document.getElementById('more-link-admin');
+      if (adminLink) {
+        adminLink.style.display = (typeof Admin !== 'undefined' && Admin.isAdminUser()) ? 'flex' : 'none';
+      }
+
+      // Night mode label
+      const isDark = document.body.classList.contains('dark-theme');
+      const moreNightLabel = document.getElementById('more-nightmode-label');
+      if (moreNightLabel) {
+        moreNightLabel.textContent = isDark ? 'Light Mode' : 'Night Mode';
+      }
+
+      // Ensure active states are visually synced
+      const currentScale = localStorage.getItem('prayerly_font_scale') || 'md';
+      this.setTextSize(currentScale, false);
+
+      const currentColor = localStorage.getItem('prayerly_theme_color') || 'olive';
+      this.setThemeColor(currentColor, false);
+
+      modal.classList.add('active');
+    }
+  },
+
+  openMoreLink(tab) {
+    this.closeAllModals();
+    this.switchTab(tab);
+  },
+
+  openMoreManual() {
+    this.closeAllModals();
+    if (typeof Settings !== 'undefined' && Settings.openManualModal) {
+      Settings.openManualModal();
+    } else {
+      const modal = document.getElementById('modal-manual');
+      if (modal) modal.classList.add('active');
     }
   },
 
@@ -273,6 +404,15 @@ const App = {
       }
     });
 
+    const mobileMoreBtn = document.getElementById('btn-mobile-more');
+    if (mobileMoreBtn) {
+      if (tabName === 'settings' || tabName === 'history') {
+        mobileMoreBtn.classList.add('active');
+      } else {
+        mobileMoreBtn.classList.remove('active');
+      }
+    }
+
     // Update views
     document.querySelectorAll('.view-panel').forEach(panel => {
       panel.classList.remove('active');
@@ -357,10 +497,16 @@ const App = {
     }
 
     if (userBadgeEl) {
-      if (isLoggedIn) {
+      if (isLoggedIn || Auth.isLocalMode()) {
         userBadgeEl.style.display = 'inline-flex';
-        userBadgeEl.textContent = Auth.getUserEmail();
-        userBadgeEl.title = 'Account: ' + Auth.getUserEmail() + ' (Click to manage account)';
+        const email = Auth.getUserEmail() || 'Account';
+        userBadgeEl.innerHTML = `
+          <span class="user-badge-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <span class="user-badge-text">${UI.escape(email)}</span>
+        `;
+        userBadgeEl.title = 'Account: ' + email + ' (Click to manage account)';
         userBadgeEl.onclick = () => this.switchTab('settings');
       } else {
         userBadgeEl.style.display = 'none';

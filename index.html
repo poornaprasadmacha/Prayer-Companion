@@ -45,7 +45,7 @@
       <div class="header-right">
         <button id="header-btn-signin" class="btn btn-primary btn-sm header-signin-btn" onclick="App.openAuthModal()" title="Sign in to your account">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 5px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-          Sign In
+          <span class="signin-text">Sign In</span>
         </button>
         <button id="theme-toggle-btn" class="icon-btn theme-toggle-btn" title="Toggle Light / Night Mode" aria-label="Toggle Night Mode">
           <span class="icon-sun">
@@ -55,7 +55,12 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
           </span>
         </button>
-        <span id="user-email-badge" class="user-badge" title="Account" style="display: none;">Loading...</span>
+        <span id="user-email-badge" class="user-badge" title="Account Settings" style="display: none;">
+          <span class="user-badge-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <span class="user-badge-text">Account</span>
+        </span>
         <div id="sync-status-indicator" class="sync-badge sync-synced" title="Local-First Sync Status" style="display: none;" aria-hidden="true">
           <span class="sync-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -217,7 +222,9 @@
          ==================================================================== -->
     <section id="view-community" class="view-panel">
       <div class="section-header companion-header">
-        <img src="assets/Prayerly.png" alt="Pray for Others" class="companion-title-img" />
+        <div class="banner-wrapper">
+          <img src="assets/pray-for-others.png" alt="Pray for Others" class="page-banner-img" />
+        </div>
       </div>
 
       <!-- Filters & Search -->
@@ -262,10 +269,9 @@
          VIEW 4: ANSWERED PRAYERS
          ==================================================================== -->
     <section id="view-answered" class="view-panel">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">Answered Prayers</h2>
-          <p style="font-size: 13px; color: #4A5568;">"Truly God has listened; He has attended to the voice of my prayer."</p>
+      <div class="section-header banner-section-header">
+        <div class="banner-wrapper">
+          <img src="assets/answered-prayers.png" alt="Answered Prayers" class="page-banner-img" />
         </div>
       </div>
 
@@ -286,12 +292,13 @@
          VIEW 5: THANKSGIVING JOURNAL
          ==================================================================== -->
     <section id="view-thanksgiving" class="view-panel">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">Thanksgiving Journal</h2>
-          <p style="font-size: 13px; color: #4A5568;">Give thanks to the Lord, for He is good.</p>
+      <div class="section-header banner-section-header" style="display: flex; flex-direction: column; gap: 10px; align-items: stretch; margin-bottom: 16px;">
+        <div class="banner-wrapper">
+          <img src="assets/thanksgiving.png" alt="Thanksgiving" class="page-banner-img" />
         </div>
-        <button id="btn-add-thanksgiving" class="btn btn-primary btn-sm" onclick="App.openThanksgivingModal()">+ Add Gratitude</button>
+        <div style="display: flex; justify-content: flex-end;">
+          <button id="btn-add-thanksgiving" class="btn btn-primary btn-sm" onclick="App.openThanksgivingModal()">+ Add Gratitude</button>
+        </div>
       </div>
 
       <div id="thanksgiving-list-container"></div>
@@ -774,9 +781,13 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
       <span>Thanks</span>
     </button>
-    <button class="bottom-nav-item" data-tab="settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-      <span>Settings</span>
+    <button id="btn-mobile-more" class="bottom-nav-item" onclick="App.openMoreMenu()" aria-label="More Options">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;">
+        <circle cx="12" cy="12" r="1.5"/>
+        <circle cx="19" cy="12" r="1.5"/>
+        <circle cx="5" cy="12" r="1.5"/>
+      </svg>
+      <span>More</span>
     </button>
     <button id="mobile-nav-admin-btn" class="bottom-nav-item" data-tab="admin" style="display: none; color: #B45309;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -1218,6 +1229,143 @@
       </div>
       <div class="modal-footer" style="border-top: 1px solid var(--border-light); padding: 12px 20px;">
         <button class="btn btn-primary" onclick="App.closeAllModals()" style="width: 100%;">Close Manual</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL: MORE OPTIONS (MOBILE SHEET)
+       ==================================================================== -->
+  <div id="modal-more-menu" class="modal-backdrop">
+    <div class="modal-card more-options-modal-card">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; color: var(--navy-900);">
+            <circle cx="12" cy="12" r="1.5"/>
+            <circle cx="19" cy="12" r="1.5"/>
+            <circle cx="5" cy="12" r="1.5"/>
+          </svg>
+          More Options
+        </h3>
+        <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px 20px 24px 20px;">
+        
+        <!-- SECTION 1: TEXT SIZE -->
+        <div class="more-menu-section">
+          <div class="more-section-title-row">
+            <span class="more-section-title">Reading Text Size</span>
+            <span id="font-scale-indicator" class="font-scale-badge">Default (100%)</span>
+          </div>
+          <p class="more-section-desc">Adjust size of prayer titles, descriptions and daily inspiration text.</p>
+          <div class="text-size-selector">
+            <button class="text-size-btn" data-scale="sm" onclick="App.setTextSize('sm')" title="Small Text">
+              <span style="font-size: 13px; font-weight: 600;">A-</span>
+              <small>Small</small>
+            </button>
+            <button class="text-size-btn active" data-scale="md" onclick="App.setTextSize('md')" title="Standard Text">
+              <span style="font-size: 15px; font-weight: 600;">A</span>
+              <small>Default</small>
+            </button>
+            <button class="text-size-btn" data-scale="lg" onclick="App.setTextSize('lg')" title="Large Text">
+              <span style="font-size: 18px; font-weight: 600;">A+</span>
+              <small>Large</small>
+            </button>
+            <button class="text-size-btn" data-scale="xl" onclick="App.setTextSize('xl')" title="Extra Large Text">
+              <span style="font-size: 21px; font-weight: 700;">A++</span>
+              <small>X-Large</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECTION 2: THEME COLORS & NIGHT MODE -->
+        <div class="more-menu-section">
+          <div class="more-section-title-row">
+            <span class="more-section-title">Theme Colors</span>
+            <button id="more-nightmode-toggle" class="btn btn-secondary btn-sm" onclick="App.toggleTheme()" style="padding: 4px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+              <span id="more-nightmode-label">Night Mode</span>
+            </button>
+          </div>
+          <p class="more-section-desc">Choose your preferred soothing color palette.</p>
+          <div class="theme-color-palette">
+            <button class="theme-color-dot" data-theme="olive" onclick="App.setThemeColor('olive')" title="Olive Green (Calming & Gentle on Eyes)">
+              <span class="dot-swatch" style="background: #556B2F;"></span>
+              <span class="dot-label">Olive</span>
+            </button>
+            <button class="theme-color-dot active" data-theme="navy" onclick="App.setThemeColor('navy')" title="Classic Navy (Executive & Dignified)">
+              <span class="dot-swatch" style="background: #023E8A;"></span>
+              <span class="dot-label">Navy</span>
+            </button>
+            <button class="theme-color-dot" data-theme="emerald" onclick="App.setThemeColor('emerald')" title="Emerald Forest (Fresh & Inspiring)">
+              <span class="dot-swatch" style="background: #0F766E;"></span>
+              <span class="dot-label">Emerald</span>
+            </button>
+            <button class="theme-color-dot" data-theme="amber" onclick="App.setThemeColor('amber')" title="Warm Amber (Warm & Uplifting)">
+              <span class="dot-swatch" style="background: #B45309;"></span>
+              <span class="dot-label">Amber</span>
+            </button>
+            <button class="theme-color-dot" data-theme="purple" onclick="App.setThemeColor('purple')" title="Royal Purple (Spiritual & Contemplative)">
+              <span class="dot-swatch" style="background: #6D28D9;"></span>
+              <span class="dot-label">Purple</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECTION 3: NAVIGATION LINKS -->
+        <div class="more-menu-section" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
+          <span class="more-section-title" style="display: block; margin-bottom: 10px;">Quick Access</span>
+          <div class="more-menu-links">
+            <button class="more-menu-link-item" onclick="App.openMoreLink('history')">
+              <span class="more-link-icon" style="background: rgba(2, 62, 138, 0.08); color: var(--navy-900);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </span>
+              <div class="more-link-content">
+                <span class="more-link-title">Prayer History & Streaks</span>
+                <span class="more-link-desc">View prayer logs, daily streaks & calendar records</span>
+              </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
+            <button class="more-menu-link-item" onclick="App.openMoreLink('settings')">
+              <span class="more-link-icon" style="background: rgba(107, 142, 35, 0.12); color: var(--olive-700);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+              </span>
+              <div class="more-link-content">
+                <span class="more-link-title">App Settings</span>
+                <span class="more-link-desc">Manage account, reminders, sync & preferences</span>
+              </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
+            <button class="more-menu-link-item" onclick="App.openMoreManual()">
+              <span class="more-link-icon" style="background: rgba(217, 119, 6, 0.12); color: #B45309;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </span>
+              <div class="more-link-content">
+                <span class="more-link-title">User Manual & Guide</span>
+                <span class="more-link-desc">Explore features, offline usage & guidance</span>
+              </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
+            <button id="more-link-admin" class="more-menu-link-item" onclick="App.openMoreLink('admin')" style="display: none;">
+              <span class="more-link-icon" style="background: rgba(225, 29, 72, 0.1); color: #E11D48;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              <div class="more-link-content">
+                <span class="more-link-title">Admin Console</span>
+                <span class="more-link-desc">System monitoring, users & audit logs</span>
+              </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
