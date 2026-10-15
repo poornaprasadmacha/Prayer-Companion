@@ -517,11 +517,56 @@ const App = {
 
     if (emptyState) emptyState.style.display = 'none';
 
-    container.innerHTML = activePrayers.map(p => {
-      const isPrayed = prayedSet.has(p.prayer_id);
-      return this.renderPrayerCardHtml(p, isPrayed, true);
-    }).join('');
+    // Separate into to-pray (unprayed today) and prayed today
+    const toPrayPrayers = activePrayers.filter(p => !prayedSet.has(p.prayer_id));
+    const prayedPrayers = activePrayers.filter(p => prayedSet.has(p.prayer_id));
 
+    let html = '';
+
+    if (toPrayPrayers.length > 0) {
+      html += `
+        <div class="prayer-section-group" style="margin-bottom: 24px;">
+          <div class="prayer-section-header-sub">
+            <span class="prayer-section-title">Focus: To Pray Today</span>
+            <span class="badge-inspire" style="background: var(--navy-900);">${toPrayPrayers.length} to pray</span>
+          </div>
+          <div class="to-pray-cards-list">
+            ${toPrayPrayers.map(p => this.renderPrayerCardHtml(p, false, true)).join('')}
+          </div>
+        </div>
+      `;
+    } else {
+      // All active prayers completed for today!
+      html += `
+        <div class="all-prayed-banner">
+          <div class="all-prayed-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px; color: #059669;"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <h4 style="font-size: 15px; font-weight: 700; color: #065F46; margin: 0 0 4px 0;">All Prayer Points Completed Today!</h4>
+            <p style="font-size: 13px; color: #047857; margin: 0; line-height: 1.4;">
+              You have prayed through all your active requests. Focus on resting in God's peace.
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    if (prayedPrayers.length > 0) {
+      html += `
+        <div class="prayer-section-group prayed-section-group" style="margin-top: 10px;">
+          <div class="prayer-section-header-sub">
+            <span class="prayer-section-title" style="color: #059669;">Prayed Today</span>
+            <span class="badge-inspire" style="background: #10B981;">${prayedPrayers.length} completed</span>
+          </div>
+          <div class="prayed-cards-list">
+            ${prayedPrayers.map(p => this.renderPrayerCardHtml(p, true, true)).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
     this.attachPrayerCardActions(container);
   },
 
@@ -529,10 +574,34 @@ const App = {
   // PRAYERS LIST RENDERING
   // ==========================================================================
 
+  async updatePrayerTabCounts() {
+    try {
+      const allActive = await Prayers.query({ status: 'active' });
+      const prayedSet = await Tracking.getPrayedPrayerIdsForDate();
+      const toPrayCount = allActive.filter(p => !prayedSet.has(p.prayer_id)).length;
+      const prayedCount = allActive.filter(p => prayedSet.has(p.prayer_id)).length;
+      const allCount = allActive.length;
+      const archivedPrayers = await Prayers.query({ status: 'archived' });
+      const archivedCount = archivedPrayers.length;
+
+      const toPrayPill = document.querySelector('.prayer-status-pill[data-status="to-pray"]');
+      const prayedPill = document.querySelector('.prayer-status-pill[data-status="prayed"]');
+      const activePill = document.querySelector('.prayer-status-pill[data-status="active"]');
+      const archivedPill = document.querySelector('.prayer-status-pill[data-status="archived"]');
+
+      if (toPrayPill) toPrayPill.textContent = `To Pray Today (${toPrayCount})`;
+      if (prayedPill) prayedPill.textContent = `Prayed Today (${prayedCount})`;
+      if (activePill) activePill.textContent = `All Active (${allCount})`;
+      if (archivedPill) archivedPill.textContent = `Archived (${archivedCount})`;
+    } catch (_) {}
+  },
+
   async renderPrayersList() {
     const container = document.getElementById('prayers-list-container');
     const emptyState = document.getElementById('prayers-empty-state');
     if (!container) return;
+
+    await this.updatePrayerTabCounts();
 
     const searchInput = document.getElementById('prayer-search-input');
     const searchQuery = searchInput ? searchInput.value : '';
@@ -541,26 +610,50 @@ const App = {
     const category = categorySelect ? categorySelect.value : 'all';
 
     const activePill = document.querySelector('.prayer-status-pill.active');
-    const status = activePill ? activePill.getAttribute('data-status') : 'active';
+    const statusTab = activePill ? activePill.getAttribute('data-status') : 'to-pray';
+
+    const prayedSet = await Tracking.getPrayedPrayerIdsForDate();
+
+    let queryStatus = 'active';
+    if (statusTab === 'archived') {
+      queryStatus = 'archived';
+    }
 
     const prayers = await Prayers.query({
-      status: status,
+      status: queryStatus,
       category: category,
       searchQuery: searchQuery,
       sortBy: 'newest'
     });
 
-    const prayedSet = await Tracking.getPrayedPrayerIdsForDate();
+    let displayPrayers = prayers;
+    if (statusTab === 'to-pray') {
+      displayPrayers = prayers.filter(p => !prayedSet.has(p.prayer_id));
+    } else if (statusTab === 'prayed') {
+      displayPrayers = prayers.filter(p => prayedSet.has(p.prayer_id));
+    }
 
-    if (prayers.length === 0) {
+    if (displayPrayers.length === 0) {
       container.innerHTML = '';
-      if (emptyState) emptyState.style.display = 'block';
+      if (emptyState) {
+        emptyState.style.display = 'block';
+        const emptyMsg = emptyState.querySelector('p');
+        if (emptyMsg) {
+          if (statusTab === 'to-pray' && prayers.length > 0) {
+            emptyMsg.textContent = 'All prayer points prayed for today! Check the "Prayed Today" tab to review.';
+          } else if (statusTab === 'prayed') {
+            emptyMsg.textContent = 'No prayer points marked as prayed yet today.';
+          } else {
+            emptyMsg.textContent = 'No prayer points matching your current filter.';
+          }
+        }
+      }
       return;
     }
 
     if (emptyState) emptyState.style.display = 'none';
 
-    container.innerHTML = prayers.map(p => {
+    container.innerHTML = displayPrayers.map(p => {
       const isPrayed = prayedSet.has(p.prayer_id);
       return this.renderPrayerCardHtml(p, isPrayed, false);
     }).join('');
@@ -569,29 +662,29 @@ const App = {
   },
 
   renderPrayerCardHtml(prayer, isPrayed, isDashboard = false) {
-    const priorityClass = `badge-priority-${(prayer.priority || 'medium').toLowerCase()}`;
     const cardStatusClass = isPrayed ? 'card-prayed' : '';
     const dateFormatted = new Date(prayer.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    const hasDesc = Boolean(prayer.description && prayer.description.trim());
+    const mainText = hasDesc ? prayer.description.trim() : prayer.title;
+    const refTitle = hasDesc ? prayer.title : '';
 
     return `
       <div class="prayer-card ${cardStatusClass}" data-id="${prayer.prayer_id}">
-        <div class="prayer-card-header">
-          <div class="prayer-tags">
-            <span class="badge badge-category">${UI.escape(prayer.category)}</span>
-            <span class="badge ${priorityClass}">${UI.escape(prayer.priority)}</span>
-            ${prayer.person_name ? `<span class="badge badge-person"><span class="badge-icon">${Icons.person}</span> ${UI.escape(prayer.person_name)}</span>` : ''}
-          </div>
-          <div class="prayer-date">${dateFormatted}</div>
-        </div>
+        <div class="prayer-main-text">${UI.escape(mainText)}</div>
 
-        <h3 class="prayer-title">${UI.escape(prayer.title)}</h3>
-        ${prayer.description ? `<p class="prayer-desc">${UI.escape(prayer.description)}</p>` : ''}
+        <div class="prayer-meta-row">
+          ${refTitle ? `<span class="prayer-ref-title">${UI.escape(refTitle)}</span>` : ''}
+          <span class="badge-inspire badge-category">${UI.escape(prayer.category)}</span>
+          ${prayer.person_name ? `<span class="badge-inspire badge-person">${UI.escape(prayer.person_name)}</span>` : ''}
+          ${prayer.priority === 'High' ? `<span class="badge-inspire badge-priority-high">High Priority</span>` : ''}
+          <span class="prayer-date-subtle">${dateFormatted}</span>
+        </div>
 
         <div class="prayer-card-footer">
           <div class="prayer-primary-group" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <button class="btn btn-pray ${isPrayed ? 'btn-prayed' : ''}" data-action="toggle-pray" data-id="${prayer.prayer_id}">
+            <button class="btn btn-pray ${isPrayed ? 'btn-prayed' : ''}" data-action="toggle-pray" data-id="${prayer.prayer_id}" title="${isPrayed ? 'Click to move back to To-Pray' : 'Mark as prayed and move to Prayed list'}">
               <span class="btn-icon">${isPrayed ? Icons.checkCircle : Icons.prayerHands}</span>
-              <span>${isPrayed ? 'Prayed' : 'I Prayed'}</span>
+              <span>${isPrayed ? 'Prayed ✓' : 'I Prayed'}</span>
             </button>
             <button class="btn btn-secondary btn-sm" title="God Answered This Prayer" data-action="answered" data-id="${prayer.prayer_id}">
               <span class="btn-icon">${Icons.sparkles}</span>
@@ -657,11 +750,17 @@ const App = {
           try { window.navigator.vibrate(15); } catch (_) {}
         }
         const id = e.currentTarget.getAttribute('data-id');
+        const card = e.currentTarget.closest('.prayer-card');
+        if (card) {
+          card.style.transition = 'all 0.22s ease-out';
+          card.style.transform = 'scale(0.97) translateY(-4px)';
+          card.style.opacity = '0.35';
+        }
         const res = await Tracking.togglePrayedToday(id);
         if (res.prayed) {
-          UI.toast('Marked as prayed today. Blessed be God!', 'success');
+          UI.toast('Moved to Prayed list so you can focus on remaining prayers!', 'success');
         } else {
-          UI.toast('Prayer mark undone.', 'info');
+          UI.toast('Moved back to To-Pray list.', 'info');
         }
       });
     });
