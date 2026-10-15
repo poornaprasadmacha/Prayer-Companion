@@ -135,56 +135,63 @@ const heroPreviewSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380
 fs.writeFileSync(path.join(assetsDir, 'landing-hero-preview.svg'), heroPreviewSvg.trim(), 'utf8');
 
 // 2. COMPLETED PRAYERS BANNER GRAPHIC (Replaces "All Prayer Points Completed Today!")
-const completedBannerSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 130" width="100%" height="100%">
+const completedBannerSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 120" width="100%" height="100%">
   <defs>
     <linearGradient id="compGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#F0FDF4"/>
       <stop offset="50%" stop-color="#ECFDF5"/>
-      <stop offset="100%" stop-color="#F0F7FF"/>
+      <stop offset="100%" stop-color="#F0F9FF"/>
     </linearGradient>
-    <linearGradient id="sunbeam" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FEF3C7" stop-opacity="0.8"/>
-      <stop offset="100%" stop-color="#D97706" stop-opacity="0"/>
+    <linearGradient id="circleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF3C7"/>
+      <stop offset="100%" stop-color="#D1FAE5"/>
     </linearGradient>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <style>
+      .banner-bg { fill: url(#compGrad); stroke: #BBF7D0; }
+      .title-text { fill: #065F46; }
+      .sub-text { fill: #047857; }
+      @media (prefers-color-scheme: dark) {
+        .banner-bg { fill: #064E3B; stroke: #047857; }
+        .title-text { fill: #F0FDF4; }
+        .sub-text { fill: #A7F3D0; }
+      }
+    </style>
   </defs>
 
-  <rect width="680" height="130" rx="14" fill="url(#compGrad)" stroke="#BBF7D0" stroke-width="1.2"/>
+  <rect class="banner-bg" width="680" height="120" rx="14" stroke-width="1.2"/>
 
-  <!-- Radiant glow elements -->
-  <circle cx="95" cy="65" r="50" fill="url(#sunbeam)"/>
-
-  <!-- Peaceful Emblem (Open Bible with Olive Leaves) -->
-  <g transform="translate(65, 35)">
-    <!-- Open Bible Pages -->
-    <path d="M5 45 C15 35, 25 38, 30 42 C35 38, 45 35, 55 45 L55 20 C45 10, 35 13, 30 17 C25 13, 15 10, 5 20 Z" fill="#FFFFFF" stroke="#059669" stroke-width="2" stroke-linejoin="round"/>
-    <line x1="30" y1="17" x2="30" y2="42" stroke="#059669" stroke-width="2"/>
-    <line x1="12" y1="23" x2="24" y2="21" stroke="#A7F3D0" stroke-width="1.5"/>
-    <line x1="12" y1="28" x2="24" y2="26" stroke="#A7F3D0" stroke-width="1.5"/>
-    <line x1="36" y1="21" x2="48" y2="23" stroke="#A7F3D0" stroke-width="1.5"/>
-    <line x1="36" y1="26" x2="48" y2="28" stroke="#A7F3D0" stroke-width="1.5"/>
-
-    <!-- Olive branch / sprig -->
-    <path d="M30 10 Q32 0 42 2" stroke="#10B981" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <ellipse cx="38" cy="3" rx="4" ry="2" transform="rotate(-30 38 3)" fill="#10B981"/>
-    <ellipse cx="33" cy="7" rx="3" ry="1.5" transform="rotate(20 33 7)" fill="#34D399"/>
+  <g transform="translate(30, 22)">
+    <circle cx="38" cy="38" r="38" fill="url(#circleGrad)"/>
+    <path d="M38 4 v-4 M38 72 v4 M4 38 h-4 M72 38 h4 M14 14 l-3 -3 M62 62 l3 3 M14 62 l-3 3 M62 14 l3 -3" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    <g transform="translate(13, 16)">
+      <path d="M5 34 C13 26, 21 28, 25 31 C29 28, 37 26, 45 34 L45 14 C37 6, 29 8, 25 11 C21 8, 13 6, 5 14 Z" fill="#FFFFFF" stroke="#059669" stroke-width="2" stroke-linejoin="round"/>
+      <line x1="25" y1="11" x2="25" y2="31" stroke="#059669" stroke-width="2"/>
+      <line x1="11" y1="16" x2="20" y2="15" stroke="#A7F3D0" stroke-width="1.5"/>
+      <line x1="11" y1="21" x2="20" y2="20" stroke="#A7F3D0" stroke-width="1.5"/>
+      <line x1="30" y1="15" x2="39" y2="16" stroke="#A7F3D0" stroke-width="1.5"/>
+      <line x1="30" y1="20" x2="39" y2="21" stroke="#A7F3D0" stroke-width="1.5"/>
+      <path d="M25 6 Q27 -2 35 0" stroke="#10B981" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="32" cy="0" rx="3.5" ry="1.8" transform="rotate(-30 32 0)" fill="#10B981"/>
+    </g>
   </g>
 
-  <!-- Typography Content -->
-  <text x="160" y="52" font-family="'Inter', -apple-system, sans-serif" font-size="18" font-weight="700" fill="#065F46" letter-spacing="-0.3px">
-    Rested in God's Peace
-  </text>
-  <text x="160" y="75" font-family="'Inter', -apple-system, sans-serif" font-size="13.5" font-weight="500" fill="#047857">
-    All prayer points for today are lifted up in faith.
-  </text>
-  <text x="160" y="96" font-family="'Inter', -apple-system, sans-serif" font-size="12" font-weight="400" fill="#059669">
-    "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God." &#8212; Phil 4:6
-  </text>
+  <g transform="translate(130, 0)">
+    <text class="title-text" x="0" y="55" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="800" letter-spacing="-0.4px">
+      All Prayer Points Completed!
+    </text>
+    <text class="sub-text" x="0" y="80" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13.5" font-weight="500">
+      Rest in God's peace today &#8226; All petitions have been lifted in faith
+    </text>
+  </g>
 
-  <!-- Done Pill Badge -->
-  <g transform="translate(560, 48)">
-    <rect width="90" height="32" rx="16" fill="#10B981"/>
-    <path d="M578 64 l4 4 l8 -8" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <text x="618" y="69" font-family="'Inter', sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">Completed</text>
+  <g transform="translate(600, 60)">
+    <circle r="25" fill="url(#badgeGrad)"/>
+    <circle r="29" fill="none" stroke="#34D399" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <path d="M-8 0 l5 6 l12 -12" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>
 </svg>`;
 
