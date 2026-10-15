@@ -21,6 +21,10 @@ const scripts = [
   'assets/answered-prayers.png',
   'assets/pray-for-others.png',
   'assets/thanksgiving.png',
+  'assets/onboarding-step1.svg',
+  'assets/onboarding-step2.svg',
+  'assets/onboarding-step3.svg',
+  'assets/onboarding-step4.svg',
   'js/icons.js',
   'js/content.js',
   'js/db.js',
@@ -204,7 +208,20 @@ const requiredIds = [
   'tg-form-category',
   'tg-form-date',
   'tg-form-desc',
-  'btn-save-thanksgiving'
+  'btn-save-thanksgiving',
+  // Guided Onboarding
+  'modal-onboarding',
+  'onboarding-step-badge',
+  'btn-skip-onboarding',
+  'onboarding-slide-0',
+  'onboarding-slide-1',
+  'onboarding-slide-2',
+  'onboarding-slide-3',
+  'btn-onboarding-prev',
+  'btn-onboarding-next',
+  'btn-onboarding-finish',
+  'btn-settings-guided-tour',
+  'btn-manual-guided-tour'
 ];
 
 requiredIds.forEach(id => {

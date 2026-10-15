@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" fill="none">
+  <defs>
+    <linearGradient id="s4-bg" x1="0" y1="0" x2="400" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <style>
+      .cloud-sync-anim {
+        animation: s4Sync 3.5s ease-in-out infinite;
+      }
+      .signal-line {
+        animation: s4Signal 2.5s linear infinite;
+        stroke-dasharray: 6 4;
+      }
+      .node-pulse {
+        animation: s4Node 2s ease-in-out infinite alternate;
+      }
+      @keyframes s4Sync {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+      }
+      @keyframes s4Signal {
+        to { stroke-dashoffset: -20; }
+      }
+      @keyframes s4Node {
+        0% { transform: scale(0.95); opacity: 0.8; }
+        100% { transform: scale(1.08); opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <rect width="400" height="240" rx="16" fill="url(#s4-bg)" />
+
+  <!-- Cloud Synchronization Hub (Top Center) -->
+  <g class="cloud-sync-anim" transform="translate(160, 30)">
+    <rect width="80" height="50" rx="12" fill="#1E293B" stroke="#38BDF8" stroke-width="1.5" />
+    <!-- Cloud Icon -->
+    <path d="M30 33 H 52 A 7 7 0 0 0 52 19 A 11 11 0 0 0 31 23 A 7 7 0 0 0 30 33 Z" fill="rgba(56, 189, 248, 0.2)" stroke="#38BDF8" stroke-width="1.5" />
+    <!-- Small Sync Arrow -->
+    <path d="M37 28 L 41 24 L 45 28 M41 25 V 31" stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- Anonymous Fellowship Connections -->
+  <!-- Left Believer Node -->
+  <g transform="translate(60, 110)">
+    <rect width="115" height="60" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1.2" />
+    <circle cx="26" cy="30" r="14" fill="#0F172A" stroke="#38BDF8" stroke-width="1.2" />
+    <path d="M26 23 A 4 4 0 1 1 26 31 A 4 4 0 1 1 26 23 M18 40 C 18 35, 22 34, 26 34 C 30 34, 34 35, 34 40" stroke="#38BDF8" stroke-width="1.2" fill="none" />
+    <text x="48" y="27" fill="#F8FAFC" font-family="'Inter', sans-serif" font-size="11" font-weight="700">Poorna</text>
+    <text x="48" y="41" fill="#38BDF8" font-family="'Inter', sans-serif" font-size="9" font-weight="600">Praying for you</text>
+  </g>
+
+  <!-- Right Believer Node (Companion) -->
+  <g transform="translate(225, 110)">
+    <rect width="115" height="60" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1.2" />
+    <circle cx="26" cy="30" r="14" fill="#0F172A" stroke="#A855F7" stroke-width="1.2" />
+    <path d="M26 23 A 4 4 0 1 1 26 31 A 4 4 0 1 1 26 23 M18 40 C 18 35, 22 34, 26 34 C 30 34, 34 40" stroke="#A855F7" stroke-width="1.2" fill="none" />
+    <text x="48" y="27" fill="#F8FAFC" font-family="'Inter', sans-serif" font-size="11" font-weight="700">Anonymous</text>
+    <text x="48" y="41" fill="#A855F7" font-family="'Inter', sans-serif" font-size="9" font-weight="600">Companion</text>
+  </g>
+
+  <!-- Connecting Intercession Rays -->
+  <path d="M175 140 C 190 140, 210 140, 225 140" stroke="#38BDF8" stroke-width="2" class="signal-line" />
+  <path d="M117 110 C 140 90, 160 85, 175 80" stroke="#38BDF8" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6" />
+  <path d="M282 110 C 260 90, 240 85, 225 80" stroke="#A855F7" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6" />
+
+  <!-- Shield Badge at Center -->
+  <g transform="translate(186, 126)" class="node-pulse" style="transform-origin: 200px 140px;">
+    <circle cx="14" cy="14" r="13" fill="#0F172A" stroke="#38BDF8" stroke-width="1.5" />
+    <path d="M14 6 L 21 9 V 15 C 21 19, 17 22, 14 23 C 11 22, 7 19, 7 15 V 9 Z" fill="rgba(56, 189, 248, 0.25)" stroke="#38BDF8" stroke-width="1.2" />
+  </g>
+
+  <!-- Bottom Title Badge -->
+  <rect x="70" y="200" width="260" height="24" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1" />
+  <text x="200" y="216" text-anchor="middle" fill="#38BDF8" font-family="'Inter', sans-serif" font-size="11" font-weight="600" letter-spacing="0.4">
+    100% PRIVATE &bull; LOCAL &amp; CLOUD SYNC
+  </text>
+</svg>

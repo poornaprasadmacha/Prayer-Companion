@@ -893,6 +893,7 @@
           <button id="btn-clear-cache" class="btn btn-secondary btn-sm">Clear Cache</button>
           <button id="btn-delete-account" class="btn btn-danger btn-sm">Delete Account</button>
           <button id="btn-open-manual" class="btn btn-secondary btn-sm">User Manual</button>
+          <button id="btn-settings-guided-tour" class="btn btn-secondary btn-sm" onclick="App.restartOnboarding()">Guided Tour</button>
         </div>
       </div>
 
@@ -1365,8 +1366,9 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer" style="border-top: 1px solid var(--border-light); padding: 12px 20px;">
-        <button class="btn btn-primary" onclick="App.closeAllModals()" style="width: 100%;">Close Guide</button>
+      <div class="modal-footer" style="border-top: 1px solid var(--border-light); padding: 12px 20px; display: flex; gap: 10px;">
+        <button id="btn-manual-guided-tour" class="btn btn-secondary" onclick="App.restartOnboarding()" style="flex: 1;">Take Guided Tour</button>
+        <button class="btn btn-primary" onclick="App.closeAllModals()" style="flex: 1;">Close Guide</button>
       </div>
     </div>
   </div>
@@ -1539,6 +1541,105 @@
           Send Invitation Email
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL: CLEAR GUIDED ONBOARDING (WITH SMOOTH ANIMATIONS)
+       ==================================================================== -->
+  <div id="modal-onboarding" class="modal-backdrop">
+    <div class="modal-card onboarding-modal-card">
+      <div class="modal-drag-handle"></div>
+      
+      <!-- Top Step & Action Bar -->
+      <div class="onboarding-modal-header">
+        <span id="onboarding-step-badge" class="onboarding-step-pill">Step 1 of 4</span>
+        <button id="btn-skip-onboarding" class="onboarding-skip-btn" onclick="App.skipOnboarding()" aria-label="Skip Guided Tour">
+          Skip Tour
+        </button>
+      </div>
+
+      <!-- Slides Container -->
+      <div class="onboarding-slides-container">
+        <!-- Slide 0: Personal Devotional Scripture -->
+        <div id="onboarding-slide-0" class="onboarding-slide active">
+          <div class="onboarding-visual-box">
+            <img src="assets/onboarding-step1.svg" alt="Morning Devotional and Daily Scripture Meditation" class="onboarding-visual-img" />
+          </div>
+          <div class="onboarding-slide-content">
+            <span class="onboarding-tag">Personal Devotion</span>
+            <h3 class="onboarding-slide-title">Begin Each Day in God's Word</h3>
+            <p class="onboarding-slide-desc">
+              Start every morning with tranquil scripture meditation and devotional reflection. Ground your heart in spiritual peace before opening your daily petitions.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 1: Focus Flow & I Prayed -->
+        <div id="onboarding-slide-1" class="onboarding-slide" style="display: none;">
+          <div class="onboarding-visual-box">
+            <img src="assets/onboarding-step2.svg" alt="I Prayed Focus Workflow" class="onboarding-visual-img" />
+          </div>
+          <div class="onboarding-slide-content">
+            <span class="onboarding-tag" style="color: #65A30D; background: rgba(101, 163, 13, 0.12); border-color: rgba(101, 163, 13, 0.25);">Undivided Focus</span>
+            <h3 class="onboarding-slide-title">Mark Prayed &amp; Stay Focused</h3>
+            <p class="onboarding-slide-desc">
+              When finished praying for a request, tap <strong>I Prayed</strong>. It immediately folds down into <em>Prayed Today</em> so you can concentrate solely on remaining petitions without distraction.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 2: Answered Prayers & Gratitude -->
+        <div id="onboarding-slide-2" class="onboarding-slide" style="display: none;">
+          <div class="onboarding-visual-box">
+            <img src="assets/onboarding-step3.svg" alt="Celebrate Answered Prayers" class="onboarding-visual-img" />
+          </div>
+          <div class="onboarding-slide-content">
+            <span class="onboarding-tag" style="color: #D97706; background: rgba(217, 119, 6, 0.12); border-color: rgba(217, 119, 6, 0.25);">Testimonies &amp; Faith</span>
+            <h3 class="onboarding-slide-title">Celebrate Answered Prayers</h3>
+            <p class="onboarding-slide-desc">
+              When God answers, move requests to <strong>Answered</strong>. Record testimonies in your Thanksgiving Journal to remember God's faithfulness and inspire your journey.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 3: Companions Fellowship & Cloud Sync -->
+        <div id="onboarding-slide-3" class="onboarding-slide" style="display: none;">
+          <div class="onboarding-visual-box">
+            <img src="assets/onboarding-step4.svg" alt="Companions Fellowship and Cloud Backup" class="onboarding-visual-img" />
+          </div>
+          <div class="onboarding-slide-content">
+            <span class="onboarding-tag" style="color: #7C3AED; background: rgba(124, 58, 237, 0.12); border-color: rgba(124, 58, 237, 0.25);">100% Private &amp; Cloud Sync</span>
+            <h3 class="onboarding-slide-title">Fellowship &amp; Private Sync</h3>
+            <p class="onboarding-slide-desc">
+              Intercede for fellow believers anonymously in the Companions tab. All prayers stay safe on your local device, with secure cloud synchronization via a simple 4-digit code.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer with Stepper Dots & Navigation Actions -->
+      <div class="onboarding-modal-footer">
+        <div class="onboarding-stepper-dots">
+          <button class="onboarding-dot active" data-step="0" onclick="App.goToOnboardingStep(0)" aria-label="Step 1"></button>
+          <button class="onboarding-dot" data-step="1" onclick="App.goToOnboardingStep(1)" aria-label="Step 2"></button>
+          <button class="onboarding-dot" data-step="2" onclick="App.goToOnboardingStep(2)" aria-label="Step 3"></button>
+          <button class="onboarding-dot" data-step="3" onclick="App.goToOnboardingStep(3)" aria-label="Step 4"></button>
+        </div>
+
+        <div class="onboarding-nav-actions">
+          <button id="btn-onboarding-prev" class="btn btn-secondary btn-sm" onclick="App.prevOnboardingStep()" style="display: none;">
+            &larr; Back
+          </button>
+          <button id="btn-onboarding-next" class="btn btn-primary btn-sm" onclick="App.nextOnboardingStep()">
+            Next &rarr;
+          </button>
+          <button id="btn-onboarding-finish" class="btn btn-primary btn-sm" onclick="App.completeOnboarding()" style="display: none;">
+            Start Praying
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 

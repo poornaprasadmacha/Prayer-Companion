@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" fill="none">
+  <defs>
+    <linearGradient id="s2-bg" x1="0" y1="0" x2="400" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <style>
+      .tap-cursor {
+        animation: s2Tap 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      .btn-pray-anim {
+        animation: s2BtnColor 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      .card-slide-down {
+        animation: s2CardMove 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      .prayed-folded-badge {
+        animation: s2BadgePulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      @keyframes s2Tap {
+        0%, 20% { transform: translate(250px, 85px) scale(1); opacity: 0; }
+        30% { transform: translate(250px, 85px) scale(1); opacity: 1; }
+        38% { transform: translate(248px, 82px) scale(0.85); opacity: 1; }
+        48% { transform: translate(250px, 85px) scale(1); opacity: 1; }
+        65%, 100% { transform: translate(250px, 95px) scale(1); opacity: 0; }
+      }
+      @keyframes s2BtnColor {
+        0%, 35% { fill: #2563EB; }
+        42%, 100% { fill: #556B2F; }
+      }
+      @keyframes s2CardMove {
+        0%, 40% { transform: translateY(0); opacity: 1; }
+        55% { transform: translateY(35px) scale(0.96); opacity: 0.85; }
+        70%, 100% { transform: translateY(68px) scale(0.92); opacity: 0; }
+      }
+      @keyframes s2BadgePulse {
+        0%, 55% { transform: scale(1); opacity: 0.7; }
+        65% { transform: scale(1.04); opacity: 1; }
+        75%, 100% { transform: scale(1); opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <rect width="400" height="240" rx="16" fill="url(#s2-bg)" />
+
+  <!-- Active Upper Request Card (Animated to slide down once prayed) -->
+  <g class="card-slide-down">
+    <g transform="translate(60, 30)">
+      <rect width="280" height="68" rx="10" fill="#1E293B" stroke="#38BDF8" stroke-width="1.5" />
+      
+      <!-- Category Tag & Priority -->
+      <rect x="14" y="12" width="70" height="14" rx="4" fill="rgba(56, 189, 248, 0.15)" />
+      <text x="49" y="22" text-anchor="middle" fill="#38BDF8" font-family="'Inter', sans-serif" font-size="9" font-weight="600">FAMILY</text>
+
+      <text x="14" y="44" fill="#F8FAFC" font-family="'Inter', sans-serif" font-size="13" font-weight="700">Health &amp; Peace for Family</text>
+      <text x="14" y="58" fill="#94A3B8" font-family="'Inter', sans-serif" font-size="10.5">Focusing on complete physical healing</text>
+
+      <!-- I Prayed Interactive Button -->
+      <rect x="200" y="20" width="66" height="28" rx="6" class="btn-pray-anim" />
+      <path d="M210 34 L 214 38 L 222 30" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <text x="238" y="38" text-anchor="middle" fill="#FFFFFF" font-family="'Inter', sans-serif" font-size="10.5" font-weight="700">Prayed</text>
+    </g>
+  </g>
+
+  <!-- Simulating Tap Finger / Gesture -->
+  <g class="tap-cursor">
+    <circle cx="16" cy="16" r="14" fill="rgba(56, 189, 248, 0.25)" />
+    <circle cx="16" cy="16" r="6" fill="#38BDF8" />
+  </g>
+
+  <!-- Downward Flow Arrow indicator -->
+  <g transform="translate(190, 112)">
+    <circle cx="10" cy="10" r="14" fill="#0F172A" stroke="#334155" stroke-width="1" />
+    <path d="M10 4 V 14 M6 10 L 10 14 L 14 10" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- Folded Section: Prayed Today (Drops down and collapses) -->
+  <g transform="translate(60, 142)" class="prayed-folded-badge" style="transform-origin: 200px 160px;">
+    <rect width="280" height="42" rx="8" fill="#13231B" stroke="#556B2F" stroke-width="1.2" />
+    <path d="M78 163 L 83 160 L 78 157 Z" fill="#84CC16" />
+    <text x="94" y="166" fill="#C5DC98" font-family="'Inter', sans-serif" font-size="12" font-weight="700">
+      Prayed Today (1)
+    </text>
+    <rect x="204" y="152" width="62" height="20" rx="10" fill="rgba(132, 204, 22, 0.15)" />
+    <text x="235" y="165" text-anchor="middle" fill="#A3E635" font-family="'Inter', sans-serif" font-size="9.5" font-weight="600">
+      FOLDED
+    </text>
+  </g>
+
+  <!-- Bottom Clarification Label -->
+  <rect x="65" y="200" width="270" height="24" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1" />
+  <text x="200" y="216" text-anchor="middle" fill="#A3E635" font-family="'Inter', sans-serif" font-size="11" font-weight="600" letter-spacing="0.4">
+    PRAYED MOVES DOWN &bull; CLEAR FOCUS
+  </text>
+</svg>

@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" fill="none">
+  <defs>
+    <linearGradient id="s3-bg" x1="0" y1="0" x2="400" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <linearGradient id="s3-gold" x1="140" y1="60" x2="260" y2="170" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    <style>
+      .star-glow {
+        animation: s3Sparkle 3s ease-in-out infinite;
+        transform-origin: 200px 75px;
+      }
+      .testimony-card-anim {
+        animation: s3Float 4s ease-in-out infinite;
+      }
+      @keyframes s3Sparkle {
+        0%, 100% { transform: scale(0.9) rotate(0deg); opacity: 0.7; }
+        50% { transform: scale(1.15) rotate(180deg); opacity: 1; }
+      }
+      @keyframes s3Float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+      }
+    </style>
+  </defs>
+
+  <rect width="400" height="240" rx="16" fill="url(#s3-bg)" />
+
+  <!-- Radiance Aura -->
+  <circle cx="200" cy="95" r="70" fill="rgba(245, 158, 11, 0.12)" />
+
+  <!-- Answered Prayer Testimony Card -->
+  <g class="testimony-card-anim">
+    <g transform="translate(70, 40)">
+      <rect width="260" height="135" rx="12" fill="#1E293B" stroke="#D97706" stroke-width="1.5" />
+      
+      <!-- Answered Pill Badge -->
+      <rect x="16" y="14" width="88" height="20" rx="10" fill="rgba(245, 158, 11, 0.18)" stroke="#F59E0B" stroke-width="1" />
+      <circle cx="26" cy="24" r="3" fill="#FBBF24" />
+      <text x="60" y="28" text-anchor="middle" fill="#FBBF24" font-family="'Inter', sans-serif" font-size="10.5" font-weight="700">ANSWERED</text>
+      
+      <text x="16" y="56" fill="#F8FAFC" font-family="'Inter', sans-serif" font-size="13" font-weight="700">Miraculous Job Breakthrough</text>
+      <text x="16" y="72" fill="#94A3B8" font-family="'Inter', sans-serif" font-size="10.5">Answered on October 14, 2026</text>
+
+      <!-- Testimony Quote Container -->
+      <rect x="16" y="84" width="228" height="38" rx="6" fill="#0F172A" stroke="#334155" stroke-width="1" />
+      <path d="M26 94 Q 24 99, 29 101" stroke="#F59E0B" stroke-width="2" fill="none" />
+      <text x="34" y="99" fill="#CBD5E1" font-family="'Inter', sans-serif" font-size="10" font-style="italic">
+        "God opened doors beyond what I asked or thought."
+      </text>
+      <text x="34" y="112" fill="#94A3B8" font-family="'Inter', sans-serif" font-size="9">
+        — Added to Thanksgiving Journal
+      </text>
+    </g>
+  </g>
+
+  <!-- Sparkle Graphic on Top Corner -->
+  <g transform="translate(190, 22)" class="star-glow">
+    <path d="M10 0 L 12.5 7.5 L 20 10 L 12.5 12.5 L 10 20 L 7.5 12.5 L 0 10 L 7.5 7.5 Z" fill="#FBBF24" />
+  </g>
+
+  <!-- Bottom Title Badge -->
+  <rect x="75" y="200" width="250" height="24" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1" />
+  <text x="200" y="216" text-anchor="middle" fill="#FBBF24" font-family="'Inter', sans-serif" font-size="11" font-weight="600" letter-spacing="0.4">
+    CELEBRATE &amp; RECORD GOD'S ANSWERS
+  </text>
+</svg>

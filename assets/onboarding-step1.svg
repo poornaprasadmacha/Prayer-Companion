@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" fill="none">
+  <defs>
+    <linearGradient id="s1-bg" x1="0" y1="0" x2="400" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <linearGradient id="s1-glow" x1="200" y1="40" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="s1-book" x1="120" y1="70" x2="280" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#F1F5F9" />
+    </linearGradient>
+    <style>
+      .halo-pulse {
+        animation: s1Pulse 3.5s ease-in-out infinite;
+        transform-origin: 200px 110px;
+      }
+      .ribbon-sway {
+        animation: s1Sway 4s ease-in-out infinite;
+        transform-origin: 200px 75px;
+      }
+      .line-shimmer {
+        animation: s1Shimmer 2.5s ease-in-out infinite alternate;
+      }
+      @keyframes s1Pulse {
+        0%, 100% { transform: scale(0.96); opacity: 0.45; }
+        50% { transform: scale(1.08); opacity: 0.85; }
+      }
+      @keyframes s1Sway {
+        0%, 100% { transform: rotate(-3deg); }
+        50% { transform: rotate(3deg); }
+      }
+      @keyframes s1Shimmer {
+        0% { opacity: 0.4; }
+        100% { opacity: 0.95; }
+      }
+    </style>
+  </defs>
+
+  <rect width="400" height="240" rx="16" fill="url(#s1-bg)" />
+  <circle cx="200" cy="110" r="85" fill="url(#s1-glow)" class="halo-pulse" />
+
+  <!-- Open Bible / Devotional Notebook -->
+  <g transform="translate(0, 5)">
+    <!-- Book Shadows / Cover Pages -->
+    <path d="M110 168 C 150 164, 185 167, 200 174 C 215 167, 250 164, 290 168 L 296 82 C 255 78, 220 81, 200 89 C 180 81, 145 78, 104 82 Z" fill="#023E8A" opacity="0.6" />
+    <path d="M114 165 C 152 161, 186 164, 200 171 C 214 164, 248 161, 286 165 L 292 80 C 253 76, 219 79, 200 87 C 181 79, 147 76, 108 80 Z" fill="#E2E8F0" />
+    
+    <!-- Top White Pages -->
+    <path d="M118 162 C 154 158, 187 161, 200 168 C 213 161, 246 158, 282 162 L 288 78 C 251 74, 218 77, 200 85 C 182 77, 149 74, 112 78 Z" fill="url(#s1-book)" />
+
+    <!-- Center Spine Crease -->
+    <line x1="200" y1="85" x2="200" y2="168" stroke="#CBD5E1" stroke-width="2" />
+
+    <!-- Scripture Text Lines (Left Page) -->
+    <line x1="130" y1="98" x2="185" y2="98" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" class="line-shimmer" />
+    <line x1="130" y1="110" x2="185" y2="110" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="130" y1="122" x2="175" y2="122" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" class="line-shimmer" />
+    <line x1="130" y1="134" x2="180" y2="134" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="130" y1="146" x2="165" y2="146" stroke="#0284C7" stroke-width="2" stroke-linecap="round" />
+
+    <!-- Scripture Text Lines (Right Page) -->
+    <line x1="215" y1="98" x2="270" y2="98" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="215" y1="110" x2="265" y2="110" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" class="line-shimmer" />
+    <line x1="215" y1="122" x2="270" y2="122" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="215" y1="134" x2="255" y2="134" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" class="line-shimmer" />
+    <line x1="215" y1="146" x2="260" y2="146" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Satin Bookmark Ribbon -->
+    <path d="M200 84 Q 198 120, 203 150 Q 206 172, 201 185 L 195 180 L 191 188 L 197 150 Q 198 120, 200 84 Z" fill="#0284C7" class="ribbon-sway" />
+  </g>
+
+  <!-- Golden Cross Accent -->
+  <g transform="translate(193, 40)">
+    <circle cx="7" cy="7" r="14" fill="#0F172A" stroke="#38BDF8" stroke-width="1.5" />
+    <path d="M7 2 V 12 M4 5 H 10" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <!-- Bottom Title Badge -->
+  <rect x="90" y="200" width="220" height="24" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1" />
+  <text x="200" y="216" text-anchor="middle" fill="#38BDF8" font-family="'Inter', sans-serif" font-size="11" font-weight="600" letter-spacing="0.5">
+    DAILY INSPIRATION &amp; SCRIPTURE
+  </text>
+</svg>

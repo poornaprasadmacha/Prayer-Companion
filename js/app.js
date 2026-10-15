@@ -16,6 +16,7 @@ const App = {
   communityCategory: 'all',
   communityPage: 1,
   prayedTodayExpanded: false,
+  currentOnboardingStep: 0,
 
   async init() {
     console.log('Initializing Prayer Companion with Community & Admin...');
@@ -413,6 +414,7 @@ const App = {
       landing.style.display = 'flex';
     } else {
       landing.style.display = 'none';
+      this.checkOnboardingState();
     }
   },
 
@@ -432,6 +434,137 @@ const App = {
     }
     this.renderHeader();
     await this.renderCurrentView();
+    this.checkOnboardingState();
+  },
+
+  // ==========================================================================
+  // CLEAR GUIDED ONBOARDING SYSTEM (WITH ANIMATIONS)
+  // ==========================================================================
+
+  checkOnboardingState() {
+    const landing = document.getElementById('landing-screen');
+    if (landing && landing.style.display !== 'none' && landing.style.display !== '') {
+      return; // Do not interrupt landing screen selection
+    }
+    const completed = localStorage.getItem('prayerly_onboarding_completed') === 'true';
+    if (!completed) {
+      setTimeout(() => {
+        this.openOnboarding(0);
+      }, 200);
+    }
+  },
+
+  openOnboarding(step = 0) {
+    this.closeAllModals();
+    const modal = document.getElementById('modal-onboarding');
+    if (!modal) return;
+    modal.classList.add('active');
+    this.goToOnboardingStep(step);
+  },
+
+  goToOnboardingStep(stepIndex) {
+    const prevIndex = this.currentOnboardingStep || 0;
+    const direction = stepIndex >= prevIndex ? 'forward' : 'back';
+    this.updateOnboardingStep(stepIndex, direction);
+  },
+
+  updateOnboardingStep(stepIndex, direction = 'forward') {
+    const clampedIndex = Math.max(0, Math.min(3, stepIndex));
+    this.currentOnboardingStep = clampedIndex;
+
+    // 1. Update Step Badge Pill
+    const badge = document.getElementById('onboarding-step-badge');
+    if (badge) {
+      badge.textContent = `Step ${clampedIndex + 1} of 4`;
+    }
+
+    // 2. Update Slides with animated classes
+    for (let i = 0; i < 4; i++) {
+      const slide = document.getElementById(`onboarding-slide-${i}`);
+      if (slide) {
+        if (i === clampedIndex) {
+          slide.style.display = 'flex';
+          slide.classList.remove('active', 'slide-back');
+          // Force reflow to reliably trigger keyframe animation
+          void slide.offsetWidth;
+          slide.classList.add('active');
+          if (direction === 'back') {
+            slide.classList.add('slide-back');
+          }
+        } else {
+          slide.style.display = 'none';
+          slide.classList.remove('active', 'slide-back');
+        }
+      }
+    }
+
+    // 3. Update Stepper Dots
+    document.querySelectorAll('.onboarding-dot').forEach(dot => {
+      const dotStep = parseInt(dot.getAttribute('data-step'), 10);
+      if (dotStep === clampedIndex) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+
+    // 4. Update Navigation Buttons
+    const prevBtn = document.getElementById('btn-onboarding-prev');
+    const nextBtn = document.getElementById('btn-onboarding-next');
+    const finishBtn = document.getElementById('btn-onboarding-finish');
+
+    if (prevBtn) {
+      prevBtn.style.display = clampedIndex > 0 ? 'inline-flex' : 'none';
+    }
+    if (nextBtn) {
+      nextBtn.style.display = clampedIndex < 3 ? 'inline-flex' : 'none';
+    }
+    if (finishBtn) {
+      finishBtn.style.display = clampedIndex === 3 ? 'inline-flex' : 'none';
+    }
+  },
+
+  nextOnboardingStep() {
+    if (this.currentOnboardingStep < 3) {
+      this.updateOnboardingStep(this.currentOnboardingStep + 1, 'forward');
+    } else {
+      this.completeOnboarding();
+    }
+  },
+
+  prevOnboardingStep() {
+    if (this.currentOnboardingStep > 0) {
+      this.updateOnboardingStep(this.currentOnboardingStep - 1, 'back');
+    }
+  },
+
+  completeOnboarding() {
+    localStorage.setItem('prayerly_onboarding_completed', 'true');
+    const modal = document.getElementById('modal-onboarding');
+    if (modal) modal.classList.remove('active');
+
+    if (typeof UI !== 'undefined' && UI.toast) {
+      UI.toast('Welcome to Prayerly! Begin your personal prayer journey.', 'success');
+    }
+
+    // Guide attention to the "+ Quick Add" button with a gentle spotlight ring
+    const quickAddBtn = document.getElementById('btn-quick-add');
+    if (quickAddBtn) {
+      quickAddBtn.classList.add('spotlight-active');
+      setTimeout(() => {
+        quickAddBtn.classList.remove('spotlight-active');
+      }, 3000);
+    }
+  },
+
+  skipOnboarding() {
+    localStorage.setItem('prayerly_onboarding_completed', 'true');
+    const modal = document.getElementById('modal-onboarding');
+    if (modal) modal.classList.remove('active');
+  },
+
+  restartOnboarding() {
+    this.openOnboarding(0);
   },
 
   bindEvents() {
@@ -2005,6 +2138,7 @@ const App = {
           this.renderHeader();
           await SyncEngine.initialCloudPull();
           await this.renderCurrentView();
+          this.checkOnboardingState();
         } catch (err) {
           console.warn('verifyOtp error:', err);
           showAlert(err.message || 'Invalid verification code. Please check and try again.', 'error');
@@ -2053,6 +2187,7 @@ const App = {
         UI.toast('Using Prayerly in Local Mode', 'info');
         this.renderHeader();
         await this.renderCurrentView();
+        this.checkOnboardingState();
       };
     }
   },
