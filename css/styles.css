@@ -1943,6 +1943,11 @@ body.dark-theme .page-banner-img {
 /* ==========================================================================
    NIGHT / DARK THEME SPECIFICATION
    ========================================================================== */
+html.dark-theme,
+body.dark-theme {
+  color-scheme: dark;
+}
+
 body.dark-theme {
   --bg-app: #0B1120;
   --bg-card: #1E293B;
@@ -2014,8 +2019,9 @@ body.dark-theme .nav-tab-btn:hover {
 }
 
 body.dark-theme .nav-tab-btn.active {
-  background: #0284C7;
-  color: #FFFFFF;
+  background: #0284C7 !important;
+  color: #FFFFFF !important;
+  font-weight: 600;
 }
 
 body.dark-theme .mobile-bottom-nav {
@@ -2028,17 +2034,117 @@ body.dark-theme .bottom-nav-item {
 }
 
 body.dark-theme .bottom-nav-item.active {
-  color: var(--navy-900);
+  color: #38BDF8 !important;
 }
 
 body.dark-theme .stat-card,
 body.dark-theme .prayer-card,
 body.dark-theme .community-request-card,
 body.dark-theme .modal-card,
-body.dark-theme .pwa-banner {
-  background: var(--bg-card);
-  border-color: var(--border-light);
-  color: var(--text-primary);
+body.dark-theme .pwa-banner,
+body.dark-theme .history-record-card,
+body.dark-theme .empty-state-card,
+body.dark-theme .streak-box,
+body.dark-theme .settings-card,
+body.dark-theme .manual-card,
+body.dark-theme .answered-card,
+body.dark-theme .thanksgiving-card,
+body.dark-theme .testimony-box,
+body.dark-theme .story-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border-light) !important;
+  color: var(--text-primary) !important;
+}
+
+body.dark-theme .empty-state-card {
+  background: #1E293B !important;
+  border: 1px dashed #334155 !important;
+  color: #CBD5E1 !important;
+}
+
+body.dark-theme .empty-state-card h2,
+body.dark-theme .empty-state-card h3 {
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .empty-state-card p {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme .empty-state-icon {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .history-record-card {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme .history-record-card div {
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .history-record-card [style*="color: var(--text-muted)"] {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme .prayer-status-pill {
+  background: #0F172A !important;
+  border-color: #334155 !important;
+  color: #CBD5E1 !important;
+}
+
+body.dark-theme .prayer-status-pill:hover {
+  background: #1E293B !important;
+  border-color: #475569 !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .prayer-status-pill.active {
+  background: #0284C7 !important;
+  border-color: #0284C7 !important;
+  color: #FFFFFF !important;
+  font-weight: 600;
+}
+
+body.dark-theme .btn-share-app {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+  color: #38BDF8 !important;
+}
+
+body.dark-theme .btn-share-app:hover {
+  background: #334155 !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .level-0 {
+  background: #1E293B !important;
+}
+
+body.dark-theme .history-bar {
+  background: #1E293B !important;
+}
+
+body.dark-theme .history-bar.active {
+  background: #0284C7 !important;
+}
+
+body.dark-theme .history-day-label {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme .story-card-img-wrap {
+  background: #0F172A !important;
+  border-bottom-color: #334155 !important;
+}
+
+body.dark-theme input[type="date"] {
+  color-scheme: dark;
+  background: var(--bg-card-subtle) !important;
+  border-color: var(--border-light) !important;
+  color: #F8FAFC !important;
 }
 
 body.dark-theme .form-input,
