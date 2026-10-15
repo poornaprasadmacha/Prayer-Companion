@@ -87,45 +87,62 @@ const App = {
 
   initMultilingualLogoTitle() {
     const brandTitleEl = document.getElementById('brand-title-text');
-    if (!brandTitleEl) return;
+    const langTickerEl = document.getElementById('brand-lang-ticker');
+    const landingLangTickerEl = document.getElementById('landing-lang-ticker');
 
-    // Multilingual prayer words cycling every 3 seconds (frequently repeating Telugu as requested)
-    const words = [
-      'Prayerly',         // English
-      'ప్రార్థన',          // Telugu
-      'Prayerly',         // English
-      'பிரார்த்தனை',      // Tamil
-      'Prayerly',         // English
-      'ప్రార్థన',          // Telugu
-      'Prayerly',         // English
-      'प्रार्थना',         // Hindi
-      'Prayerly',         // English
-      'ప్రార్థన',          // Telugu
-      'Prayerly',         // English
-      'প্রার্থনা',         // Bengali
-      'Prayerly',         // English
-      'പ്രാർത്ഥന',       // Malayalam
-      'Prayerly',         // English
-      'ప్రార్థన',          // Telugu
-      'Prayerly',         // English
-      'ಪ್ರಾರ್ಥನೆ',        // Kannada
-      'Prayerly',         // English
-      'Oración',          // Spanish
-      'Prayerly',         // English
-      'Oratio',           // Latin
-      'Prayerly',         // English
-      'Προσευχή'         // Greek
+    // 1. Keep Special Logo text for Prayerly permanently
+    if (brandTitleEl) {
+      brandTitleEl.textContent = 'Prayerly';
+    }
+
+    // 2. Multilingual prayer words cycling next to Prayerly every 3 seconds (frequently repeating Telugu as requested)
+    const languages = [
+      { word: 'ప్రార్థన', label: 'Telugu' },
+      { word: 'பிரார்த்தனை', label: 'Tamil' },
+      { word: 'ప్రార్థన', label: 'Telugu' },
+      { word: 'प्रार्थना', label: 'Hindi' },
+      { word: 'ప్రార్థన', label: 'Telugu' },
+      { word: 'প্রার্থনা', label: 'Bengali' },
+      { word: 'ప్రార్థన', label: 'Telugu' },
+      { word: 'പ്രാർത്ഥന', label: 'Malayalam' },
+      { word: 'ప్రార్థన', label: 'Telugu' },
+      { word: 'ಪ್ರಾರ್ಥನೆ', label: 'Kannada' },
+      { word: 'ప్రార్థన', label: 'Telugu' },
+      { word: 'Oración', label: 'Spanish' },
+      { word: 'ప్రార్థన', label: 'Telugu' },
+      { word: 'Oratio', label: 'Latin' },
+      { word: 'ప్రార్థన', label: 'Telugu' },
+      { word: 'Prayer', label: 'English' },
+      { word: 'ప్రార్థన', label: 'Telugu' },
+      { word: 'Προσευχή', label: 'Greek' },
+      { word: 'ప్రార్థన', label: 'Telugu' },
+      { word: 'Prière', label: 'French' },
+      { word: 'ప్రార్థన', label: 'Telugu' },
+      { word: 'Gebet', label: 'German' }
     ];
 
     let wordIndex = 0;
-    setInterval(() => {
-      wordIndex = (wordIndex + 1) % words.length;
-      brandTitleEl.classList.add('switching');
+    const tickerElements = [langTickerEl, landingLangTickerEl].filter(Boolean);
+    if (!tickerElements.length) return;
+
+    const updateTicker = () => {
+      const item = languages[wordIndex];
+      tickerElements.forEach(el => el.classList.add('switching'));
       setTimeout(() => {
-        brandTitleEl.textContent = words[wordIndex];
-        brandTitleEl.classList.remove('switching');
+        tickerElements.forEach(el => {
+          el.textContent = item.word;
+          el.title = `${item.label}: ${item.word} (Prayer)`;
+          el.classList.remove('switching');
+        });
       }, 260);
-    }, 3000);
+      wordIndex = (wordIndex + 1) % languages.length;
+    };
+
+    // Initial render
+    updateTicker();
+
+    // Cycle every 3 seconds
+    setInterval(updateTicker, 3000);
   },
 
   initTheme() {

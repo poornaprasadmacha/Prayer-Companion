@@ -259,7 +259,8 @@ const requiredIds = [
   'btn-test-verse-notification',
   'btn-export-pdf-settings',
   'btn-settings-read-stories',
-  'printable-prayer-summary'
+  'printable-prayer-summary',
+  'brand-lang-ticker'
 ];
 
 requiredIds.forEach(id => {
