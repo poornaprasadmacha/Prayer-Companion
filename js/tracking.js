@@ -215,6 +215,133 @@ const Tracking = {
     }
 
     return result;
+  },
+
+  /**
+   * Calculate detailed streak statistics
+   */
+  async getDetailedStreakStats() {
+    const userId = Auth.getUserId();
+    const allHistory = await AppDB.getAll('prayer_history');
+
+    const validDates = new Set();
+    let totalPrayers = 0;
+    allHistory.forEach(h => {
+      if (h.user_id === userId && !h.is_deleted && h.date) {
+        validDates.add(h.date);
+        totalPrayers++;
+      }
+    });
+
+    const currentStreak = await this.getPrayerStreak();
+
+    // Calculate longest streak in history
+    let longestStreak = 0;
+    const sortedDates = Array.from(validDates).sort();
+    let tempStreak = 0;
+    let prevTime = null;
+
+    for (const dStr of sortedDates) {
+      const currTime = new Date(dStr + 'T00:00:00').getTime();
+      if (prevTime === null) {
+        tempStreak = 1;
+      } else {
+        const diffDays = Math.round((currTime - prevTime) / (1000 * 60 * 60 * 24));
+        if (diffDays === 1) {
+          tempStreak++;
+        } else if (diffDays > 1) {
+          tempStreak = 1;
+        }
+      }
+      if (tempStreak > longestStreak) longestStreak = tempStreak;
+      prevTime = currTime;
+    }
+
+    if (currentStreak > longestStreak) longestStreak = currentStreak;
+
+    return {
+      currentStreak,
+      longestStreak,
+      totalActiveDays: validDates.size,
+      totalPrayers
+    };
+  },
+
+  /**
+   * Generate GitHub-style activity heat-map data (weeks x 7 days)
+   * @param {number} totalWeeks Default: 12 weeks
+   */
+  async getHeatmapData(totalWeeks = 12) {
+    const userId = Auth.getUserId();
+    const allHistory = await AppDB.getAll('prayer_history');
+
+    const countsByDate = new Map();
+    allHistory.forEach(h => {
+      if (h.user_id === userId && !h.is_deleted && h.date) {
+        countsByDate.set(h.date, (countsByDate.get(h.date) || 0) + 1);
+      }
+    });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStr = this.getLocalDateString(today);
+
+    // End date is the end of the current week (Sunday)
+    const currentDayOfWeek = today.getDay(); // 0-6 (0=Sun)
+    const daysToSunday = (7 - currentDayOfWeek) % 7;
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + daysToSunday);
+
+    const totalDays = totalWeeks * 7;
+    const startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - totalDays + 1);
+
+    const weeks = [];
+    let currentWeek = [];
+
+    const cursor = new Date(startDate);
+    while (cursor <= endDate) {
+      const dStr = this.getLocalDateString(cursor);
+      const count = countsByDate.get(dStr) || 0;
+      const isFuture = cursor > today;
+      const isToday = dStr === todayStr;
+
+      let level = 0;
+      if (!isFuture && count > 0) {
+        if (count === 1) level = 1;
+        else if (count <= 3) level = 2;
+        else if (count <= 5) level = 3;
+        else level = 4;
+      }
+
+      currentWeek.push({
+        date: dStr,
+        dayName: cursor.toLocaleDateString(undefined, { weekday: 'short' }),
+        dayNum: cursor.getDate(),
+        monthName: cursor.toLocaleDateString(undefined, { month: 'short' }),
+        count: isFuture ? 0 : count,
+        level,
+        isFuture,
+        isToday
+      });
+
+      if (currentWeek.length === 7) {
+        weeks.push(currentWeek);
+        currentWeek = [];
+      }
+
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    if (currentWeek.length > 0) {
+      weeks.push(currentWeek);
+    }
+
+    return {
+      weeks,
+      startDate: this.getLocalDateString(startDate),
+      endDate: this.getLocalDateString(endDate)
+    };
   }
 };
 

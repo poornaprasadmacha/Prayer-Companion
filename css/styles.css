@@ -3522,5 +3522,512 @@ body.dark-theme .onboarding-modal-footer {
   background: transparent !important;
 }
 
+/* ==========================================================================
+   FEATURE 1: VOICE DICTATION (WEB SPEECH API)
+   ========================================================================== */
+.voice-dictate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1.2;
+}
+
+.voice-dictate-btn:hover {
+  border-color: var(--navy-900);
+  color: var(--navy-900);
+  background: var(--bg-card-subtle);
+}
+
+@keyframes voicePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(1.12); }
+}
+
+.voice-dictate-btn.voice-listening {
+  background: rgba(225, 29, 72, 0.12) !important;
+  color: #E11D48 !important;
+  border-color: #E11D48 !important;
+  font-weight: 600;
+}
+
+.voice-dictate-btn.voice-listening svg {
+  animation: voicePulse 1s ease-in-out infinite;
+  color: #E11D48;
+}
+
+/* ==========================================================================
+   FEATURE 2: SPIRITUAL HABIT HEAT-MAP & STREAK GRID
+   ========================================================================== */
+.streak-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .streak-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.heatmap-scroll-wrapper {
+  overflow-x: auto;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.heatmap-table {
+  display: flex;
+  gap: 4px;
+  align-items: flex-start;
+  min-width: 540px;
+}
+
+.heatmap-weekday-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding-top: 17px;
+  margin-right: 2px;
+  line-height: 13px;
+}
+
+.heatmap-weekday-col span {
+  height: 13px;
+  display: flex;
+  align-items: center;
+}
+
+.heatmap-week-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.heatmap-month-header {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  height: 13px;
+  line-height: 13px;
+  text-align: center;
+  width: 100%;
+}
+
+.heatmap-days-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heatmap-cell {
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.15s ease, outline 0.15s ease;
+  position: relative;
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.3);
+  outline: 1.5px solid var(--navy-900);
+  z-index: 2;
+}
+
+/* 5 Heatmap Intensity Levels */
+.level-0 { background: #E2E8F0; }
+.level-1 { background: #BBF7D0; }
+.level-2 { background: #86EFAC; }
+.level-3 { background: #22C55E; }
+.level-4 { background: #15803D; }
+
+body.dark-theme .level-0 { background: #1E293B; }
+body.dark-theme .level-1 { background: #064E3B; }
+body.dark-theme .level-2 { background: #047857; }
+body.dark-theme .level-3 { background: #10B981; }
+body.dark-theme .level-4 { background: #34D399; }
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.legend-cell {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* ==========================================================================
+   FEATURE 3: BIBLE PRAYER STORIES & TEXTBOOK READER
+   ========================================================================== */
+.stories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.story-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+
+.story-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--navy-900);
+}
+
+.story-card-img-wrap {
+  width: 100%;
+  height: 160px;
+  background: #F8FAFC;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.story-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.story-card-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.story-category-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background: rgba(2, 62, 138, 0.08);
+  color: var(--navy-900);
+  display: inline-block;
+}
+
+body.dark-theme .story-category-tag {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38BDF8;
+}
+
+.story-scripture-citation {
+  font-size: 11.5px;
+  font-style: italic;
+  color: var(--text-muted);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.story-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 6px 0 4px 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.35;
+}
+
+.story-card-summary {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin-bottom: 12px;
+  flex: 1;
+}
+
+.story-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: auto;
+}
+
+.story-reader-modal-card {
+  max-width: 660px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.story-reader-hero-wrap {
+  width: 100%;
+  max-height: 220px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  background: #F8FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.story-reader-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.story-reader-headline {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 8px 0 4px 0;
+  line-height: 1.3;
+}
+
+.story-reader-summary-lead {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 14px;
+  font-style: italic;
+}
+
+.story-reader-narrative-card {
+  background: #FAF8F5;
+  border: 1px solid #E2D9CC;
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+body.dark-theme .story-reader-narrative-card {
+  background: #1E293B;
+  border-color: #334155;
+}
+
+.story-parchment-header {
+  margin-bottom: 10px;
+  border-bottom: 1px dashed #D1C7B7;
+  padding-bottom: 6px;
+}
+
+body.dark-theme .story-parchment-header {
+  border-bottom-color: #475569;
+}
+
+.story-parchment-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #8C6D46;
+  font-family: Georgia, serif;
+}
+
+body.dark-theme .story-parchment-label {
+  color: #93C5FD;
+}
+
+.story-reader-content p {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: #2D241E;
+  margin-bottom: 12px;
+}
+
+body.dark-theme .story-reader-content p {
+  color: #E2E8F0;
+}
+
+.story-takeaway-box {
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+body.dark-theme .story-takeaway-box {
+  background: rgba(217, 119, 6, 0.15);
+  border-color: rgba(217, 119, 6, 0.3);
+}
+
+.story-application-box {
+  background: #F0F9FF;
+  border: 1px solid #BAE6FD;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+
+body.dark-theme .story-application-box {
+  background: rgba(2, 62, 138, 0.15);
+  border-color: rgba(2, 62, 138, 0.3);
+}
+
+/* ==========================================================================
+   FEATURE 4: PRINTABLE / PDF WEEKLY PRAYER DIARY SUMMARY
+   ========================================================================== */
+@media print {
+  @page {
+    margin: 15mm 15mm 15mm 15mm;
+    size: portrait;
+  }
+
+  body {
+    background: #FFF !important;
+    color: #000 !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+  }
+
+  header, nav, .mobile-bottom-nav, .btn, .icon-btn, .modal-backdrop, .view-panel, footer, .landing-viewport, .form-label-row button, .onboarding-modal-card {
+    display: none !important;
+  }
+
+  #printable-prayer-summary {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .print-header {
+    border-bottom: 2pt solid #023E8A;
+    padding-bottom: 8pt;
+    margin-bottom: 14pt;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .print-title {
+    font-size: 20pt;
+    font-weight: 700;
+    color: #023E8A;
+    margin: 0 0 2pt 0;
+    font-family: Georgia, serif;
+  }
+
+  .print-subtitle {
+    font-size: 9.5pt;
+    color: #4A5568;
+    margin: 0;
+  }
+
+  .print-meta {
+    text-align: right;
+    font-size: 8.5pt;
+    color: #718096;
+  }
+
+  .print-verse-banner {
+    background: #F8FAFC !important;
+    border: 1pt solid #CBD5E1;
+    border-left: 3pt solid #023E8A;
+    padding: 8pt 10pt;
+    margin-bottom: 14pt;
+    page-break-inside: avoid;
+    font-family: Georgia, serif;
+    font-style: italic;
+  }
+
+  .print-section {
+    margin-bottom: 14pt;
+    page-break-inside: avoid;
+  }
+
+  .print-section-title {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #1E293B;
+    border-bottom: 1pt solid #CBD5E1;
+    padding-bottom: 3pt;
+    margin-bottom: 6pt;
+  }
+
+  .print-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8pt;
+    padding: 5pt 0;
+    border-bottom: 0.5pt solid #E2E8F0;
+    page-break-inside: avoid;
+  }
+
+  .print-checkbox {
+    width: 11pt;
+    height: 11pt;
+    border: 1.2pt solid #4A5568;
+    border-radius: 2pt;
+    flex-shrink: 0;
+    margin-top: 1pt;
+  }
+
+  .print-item-content {
+    flex: 1;
+  }
+
+  .print-item-title {
+    font-size: 10.5pt;
+    font-weight: 600;
+    color: #0F172A;
+  }
+
+  .print-item-desc {
+    font-size: 9pt;
+    color: #475569;
+    margin-top: 1pt;
+  }
+
+  .print-item-badge {
+    font-size: 7.5pt;
+    font-weight: 600;
+    padding: 1pt 4pt;
+    border: 0.5pt solid #CBD5E1;
+    border-radius: 2pt;
+    color: #475569;
+    margin-left: 4pt;
+  }
+
+  .print-footer {
+    border-top: 1pt solid #E2E8F0;
+    margin-top: 20pt;
+    padding-top: 6pt;
+    display: flex;
+    justify-content: space-between;
+    font-size: 8pt;
+    color: #94A3B8;
+  }
+}
+
 
 

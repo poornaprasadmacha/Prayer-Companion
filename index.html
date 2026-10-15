@@ -228,6 +228,7 @@
       <button class="nav-tab-btn" data-tab="answered">Answered</button>
       <button class="nav-tab-btn" data-tab="thanksgiving">Thanksgiving</button>
       <button class="nav-tab-btn" data-tab="history">History</button>
+      <button class="nav-tab-btn" data-tab="stories">Read Stories</button>
       <button class="nav-tab-btn" data-tab="settings">Settings</button>
       <button id="nav-admin-btn" class="nav-tab-btn nav-tab-admin" data-tab="admin" style="display: none;">Admin</button>
     </nav>
@@ -470,23 +471,66 @@
          VIEW 6: PRAYER HISTORY & STREAK
          ==================================================================== -->
     <section id="view-history" class="view-panel">
-      <div class="section-header">
-        <h2 class="section-title">Daily Prayer History</h2>
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <h2 class="section-title">Prayer Streak &amp; Spiritual Habit Calendar</h2>
+          <p class="section-subtitle">Consistent daily fellowship and prayer discipline</p>
+        </div>
+        <button id="btn-export-pdf-history" class="btn btn-secondary btn-sm" onclick="App.exportWeeklySummaryPdf()" title="Export weekly prayer summary as PDF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 5px;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+          <span>Export to PDF</span>
+        </button>
       </div>
 
-      <div class="streak-box">
-        <div style="font-size: 13px; color: #4A5568; margin-bottom: 4px;">Current Consistent Prayer Streak</div>
-        <div id="history-streak-count" class="streak-number">0 Days</div>
-        <p style="font-size: 12px; color: #718096; margin-top: 4px;">Steadfast in prayer day by day.</p>
+      <!-- Streak & Consistency Statistics Grid -->
+      <div class="stats-grid streak-stats-grid" style="margin-bottom: 16px;">
+        <div class="stat-card">
+          <div id="history-streak-count" class="stat-value" style="color: #D97706;">0 Days</div>
+          <div class="stat-label">Current Streak</div>
+        </div>
+        <div class="stat-card">
+          <div id="history-longest-streak" class="stat-value" style="color: var(--navy-900);">0 Days</div>
+          <div class="stat-label">Best Streak</div>
+        </div>
+        <div class="stat-card">
+          <div id="history-total-days" class="stat-value" style="color: #65A30D;">0 Days</div>
+          <div class="stat-label">Total Active Days</div>
+        </div>
+        <div class="stat-card">
+          <div id="history-total-prayers" class="stat-value" style="color: var(--text-primary);">0</div>
+          <div class="stat-label">Prayers Offered</div>
+        </div>
       </div>
 
-      <div style="margin-bottom: 14px;">
-        <h3 style="font-size: 14px; color: #023E8A; font-weight: 600;">Recent 14-Day Prayer Activity</h3>
+      <!-- Minimalist GitHub-Style Activity Heat-Map -->
+      <div class="settings-card" style="margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 style="font-size: 14.5px; font-weight: 700; color: var(--text-primary); margin: 0;">Spiritual Consistency Heat-Map</h3>
+            <p style="font-size: 11.5px; color: var(--text-muted); margin: 2px 0 0 0;">12-Week activity grid &bull; Tap any square to view prayers</p>
+          </div>
+          <div class="heatmap-legend">
+            <span style="font-size: 11px; color: var(--text-muted);">Less</span>
+            <span class="legend-cell level-0"></span>
+            <span class="legend-cell level-1"></span>
+            <span class="legend-cell level-2"></span>
+            <span class="legend-cell level-3"></span>
+            <span class="legend-cell level-4"></span>
+            <span style="font-size: 11px; color: var(--text-muted);">More</span>
+          </div>
+        </div>
+
+        <!-- Scrollable Heat-Map Container -->
+        <div id="history-heatmap-container" class="heatmap-scroll-wrapper"></div>
+
+        <!-- 14-day Activity Summary (Preserved for backward compatibility) -->
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border-subtle);">
+          <div id="history-calendar-chart" class="calendar-chart-wrapper"></div>
+        </div>
       </div>
-      <div id="history-calendar-chart" class="calendar-chart-wrapper"></div>
 
       <div class="section-header" style="margin-top: 20px;">
-        <h3 style="font-size: 15px; color: #023E8A; font-weight: 600;">Prayers by Date</h3>
+        <h3 style="font-size: 15px; color: var(--navy-900); font-weight: 600;">Prayers by Date</h3>
         <input type="date" id="history-date-picker" class="form-input" style="width: auto; padding: 4px 10px; font-size: 13px;">
       </div>
 
@@ -775,6 +819,44 @@
       </div>
     </section>
 
+    <!-- ====================================================================
+         VIEW 8: BIBLE PRAYER STORIES (TEXTBOOK DEVOTIONAL READER)
+         ==================================================================== -->
+    <section id="view-stories" class="view-panel">
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h2 class="section-title">Bible Prayer Stories</h2>
+          <p class="section-subtitle">Illustrated textbook encounters of prayer from Sacred Scripture</p>
+        </div>
+      </div>
+
+      <!-- Search & Category Filters -->
+      <div class="filter-bar" style="margin-bottom: 16px;">
+        <div class="search-input-wrapper">
+          <input type="text" id="story-search-input" class="form-input" placeholder="Search stories, characters, scriptures..." oninput="App.filterStories()">
+        </div>
+        <select id="story-category-filter" class="form-select" style="max-width: 180px;" onchange="App.filterStories()">
+          <option value="all">All Categories</option>
+          <option value="Faith">Faith &amp; Petition</option>
+          <option value="Boldness">Boldness &amp; Miracles</option>
+          <option value="Consistency">Consistency</option>
+          <option value="Surrender">Surrender &amp; Peace</option>
+          <option value="Instant">Everyday &amp; Instant</option>
+          <option value="Praise">Praise &amp; Deliverance</option>
+          <option value="Wisdom">Wisdom &amp; Purpose</option>
+          <option value="Anxiety">Anxiety &amp; Deliverance</option>
+        </select>
+      </div>
+
+      <!-- Illustrated Textbook Stories Grid -->
+      <div id="stories-grid-container" class="stories-grid"></div>
+
+      <!-- Empty Search State -->
+      <div id="stories-empty-state" class="empty-state-card" style="display: none;">
+        <p style="color: var(--text-muted); font-size: 13.5px;">No Bible prayer stories match your filter.</p>
+      </div>
+    </section>
+
     <section id="view-settings" class="view-panel">
       <div class="section-header">
         <h2 class="section-title">Settings</h2>
@@ -873,6 +955,17 @@
           </div>
         </div>
 
+        <div class="settings-reminder-row" style="border-top: 1px solid var(--border-light); padding-top: 10px; margin-top: 10px;">
+          <div>
+            <strong style="font-size: 13.5px; color: var(--navy-900);">Scripture Verse Notifications</strong>
+            <p style="font-size: 11.5px; color: var(--text-muted); margin: 0;">Tranquil daily verse delivered every morning at scheduled prayer time</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button id="btn-test-verse-notification" type="button" class="btn btn-secondary btn-sm" onclick="VerseNotifications.sendDailyVerseNotification(true)" style="font-size: 11px; padding: 4px 8px;">Test</button>
+            <input type="checkbox" id="settings-verse-notify-enabled" onchange="App.toggleVerseNotifications(this.checked)" style="width: 18px; height: 18px; cursor: pointer;">
+          </div>
+        </div>
+
         <div style="margin-top: 14px; display: flex; gap: 8px;">
           <button id="btn-save-settings" class="btn btn-primary btn-sm">Save Preferences</button>
           <button id="btn-test-email" class="btn btn-secondary btn-sm">Test Email</button>
@@ -889,6 +982,8 @@
           All prayer records are stored privately on your local device.
         </p>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btn-export-pdf-settings" class="btn btn-secondary btn-sm" onclick="App.exportWeeklySummaryPdf()">Export to PDF</button>
+          <button id="btn-settings-read-stories" class="btn btn-secondary btn-sm" onclick="App.switchTab('stories')">Bible Stories</button>
           <button id="btn-export-data" class="btn btn-secondary btn-sm">Export JSON</button>
           <button id="btn-clear-cache" class="btn btn-secondary btn-sm">Clear Cache</button>
           <button id="btn-delete-account" class="btn btn-danger btn-sm">Delete Account</button>
@@ -1033,12 +1128,24 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Prayer Title *</label>
+          <div class="form-label-row">
+            <label class="form-label" for="prayer-form-title">Prayer Title *</label>
+            <button type="button" class="voice-dictate-btn" onclick="VoiceJournal.toggle('prayer-form-title', this)" title="Voice Dictation: Speak prayer title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              <span>Speak</span>
+            </button>
+          </div>
           <input type="text" id="prayer-form-title" class="form-input" placeholder="e.g. Healing for grandmother, Job transition..." required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Description / Scriptural Promises</label>
+          <div class="form-label-row">
+            <label class="form-label" for="prayer-form-desc">Description / Scriptural Promises</label>
+            <button type="button" class="voice-dictate-btn" onclick="VoiceJournal.toggle('prayer-form-desc', this)" title="Voice Dictation: Speak description">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              <span>Speak</span>
+            </button>
+          </div>
           <textarea id="prayer-form-desc" class="form-textarea" placeholder="Add specific petitions or scriptures you are claiming..."></textarea>
         </div>
 
@@ -1239,7 +1346,13 @@
           <input type="date" id="answered-form-date" class="form-input">
         </div>
         <div class="form-group">
-          <label class="form-label">Testimony / How God Answered (Optional)</label>
+          <div class="form-label-row">
+            <label class="form-label" for="answered-form-testimony">Testimony / How God Answered (Optional)</label>
+            <button type="button" class="voice-dictate-btn" onclick="VoiceJournal.toggle('answered-form-testimony', this)" title="Voice Dictation: Speak testimony">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              <span>Speak</span>
+            </button>
+          </div>
           <textarea id="answered-form-testimony" class="form-textarea" placeholder="Write a brief testimony of God's faithfulness..."></textarea>
         </div>
       </div>
@@ -1264,7 +1377,13 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">What are you thankful for? *</label>
+          <div class="form-label-row">
+            <label class="form-label" for="tg-form-title">What are you thankful for? *</label>
+            <button type="button" class="voice-dictate-btn" onclick="VoiceJournal.toggle('tg-form-title', this)" title="Voice Dictation: Speak gratitude">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              <span>Speak</span>
+            </button>
+          </div>
           <input type="text" id="tg-form-title" class="form-input" placeholder="e.g. God's peace during a difficult week..." required>
         </div>
         <div class="form-group">
@@ -1276,7 +1395,13 @@
           <input type="date" id="tg-form-date" class="form-input">
         </div>
         <div class="form-group">
-          <label class="form-label">Reflection / Prayer of Praise</label>
+          <div class="form-label-row">
+            <label class="form-label" for="tg-form-desc">Reflection / Prayer of Praise</label>
+            <button type="button" class="voice-dictate-btn" onclick="VoiceJournal.toggle('tg-form-desc', this)" title="Voice Dictation: Speak reflection">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              <span>Speak</span>
+            </button>
+          </div>
           <textarea id="tg-form-desc" class="form-textarea" placeholder="Detail your gratitude or thanksgiving scriptures..."></textarea>
         </div>
       </div>
@@ -1369,6 +1494,72 @@
       <div class="modal-footer" style="border-top: 1px solid var(--border-light); padding: 12px 20px; display: flex; gap: 10px;">
         <button id="btn-manual-guided-tour" class="btn btn-secondary" onclick="App.restartOnboarding()" style="flex: 1;">Take Guided Tour</button>
         <button class="btn btn-primary" onclick="App.closeAllModals()" style="flex: 1;">Close Guide</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 9: BIBLE PRAYER STORY TEXTBOOK READER
+       ==================================================================== -->
+  <div id="modal-story-reader" class="modal-backdrop">
+    <div class="modal-card story-reader-modal-card">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header" style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: var(--navy-900);"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+          <h3 id="story-reader-modal-title" class="modal-title" style="margin: 0; font-size: 16px;">Bible Prayer Story</h3>
+        </div>
+        <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body story-reader-modal-body" style="overflow-y: auto; padding: 20px;">
+        <!-- Illustration Header Banner -->
+        <div id="story-reader-hero-wrap" class="story-reader-hero-wrap">
+          <img id="story-reader-img" src="" alt="Story illustration" class="story-reader-hero-img" />
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; margin-bottom: 10px; flex-wrap: wrap; gap: 6px;">
+          <span id="story-reader-category" class="story-category-tag">Faith</span>
+          <span id="story-reader-scripture" class="story-scripture-citation">1 Samuel 1:1-20</span>
+        </div>
+
+        <h2 id="story-reader-title" class="story-reader-headline">Story Title</h2>
+        <p id="story-reader-summary" class="story-reader-summary-lead">Summary text</p>
+
+        <!-- Narrative textbook passage -->
+        <div class="story-reader-narrative-card">
+          <div class="story-parchment-header">
+            <span class="story-parchment-label">Sacred Scripture Narrative</span>
+          </div>
+          <div id="story-reader-content" class="story-reader-content">
+            <!-- Full narrative paragraphs inserted dynamically -->
+          </div>
+        </div>
+
+        <!-- Key Takeaway Box -->
+        <div class="story-takeaway-box">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px; color: #D97706;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #92400E;">Spiritual Principle</span>
+          </div>
+          <p id="story-reader-takeaway" style="font-size: 13.5px; color: #78350F; margin: 0; line-height: 1.5;"></p>
+        </div>
+
+        <!-- Personal Prayer Application -->
+        <div class="story-application-box">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px; color: var(--navy-900);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--navy-900);">Your Devotional Application</span>
+          </div>
+          <p id="story-reader-application" style="font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.5;"></p>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="border-top: 1px solid var(--border-light); padding: 12px 20px; display: flex; gap: 10px;">
+        <button class="btn btn-secondary" onclick="App.closeAllModals()" style="flex: 1;">Close</button>
+        <button id="btn-story-pray-now" class="btn btn-primary" style="flex: 1.5;">+ Pray With This Scripture</button>
       </div>
     </div>
   </div>
@@ -1487,6 +1678,14 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               </span>
               <span class="more-grid-title">Manual</span>
+            </button>
+
+            <!-- Bible Stories -->
+            <button class="more-grid-btn" onclick="App.openMoreLink('stories')">
+              <span class="more-grid-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+              </span>
+              <span class="more-grid-title">Stories</span>
             </button>
 
             <!-- Admin Console (Shown for Admin Only) -->
@@ -1643,9 +1842,13 @@
     </div>
   </div>
 
+  <div id="printable-prayer-summary" class="print-container" style="display: none;"></div>
+
   <!-- Scripts -->
   <script src="js/icons.js"></script>
   <script src="js/content.js"></script>
+  <script src="js/stories.js"></script>
+  <script src="js/voice.js"></script>
   <script src="js/db.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/sync.js"></script>

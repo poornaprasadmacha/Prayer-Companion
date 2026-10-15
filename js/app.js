@@ -74,6 +74,11 @@ const App = {
 
     // 9. Multilingual Cycling Brand Title (3s interval, frequent Telugu)
     this.initMultilingualLogoTitle();
+
+    // 10. Start Scripture Verse Notifications Scheduler
+    if (typeof VerseNotifications !== 'undefined' && VerseNotifications.startScheduler) {
+      VerseNotifications.startScheduler();
+    }
   },
 
   // ==========================================================================
@@ -713,6 +718,38 @@ const App = {
       });
     }
 
+    // Story Category Filter
+    const storyCatFilter = document.getElementById('story-filter-category');
+    if (storyCatFilter) {
+      storyCatFilter.addEventListener('change', () => this.renderStoriesView());
+    }
+
+    // Story Search Filter
+    const storySearch = document.getElementById('story-search-input');
+    if (storySearch) {
+      storySearch.addEventListener('input', () => {
+        clearTimeout(this.storySearchTimer);
+        this.storySearchTimer = setTimeout(() => this.renderStoriesView(), 200);
+      });
+    }
+
+    // Export PDF Buttons
+    const exportPdfHistory = document.getElementById('btn-export-pdf-history');
+    if (exportPdfHistory) {
+      exportPdfHistory.addEventListener('click', () => this.exportWeeklySummaryPdf());
+    }
+
+    const exportPdfSettings = document.getElementById('btn-export-pdf-settings');
+    if (exportPdfSettings) {
+      exportPdfSettings.addEventListener('click', () => this.exportWeeklySummaryPdf());
+    }
+
+    // Read Stories Settings Button
+    const btnStoriesSettings = document.getElementById('btn-settings-read-stories');
+    if (btnStoriesSettings) {
+      btnStoriesSettings.addEventListener('click', () => this.switchTab('stories'));
+    }
+
     // Short Name changed event
     window.addEventListener('prayer-user-name-changed', () => {
       this.renderHeader();
@@ -733,7 +770,7 @@ const App = {
 
     const mobileMoreBtn = document.getElementById('btn-mobile-more');
     if (mobileMoreBtn) {
-      if (tabName === 'settings' || tabName === 'history') {
+      if (tabName === 'settings' || tabName === 'history' || tabName === 'stories') {
         mobileMoreBtn.classList.add('active');
       } else {
         mobileMoreBtn.classList.remove('active');
@@ -773,6 +810,9 @@ const App = {
         break;
       case 'history':
         await this.renderHistoryView();
+        break;
+      case 'stories':
+        await this.renderStoriesView();
         break;
       case 'admin':
         Admin.loadOverview();
@@ -1689,13 +1729,68 @@ const App = {
 
   async renderHistoryView() {
     const streakEl = document.getElementById('history-streak-count');
+    const longestStreakEl = document.getElementById('history-longest-streak');
+    const totalDaysEl = document.getElementById('history-total-days');
+    const totalPrayersEl = document.getElementById('history-total-prayers');
+    const heatmapContainer = document.getElementById('history-heatmap-container');
     const calendarEl = document.getElementById('history-calendar-chart');
-    const selectedDatePrayersEl = document.getElementById('history-date-prayers');
     const datePickerInput = document.getElementById('history-date-picker');
 
-    const streak = await Tracking.getPrayerStreak();
-    if (streakEl) streakEl.textContent = `${streak} Day${streak === 1 ? '' : 's'}`;
+    // 1. Detailed Streak & Consistency Statistics
+    try {
+      const stats = await Tracking.getDetailedStreakStats();
+      if (streakEl) streakEl.textContent = `${stats.currentStreak} Day${stats.currentStreak === 1 ? '' : 's'}`;
+      if (longestStreakEl) longestStreakEl.textContent = `${stats.longestStreak} Day${stats.longestStreak === 1 ? '' : 's'}`;
+      if (totalDaysEl) totalDaysEl.textContent = `${stats.totalActiveDays} Day${stats.totalActiveDays === 1 ? '' : 's'}`;
+      if (totalPrayersEl) totalPrayersEl.textContent = stats.totalPrayersOffered;
+    } catch (_) {
+      const streak = await Tracking.getPrayerStreak();
+      if (streakEl) streakEl.textContent = `${streak} Day${streak === 1 ? '' : 's'}`;
+    }
 
+    // 2. Minimalist GitHub-Style Activity Heat-Map (12 Weeks)
+    if (heatmapContainer) {
+      try {
+        const heatmapWeeks = await Tracking.getHeatmapData(12);
+        const dayLabels = ['M', '', 'W', '', 'F', '', 'S'];
+        let html = '<div class="heatmap-table">';
+        html += '<div class="heatmap-weekday-col">';
+        dayLabels.forEach(lbl => {
+          html += `<span>${lbl}</span>`;
+        });
+        html += '</div>';
+
+        heatmapWeeks.forEach(week => {
+          html += '<div class="heatmap-week-column">';
+          html += `<div class="heatmap-month-header">${week.monthLabel || '&nbsp;'}</div>`;
+          html += '<div class="heatmap-days-group">';
+          week.days.forEach(day => {
+            const tooltip = day.isFuture 
+              ? `${day.date} (Upcoming)` 
+              : `${day.date}: ${day.count} prayer${day.count === 1 ? '' : 's'}`;
+            html += `<div class="heatmap-cell level-${day.level}" data-date="${day.date}" title="${tooltip}"></div>`;
+          });
+          html += '</div></div>';
+        });
+        html += '</div>';
+        heatmapContainer.innerHTML = html;
+
+        // Cell click interactive navigation to load date's prayers
+        heatmapContainer.querySelectorAll('.heatmap-cell').forEach(cell => {
+          cell.addEventListener('click', (e) => {
+            const date = e.currentTarget.getAttribute('data-date');
+            if (date && datePickerInput) {
+              datePickerInput.value = date;
+              this.renderHistoryDatePrayers(date);
+            }
+          });
+        });
+      } catch (err) {
+        console.warn('Heatmap render error:', err);
+      }
+    }
+
+    // 3. 14-day Activity Summary (backward compatible)
     const recentActivity = await Tracking.getRecentDaysActivity(14);
     if (calendarEl) {
       calendarEl.innerHTML = recentActivity.map(item => `
@@ -1708,31 +1803,259 @@ const App = {
       `).join('');
     }
 
+    // 4. Prayers by Date
     const targetDate = datePickerInput ? (datePickerInput.value || Tracking.getLocalDateString()) : Tracking.getLocalDateString();
     if (datePickerInput) {
       if (!datePickerInput.value) {
         datePickerInput.value = targetDate;
       }
-      datePickerInput.onchange = () => this.renderHistoryView();
+      datePickerInput.onchange = () => {
+        this.renderHistoryDatePrayers(datePickerInput.value);
+      };
     }
 
+    await this.renderHistoryDatePrayers(targetDate);
+  },
+
+  async renderHistoryDatePrayers(targetDate) {
+    const selectedDatePrayersEl = document.getElementById('history-date-prayers');
+    if (!selectedDatePrayersEl) return;
     const dayRecords = await Tracking.getHistoryForDate(targetDate);
-    if (selectedDatePrayersEl) {
-      if (dayRecords.length === 0) {
-        selectedDatePrayersEl.innerHTML = `<div class="empty-state-card"><p>No recorded prayers for this date.</p></div>`;
-      } else {
-        selectedDatePrayersEl.innerHTML = dayRecords.map(r => `
-          <div class="history-record-card">
-            <div>
-              <div style="font-weight: bold; color: var(--text-primary);">${UI.escape(r.title)}</div>
-              <span class="badge badge-category" style="margin-top: 4px;">${UI.escape(r.category || 'General')}</span>
-            </div>
-            <div style="font-size: 12px; color: var(--text-muted);">
-              ${new Date(r.prayed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </div>
+    if (dayRecords.length === 0) {
+      selectedDatePrayersEl.innerHTML = `<div class="empty-state-card"><p>No recorded prayers for ${targetDate}.</p></div>`;
+    } else {
+      selectedDatePrayersEl.innerHTML = dayRecords.map(r => `
+        <div class="history-record-card">
+          <div>
+            <div style="font-weight: bold; color: var(--text-primary);">${UI.escape(r.title)}</div>
+            <span class="badge badge-category" style="margin-top: 4px;">${UI.escape(r.category || 'General')}</span>
           </div>
-        `).join('');
-      }
+          <div style="font-size: 12px; color: var(--text-muted);">
+            ${new Date(r.prayed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
+        </div>
+      `).join('');
+    }
+  },
+
+  // ==========================================================================
+  // BIBLE PRAYER STORIES VIEW
+  // ==========================================================================
+
+  filterStories() {
+    this.renderStoriesView();
+  },
+
+  renderStoriesView() {
+    const container = document.getElementById('stories-grid-container');
+    const emptyState = document.getElementById('stories-empty-state');
+    const categorySelect = document.getElementById('story-category-filter') || document.getElementById('story-filter-category');
+    const searchInput = document.getElementById('story-search-input');
+    if (!container) return;
+
+    if (typeof BibleStories === 'undefined') return;
+
+    const category = categorySelect ? categorySelect.value : 'all';
+    const query = searchInput ? searchInput.value.trim() : '';
+
+    let stories = BibleStories.getAll();
+    if (category && category !== 'all') {
+      stories = stories.filter(s => s.category.toLowerCase() === category.toLowerCase());
+    }
+    if (query) {
+      const searchResults = BibleStories.search(query);
+      const searchIds = new Set(searchResults.map(s => s.id));
+      stories = stories.filter(s => searchIds.has(s.id));
+    }
+
+    if (stories.length === 0) {
+      container.innerHTML = '';
+      if (emptyState) emptyState.style.display = 'block';
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+
+    container.innerHTML = stories.map(story => `
+      <div class="story-card" onclick="App.openStoryReader('${story.id}')">
+        <div class="story-card-img-wrap">
+          <img src="${story.coverImage}" alt="${UI.escape(story.title)}" class="story-card-img" loading="lazy" />
+        </div>
+        <div class="story-card-body">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span class="story-category-tag">${UI.escape(story.category)}</span>
+            <span class="story-scripture-citation">${UI.escape(story.scripture)}</span>
+          </div>
+          <h3 class="story-card-title">${UI.escape(story.title)}</h3>
+          <p class="story-card-summary">${UI.escape(story.summary)}</p>
+          <div class="story-card-footer">
+            <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 500;">Textbook Edition</span>
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); App.openStoryReader('${story.id}')">Read Story &rarr;</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  openStoryReader(storyId) {
+    if (typeof BibleStories === 'undefined') return;
+    const story = BibleStories.getById(storyId);
+    if (!story) return;
+
+    this.closeAllModals();
+    const modal = document.getElementById('modal-story-reader');
+    if (!modal) return;
+
+    const imgEl = document.getElementById('story-reader-img');
+    const catEl = document.getElementById('story-reader-category');
+    const scripEl = document.getElementById('story-reader-scripture');
+    const titleEl = document.getElementById('story-reader-title');
+    const summaryEl = document.getElementById('story-reader-summary');
+    const contentEl = document.getElementById('story-reader-content');
+    const takeawayEl = document.getElementById('story-reader-takeaway');
+    const appEl = document.getElementById('story-reader-application');
+    const prayNowBtn = document.getElementById('btn-story-pray-now');
+
+    if (imgEl) {
+      imgEl.src = story.coverImage;
+      imgEl.alt = story.title;
+    }
+    if (catEl) catEl.textContent = story.category;
+    if (scripEl) scripEl.textContent = story.scripture;
+    if (titleEl) titleEl.textContent = story.title;
+    if (summaryEl) summaryEl.textContent = story.summary;
+
+    if (contentEl) {
+      contentEl.innerHTML = story.narrative.map(p => `<p>${UI.escape(p)}</p>`).join('');
+    }
+    if (takeawayEl) takeawayEl.textContent = story.takeaway;
+    if (appEl) appEl.textContent = story.prayerApplication;
+
+    if (prayNowBtn) {
+      prayNowBtn.onclick = () => {
+        this.closeAllModals();
+        this.openPrayerModal({
+          title: `Prayer inspired by ${story.title}`,
+          description: `${story.prayerApplication}\n\nClaimed Scripture: ${story.scripture}`,
+          category: 'Spiritual Growth',
+          priority: 'Medium'
+        });
+      };
+    }
+
+    modal.classList.add('active');
+  },
+
+  // ==========================================================================
+  // PRINTABLE / PDF WEEKLY PRAYER DIARY SUMMARY
+  // ==========================================================================
+
+  async exportWeeklySummaryPdf() {
+    const container = document.getElementById('printable-prayer-summary');
+    if (!container) return;
+
+    try {
+      UI.toast('Preparing printable devotional PDF...', 'info');
+
+      // 1. Gather active prayer requests
+      const allActive = await Prayers.query({ status: 'active', sortBy: 'priority' });
+      const answeredRecords = await AppDB.getAll('answered_prayers');
+      const answeredIdSet = new Set(
+        answeredRecords.filter(a => !a.is_deleted).map(a => a.prayer_id)
+      );
+      const activePrayers = allActive.filter(p => !p.is_deleted && !answeredIdSet.has(p.prayer_id));
+
+      // 2. Gather recent answered prayers
+      const activeAnswered = answeredRecords.filter(a => !a.is_deleted);
+
+      // 3. Gather recent thanksgiving records
+      const thanksgivingRecords = await Thanksgiving.getAll();
+      const activeThanksgiving = thanksgivingRecords.filter(t => !t.is_deleted);
+
+      // 4. Scripture Verse
+      const verseTextEl = document.getElementById('daily-verse-text');
+      const verseRefEl = document.getElementById('daily-verse-ref');
+      const verseText = verseTextEl ? verseTextEl.textContent : 'Rejoice always, pray continually, give thanks in all circumstances.';
+      const verseRef = verseRefEl ? verseRefEl.textContent : '— 1 Thessalonians 5:16-18';
+
+      const userEmail = Auth.getUserEmail() || 'Personal Devotions';
+      const userName = (typeof Settings !== 'undefined' && Settings.getUserShortName) ? Settings.getUserShortName() : 'Poorna';
+      const todayStr = new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      let html = `
+        <div class="print-header">
+          <div>
+            <h1 class="print-title">Prayerly &bull; Weekly Prayer &amp; Devotional Summary</h1>
+            <p class="print-subtitle">Personal petitions, answered prayers, and gratitude diary</p>
+          </div>
+          <div class="print-meta">
+            <div><strong>Believer:</strong> ${UI.escape(userName)} (${UI.escape(userEmail)})</div>
+            <div><strong>Printed:</strong> ${todayStr}</div>
+          </div>
+        </div>
+
+        <div class="print-verse-banner">
+          <strong>Weekly Scripture Promise:</strong> "${UI.escape(verseText)}" ${UI.escape(verseRef)}
+        </div>
+
+        <div class="print-section">
+          <h2 class="print-section-title">Active Prayer Petitions (${activePrayers.length})</h2>
+          ${activePrayers.length === 0 ? '<p style="font-size: 9.5pt; color: #718096; font-style: italic;">No active petitions recorded.</p>' : ''}
+          ${activePrayers.map(p => `
+            <div class="print-item">
+              <div class="print-checkbox"></div>
+              <div class="print-item-content">
+                <div class="print-item-title">
+                  ${UI.escape(p.title)}
+                  <span class="print-item-badge">${UI.escape(p.category || 'General')}</span>
+                  <span class="print-item-badge">${UI.escape(p.priority || 'Medium')} Priority</span>
+                  ${p.person_name ? `<span class="print-item-badge">For: ${UI.escape(p.person_name)}</span>` : ''}
+                </div>
+                ${p.description ? `<div class="print-item-desc">${UI.escape(p.description)}</div>` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="print-section">
+          <h2 class="print-section-title">Answered Prayers &amp; Testimonies (${activeAnswered.length})</h2>
+          ${activeAnswered.length === 0 ? '<p style="font-size: 9.5pt; color: #718096; font-style: italic;">No answered prayers recorded yet.</p>' : ''}
+          ${activeAnswered.slice(0, 10).map(a => `
+            <div class="print-item">
+              <div style="font-size: 11pt; color: #16A34A; flex-shrink: 0; line-height: 1;">&#10003;</div>
+              <div class="print-item-content">
+                <div class="print-item-title">${UI.escape(a.prayer_title || 'Prayer Answered')} <span class="print-item-badge">Answered: ${a.date_answered || ''}</span></div>
+                ${a.testimony ? `<div class="print-item-desc"><em>Testimony:</em> ${UI.escape(a.testimony)}</div>` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="print-section">
+          <h2 class="print-section-title">Thanksgiving &amp; Gratitude Journal (${activeThanksgiving.length})</h2>
+          ${activeThanksgiving.length === 0 ? '<p style="font-size: 9.5pt; color: #718096; font-style: italic;">No gratitude entries recorded.</p>' : ''}
+          ${activeThanksgiving.slice(0, 8).map(t => `
+            <div class="print-item">
+              <div style="font-size: 10pt; color: #D97706; flex-shrink: 0; line-height: 1;">&#9825;</div>
+              <div class="print-item-content">
+                <div class="print-item-title">${UI.escape(t.title)} <span class="print-item-badge">${UI.escape(t.category || 'Praise')}</span></div>
+                ${t.description ? `<div class="print-item-desc">${UI.escape(t.description)}</div>` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="print-footer">
+          <span>Generated with Prayerly &bull; 100% Private Devotional Life</span>
+          <span>"The prayer of a righteous person is powerful and effective." — James 5:16</span>
+        </div>
+      `;
+
+      container.innerHTML = html;
+      window.print();
+    } catch (err) {
+      console.warn('PDF export error:', err);
+      UI.toast('Could not generate PDF: ' + err.message, 'error');
     }
   },
 
@@ -1786,6 +2109,26 @@ const App = {
     if (morningTimeInput) morningTimeInput.value = settings.morning_time || '03:00';
     if (eveningCheck) eveningCheck.checked = Boolean(settings.evening_email_enabled);
     if (eveningTimeInput) eveningTimeInput.value = settings.evening_time || '18:00';
+
+    // Scripture Verse of the Day Notifications Row
+    const verseNotifyCheck = document.getElementById('settings-verse-notify-enabled');
+    const testVerseBtn = document.getElementById('btn-test-verse-notification');
+
+    if (verseNotifyCheck && typeof VerseNotifications !== 'undefined') {
+      verseNotifyCheck.checked = VerseNotifications.isEnabled();
+      verseNotifyCheck.onchange = async () => {
+        const allowed = await VerseNotifications.setDailyVerseNotification(verseNotifyCheck.checked);
+        if (!allowed && verseNotifyCheck.checked) {
+          verseNotifyCheck.checked = false;
+        }
+      };
+    }
+
+    if (testVerseBtn && typeof VerseNotifications !== 'undefined') {
+      testVerseBtn.onclick = async () => {
+        await VerseNotifications.sendDailyVerseNotification(true);
+      };
+    }
 
     // Account Profile: Short Name
     const shortNameInput = document.getElementById('settings-short-name-input');
@@ -2227,7 +2570,8 @@ const App = {
       };
     }
 
-    if (existingPrayer) {
+    const isEdit = existingPrayer && existingPrayer.prayer_id;
+    if (isEdit) {
       modalTitle.textContent = 'Edit Prayer Point';
       titleInput.value = existingPrayer.title || '';
       descInput.value = existingPrayer.description || '';
@@ -2243,12 +2587,17 @@ const App = {
       }
     } else {
       modalTitle.textContent = 'New Prayer Point';
-      titleInput.value = '';
-      descInput.value = '';
-      categorySelect.value = 'Personal Life';
-      personInput.value = '';
-      prioritySelect.value = 'Medium';
-      reminderSelect.value = 'both';
+      titleInput.value = (existingPrayer && existingPrayer.title) || '';
+      descInput.value = (existingPrayer && existingPrayer.description) || '';
+      categorySelect.value = (existingPrayer && existingPrayer.category) || 'Personal Life';
+      personInput.value = (existingPrayer && existingPrayer.person_name) || '';
+      prioritySelect.value = (existingPrayer && existingPrayer.priority) || 'Medium';
+      reminderSelect.value = (existingPrayer && existingPrayer.reminder_preference) || 'both';
+
+      if (existingPrayer && (existingPrayer.category !== 'Personal Life' || existingPrayer.priority !== 'Medium')) {
+        if (advancedContainer) advancedContainer.style.display = 'block';
+        if (toggleAdvBtn) toggleAdvBtn.classList.add('expanded');
+      }
     }
 
     modal.classList.add('active');
@@ -2279,7 +2628,7 @@ const App = {
       };
 
       try {
-        if (existingPrayer) {
+        if (isEdit) {
           await Prayers.update(existingPrayer.prayer_id, payload);
         } else {
           await Prayers.create(payload);

@@ -102,3 +102,146 @@ const UI = {
 };
 
 window.UI = UI;
+
+/**
+ * Scripture Verse of the Day Web / Local Notifications
+ */
+const VerseNotifications = {
+  timerId: null,
+
+  isSupported() {
+    return 'Notification' in window;
+  },
+
+  getPermission() {
+    if (!this.isSupported()) return 'unsupported';
+    return Notification.permission;
+  },
+
+  async requestPermission() {
+    if (!this.isSupported()) {
+      if (typeof UI !== 'undefined' && UI.toast) {
+        UI.toast('Notifications are not supported in this browser.', 'warning');
+      }
+      return false;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      localStorage.setItem('prayerly_verse_notifications_permission', permission);
+      if (permission === 'granted') {
+        localStorage.setItem('prayerly_verse_notifications_enabled', 'true');
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast('Daily Scripture notifications enabled!', 'success');
+        }
+        return true;
+      } else {
+        localStorage.setItem('prayerly_verse_notifications_enabled', 'false');
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast('Notification permission was denied.', 'warning');
+        }
+        return false;
+      }
+    } catch (err) {
+      console.warn('requestPermission error:', err);
+      return false;
+    }
+  },
+
+  async sendDailyVerseNotification(isTest = false) {
+    if (!this.isSupported()) {
+      if (typeof UI !== 'undefined' && UI.toast) {
+        UI.toast('Web notifications are not supported by this browser.', 'warning');
+      }
+      return;
+    }
+    if (Notification.permission !== 'granted') {
+      const ok = await this.requestPermission();
+      if (!ok) return;
+    }
+
+    const todayContent = (typeof DailyContent !== 'undefined' && DailyContent.getToday)
+      ? DailyContent.getToday()
+      : {
+          verse: {
+            text: "In nothing be anxious; but in everything by prayer and supplication with thanksgiving let your requests be made known to God.",
+            ref: "Philippians 4:6"
+          }
+        };
+
+    const title = isTest
+      ? 'Prayerly • Test Scripture Notification'
+      : 'Prayerly • Daily Scripture Inspiration';
+
+    const body = `"${todayContent.verse.text}"\n— ${todayContent.verse.ref}`;
+
+    try {
+      if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+        const registration = await navigator.serviceWorker.ready;
+        if (registration && registration.showNotification) {
+          await registration.showNotification(title, {
+            body,
+            icon: 'assets/icons/icon-192.png',
+            badge: 'assets/icons/icon.svg',
+            tag: 'prayerly-scripture-verse',
+            renotify: true,
+            data: { url: window.location.origin }
+          });
+          if (isTest && typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Test notification delivered to your device!', 'success');
+          }
+          return;
+        }
+      }
+
+      const notification = new Notification(title, {
+        body,
+        icon: 'assets/icons/icon-192.png',
+        tag: 'prayerly-scripture-verse'
+      });
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
+
+      if (isTest && typeof UI !== 'undefined' && UI.toast) {
+        UI.toast('Test notification delivered to your device!', 'success');
+      }
+    } catch (err) {
+      console.warn('sendDailyVerseNotification note:', err);
+      if (typeof UI !== 'undefined' && UI.toast) {
+        UI.toast('Could not display system notification. Check device settings.', 'info');
+      }
+    }
+  },
+
+  startScheduler() {
+    if (this.timerId) clearInterval(this.timerId);
+
+    // Check every 30 seconds
+    this.timerId = setInterval(() => {
+      const isEnabled = localStorage.getItem('prayerly_verse_notifications_enabled') === 'true';
+      if (!isEnabled || Notification.permission !== 'granted') return;
+
+      const morningTime = localStorage.getItem('prayerly_morning_time') || '03:00';
+      const now = new Date();
+      const currentHours = String(now.getHours()).padStart(2, '0');
+      const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+      const currentTimeStr = `${currentHours}:${currentMinutes}`;
+
+      const todayStr = (typeof Tracking !== 'undefined' && Tracking.getLocalDateString)
+        ? Tracking.getLocalDateString()
+        : now.toISOString().split('T')[0];
+
+      const lastSentDate = localStorage.getItem('prayerly_last_verse_notification_date');
+
+      if (currentTimeStr === morningTime && lastSentDate !== todayStr) {
+        localStorage.setItem('prayerly_last_verse_notification_date', todayStr);
+        this.sendDailyVerseNotification(false);
+      }
+    }, 30000);
+  }
+};
+
+window.VerseNotifications = VerseNotifications;
+
