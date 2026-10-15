@@ -3,10 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Prayerly — Personal Prayer & Thanksgiving</title>
+  <title>Prayerly — Personal Prayer, Scripture &amp; Thanksgiving</title>
 
-  <!-- PWA & Mobile Meta Tags -->
-  <meta name="description" content="Personal prayer journal, daily prayer tracking, answered prayers, community prayer companions, and thanksgiving.">
+  <!-- High SEO & Discovery Meta Tags -->
+  <meta name="description" content="Prayerly is a dignified, distraction-free personal prayer journal, daily scripture devotion, and community intercession app. Works 100% offline with private cloud backup.">
+  <meta name="keywords" content="Prayerly, prayer app, daily prayer journal, christian prayer app, scripture reflection, thanksgiving journal, answered prayers, prayer companion, intercessory prayer, Telugu prayer, Tamil prayer, Hindi prayer, offline prayer journal, private devotional, Christian meditation">
+  <meta name="author" content="Prayerly">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://prayerly.ceeras.in/">
+
+  <!-- Geo & Regional SEO Tags (India & Global) -->
+  <meta name="geo.region" content="IN">
+  <meta name="geo.placename" content="India">
+  <meta name="geo.position" content="20.5937;78.9629">
+  <meta name="ICBM" content="20.5937, 78.9629">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://prayerly.ceeras.in/">
+  <meta property="og:title" content="Prayerly — A Peaceful Space for Your Daily Prayers">
+  <meta property="og:description" content="Distraction-free personal devotional journal, daily scripture reflection, and faith fellowship. 100% private and offline-first.">
+  <meta property="og:image" content="https://prayerly.ceeras.in/assets/Prayerly.png">
+  <meta property="og:site_name" content="Prayerly">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="te_IN">
+  <meta property="og:locale:alternate" content="ta_IN">
+  <meta property="og:locale:alternate" content="hi_IN">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Prayerly — Personal Prayer &amp; Thanksgiving">
+  <meta name="twitter:description" content="Distraction-free personal devotional journal, daily scripture reflection, and faith fellowship.">
+  <meta name="twitter:image" content="https://prayerly.ceeras.in/assets/Prayerly.png">
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Prayerly",
+    "url": "https://prayerly.ceeras.in/",
+    "description": "Distraction-free personal devotional journal, daily scripture reflection, and faith fellowship. Works 100% offline with optional private cloud synchronization.",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "All, iOS, Android, Windows, macOS",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Prayerly"
+    }
+  }
+  </script>
+
+  <!-- PWA & Mobile Theme -->
   <meta name="theme-color" content="#023E8A">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -33,69 +85,98 @@
        LANDING SCREEN (WELCOME & ONBOARDING WINDOW)
        ==================================================================== -->
   <div id="landing-screen" class="landing-screen" style="display: none;">
-    <div class="landing-content">
-      <div class="landing-header">
+    <div class="landing-container">
+      
+      <!-- Top Brand Row -->
+      <div class="landing-top-bar">
         <div class="landing-brand">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="landing-logo-svg"><path d="M12 2v20M7 7h10"/></svg>
+          <div class="landing-logo-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: #FFFFFF;"><path d="M12 2v20M7 7h10"/></svg>
+          </div>
           <span class="landing-brand-name">Prayerly</span>
         </div>
-        <span class="landing-tag-pill">Private &amp; Offline-First</span>
+        <span class="landing-tag-pill">Private &bull; Offline-First</span>
       </div>
 
-      <div class="landing-hero">
-        <h1 class="landing-title">A Peaceful Space for Your Daily Prayers</h1>
-        <p class="landing-subtitle">
-          Distraction-free personal devotional journal, daily scripture reflection, and faith fellowship. Designed with executive simplicity and dignity.
-        </p>
+      <!-- Hero Showcase: Split on Desktop, Stacked on Mobile -->
+      <div class="landing-hero-split">
+        <!-- Left: Copy & Dual CTAs & Desktop QR Code -->
+        <div class="landing-hero-left">
+          <h1 class="landing-title">A Peaceful Space for Your Daily Prayers</h1>
+          <p class="landing-subtitle">
+            Distraction-free personal devotional journal, daily scripture meditation, and encouraging fellowship. Designed with executive simplicity and reverence.
+          </p>
+
+          <div class="landing-actions-card">
+            <div class="landing-actions-buttons">
+              <button id="btn-landing-signin" class="btn btn-primary btn-lg" onclick="App.startLandingSignIn()">
+                Sign In with Email
+              </button>
+              <button id="btn-landing-offline" class="btn btn-secondary btn-lg" onclick="App.startLandingOffline()">
+                Continue in Offline Mode
+              </button>
+            </div>
+            <p class="landing-footnote">
+              No password needed. Simple 4-digit code. Works immediately offline without registration.
+            </p>
+          </div>
+
+          <!-- Desktop QR Code Card (Visible on Desktop only) -->
+          <div class="landing-qr-card">
+            <div class="landing-qr-wrapper">
+              <img src="assets/qr-code.svg" alt="Scan QR code to open prayerly.ceeras.in on mobile" class="landing-qr-img" />
+            </div>
+            <div class="landing-qr-info">
+              <div class="landing-qr-badge">Mobile Companion</div>
+              <strong class="landing-qr-url">prayerly.ceeras.in</strong>
+              <p class="landing-qr-desc">Scan with your phone to open instantly on mobile.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Mobile Application Mockup Preview -->
+        <div class="landing-hero-right">
+          <div class="landing-mockup-frame">
+            <img src="assets/landing-hero-preview.svg" alt="Prayerly Mobile Application Interface Preview" class="landing-mockup-img" />
+          </div>
+        </div>
       </div>
 
+      <!-- Feature Visual Cards Grid -->
       <div class="landing-grid">
         <div class="landing-feature-card">
-          <div class="landing-feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+          <div class="landing-feature-img-box">
+            <img src="assets/feature-journal.svg" alt="Daily Prayer Journal" class="landing-feature-svg" />
           </div>
           <h3>Daily Prayer Tracking</h3>
-          <p>Organize prayer points, reflect on daily scriptures, and track completed prayers.</p>
+          <p>Organize prayer points, reflect on daily scripture, and smoothly track answered prayers.</p>
         </div>
 
         <div class="landing-feature-card">
-          <div class="landing-feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <div class="landing-feature-img-box">
+            <img src="assets/feature-companion.svg" alt="Prayer Companions" class="landing-feature-svg" />
           </div>
           <h3>Prayer Companions</h3>
           <p>Intercede for fellow believers anonymously and exchange faith encouragement.</p>
         </div>
 
         <div class="landing-feature-card">
-          <div class="landing-feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <div class="landing-feature-img-box">
+            <img src="assets/feature-thanksgiving.svg" alt="Thanksgiving Journal" class="landing-feature-svg" />
           </div>
           <h3>Thanksgiving Journal</h3>
           <p>Record answered prayers with testimonies and cultivate daily gratitude.</p>
         </div>
 
         <div class="landing-feature-card">
-          <div class="landing-feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div class="landing-feature-img-box">
+            <img src="assets/feature-cloud.svg" alt="Private Cloud Sync" class="landing-feature-svg" />
           </div>
-          <h3>100% Private &amp; Offline</h3>
-          <p>Your records live safely on your device, with optional private Google Sheet backup.</p>
+          <h3>100% Private &amp; Cloud Backup</h3>
+          <p>Your records live safely on your local device, with private cloud synchronization.</p>
         </div>
       </div>
 
-      <div class="landing-actions-card">
-        <div class="landing-actions-buttons">
-          <button id="btn-landing-signin" class="btn btn-primary btn-lg" onclick="App.startLandingSignIn()">
-            Sign In with Email
-          </button>
-          <button id="btn-landing-offline" class="btn btn-secondary btn-lg" onclick="App.startLandingOffline()">
-            Continue in Offline Mode
-          </button>
-        </div>
-        <p class="landing-footnote">
-          No password needed. Works immediately offline without registration.
-        </p>
-      </div>
     </div>
   </div>
 
@@ -104,11 +185,10 @@
     <div class="header-content">
       <div class="brand-wrapper" data-tab="dashboard">
         <div class="brand-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 7h10"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 7h10"/></svg>
         </div>
         <div class="brand-title-group">
-          <span class="brand-title">Prayerly</span>
-          <span class="brand-subtitle">Personal Prayer &amp; Thanksgiving</span>
+          <span id="brand-title-text" class="brand-title brand-title-cycling" title="Prayerly - A Peaceful Space for Daily Prayer">Prayerly</span>
         </div>
       </div>
 
@@ -291,9 +371,10 @@
          VIEW 3: COMMUNITY PRAYER COMPANIONS (PRAY TOGETHER)
          ==================================================================== -->
     <section id="view-community" class="view-panel">
-      <div class="section-header companion-header">
-        <div class="banner-wrapper">
-          <img src="assets/pray-for-others.png" alt="Pray for Others" class="page-banner-img" />
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Prayer Companions</h2>
+          <p class="section-subtitle">Intercede for fellow believers and share prayer needs</p>
         </div>
       </div>
 
@@ -339,9 +420,10 @@
          VIEW 4: ANSWERED PRAYERS
          ==================================================================== -->
     <section id="view-answered" class="view-panel">
-      <div class="section-header banner-section-header">
-        <div class="banner-wrapper">
-          <img src="assets/answered-prayers.png" alt="Answered Prayers" class="page-banner-img" />
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Answered Prayers</h2>
+          <p class="section-subtitle">Testimonies of answered prayers and God's faithfulness</p>
         </div>
       </div>
 
@@ -362,13 +444,12 @@
          VIEW 5: THANKSGIVING JOURNAL
          ==================================================================== -->
     <section id="view-thanksgiving" class="view-panel">
-      <div class="section-header banner-section-header" style="display: flex; flex-direction: column; gap: 10px; align-items: stretch; margin-bottom: 16px;">
-        <div class="banner-wrapper">
-          <img src="assets/thanksgiving.png" alt="Thanksgiving" class="page-banner-img" />
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+          <h2 class="section-title">Thanksgiving Journal</h2>
+          <p class="section-subtitle">Cultivate daily gratitude and count your blessings</p>
         </div>
-        <div style="display: flex; justify-content: flex-end;">
-          <button id="btn-add-thanksgiving" class="btn btn-primary btn-sm" onclick="App.openThanksgivingModal()">+ Add Gratitude</button>
-        </div>
+        <button id="btn-add-thanksgiving" class="btn btn-primary btn-sm" onclick="App.openThanksgivingModal()">+ Add Gratitude</button>
       </div>
 
       <div id="thanksgiving-list-container"></div>
@@ -890,9 +971,6 @@
 
         <!-- STEP 1: NAME AND EMAIL -->
         <div id="auth-step-email">
-          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
-            Enter your name and email to receive a secure 6-digit verification code.
-          </p>
           <div class="form-group" style="margin-bottom: 14px;">
             <label class="form-label" for="auth-name-input">Your Name</label>
             <input type="text" id="auth-name-input" class="form-input" placeholder="e.g. Poorna" maxlength="40" autocomplete="name">
@@ -916,11 +994,11 @@
         <!-- STEP 2: ENTER OTP -->
         <div id="auth-step-otp" style="display: none;">
           <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; text-align: center; line-height: 1.5;">
-            Enter the 6-digit verification code sent to<br><strong id="auth-display-email" style="color: var(--navy-950);"></strong>
+            Enter the 4-digit verification code sent to<br><strong id="auth-display-email" style="color: var(--navy-950);"></strong>
           </p>
           <div class="form-group" style="margin-bottom: 16px;">
             <label class="form-label" for="auth-otp-input" style="text-align: center; display: block;">Verification Code</label>
-            <input type="text" id="auth-otp-input" class="form-input" placeholder="••••••" maxlength="6" inputmode="numeric" autocomplete="one-time-code" style="font-size: 26px; letter-spacing: 8px; text-align: center; font-weight: 700; height: 52px;">
+            <input type="text" id="auth-otp-input" class="form-input" placeholder="••••" maxlength="4" inputmode="numeric" autocomplete="one-time-code" style="font-size: 26px; letter-spacing: 8px; text-align: center; font-weight: 700; height: 52px;">
             <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px; text-align: center;">Check your inbox and spam folder</p>
           </div>
           <button id="btn-verify-otp" class="btn btn-primary" style="width: 100%; height: 46px; font-size: 15px; font-weight: 600;">
@@ -1272,7 +1350,7 @@
             </div>
             <div class="manual-card-body">
               <strong>5. 100% Offline &amp; Private</strong>
-              <p>Runs locally on your device with IndexedDB. Automatically syncs with Google Sheets when connected.</p>
+              <p>Runs locally on your device with IndexedDB. Automatically syncs with the Cloud when connected.</p>
             </div>
           </div>
 
@@ -1321,8 +1399,7 @@
             <span class="more-section-title">Reading Text Size</span>
             <span id="font-scale-indicator" class="font-scale-badge">Default (100%)</span>
           </div>
-          <p class="more-section-desc">Adjust size of prayer titles, descriptions and daily inspiration text.</p>
-          <div class="text-size-selector">
+          <div class="text-size-selector" style="margin-top: 10px;">
             <button class="text-size-btn" data-scale="sm" onclick="App.setTextSize('sm')" title="Small Text">
               <span style="font-size: 13px; font-weight: 600;">A-</span>
               <small>Small</small>
@@ -1351,8 +1428,7 @@
               <span id="more-nightmode-label">Night Mode</span>
             </button>
           </div>
-          <p class="more-section-desc">Choose your preferred soothing color palette.</p>
-          <div class="theme-color-palette">
+          <div class="theme-color-palette" style="margin-top: 10px;">
             <button class="theme-color-dot" data-theme="olive" onclick="App.setThemeColor('olive')" title="Olive Green (Calming & Gentle on Eyes)">
               <span class="dot-swatch" style="background: #556B2F;"></span>
               <span class="dot-label">Olive</span>
@@ -1376,64 +1452,47 @@
           </div>
         </div>
 
-        <!-- SECTION 3: NAVIGATION LINKS -->
+        <!-- SECTION 3: NAVIGATION ICONS GRID (Icon on top, Title below) -->
         <div class="more-menu-section" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
-          <span class="more-section-title" style="display: block; margin-bottom: 10px;">Quick Access</span>
-          <div class="more-menu-links">
-            <!-- Install App Button (Visible only when not installed) -->
-            <button id="more-btn-install-app" class="more-menu-link-item" onclick="App.installFromMoreMenu()" style="display: none;">
-              <span class="more-link-icon" style="color: var(--navy-900);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <div class="more-nav-grid">
+            <!-- Install App (Visible only when not installed) -->
+            <button id="more-btn-install-app" class="more-grid-btn" onclick="App.installFromMoreMenu()" style="display: none;">
+              <span class="more-grid-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               </span>
-              <div class="more-link-content">
-                <span class="more-link-title">Install Prayerly App</span>
-                <span class="more-link-desc">Add to Home Screen for quick offline access</span>
-              </div>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+              <span class="more-grid-title">Install App</span>
             </button>
 
-            <button class="more-menu-link-item" onclick="App.openMoreLink('history')">
-              <span class="more-link-icon" style="color: var(--navy-900);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <!-- Settings -->
+            <button class="more-grid-btn" onclick="App.openMoreLink('settings')">
+              <span class="more-grid-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
               </span>
-              <div class="more-link-content">
-                <span class="more-link-title">Prayer History &amp; Streaks</span>
-                <span class="more-link-desc">View prayer logs, daily streaks &amp; calendar records</span>
-              </div>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+              <span class="more-grid-title">Settings</span>
             </button>
 
-            <button class="more-menu-link-item" onclick="App.openMoreLink('settings')">
-              <span class="more-link-icon" style="color: var(--navy-900);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            <!-- History -->
+            <button class="more-grid-btn" onclick="App.openMoreLink('history')">
+              <span class="more-grid-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               </span>
-              <div class="more-link-content">
-                <span class="more-link-title">App Settings</span>
-                <span class="more-link-desc">Manage account, reminders, sync &amp; preferences</span>
-              </div>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+              <span class="more-grid-title">History</span>
             </button>
 
-            <button class="more-menu-link-item" onclick="App.openMoreManual()">
-              <span class="more-link-icon" style="color: var(--navy-900);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <!-- User Manual -->
+            <button class="more-grid-btn" onclick="App.openMoreManual()">
+              <span class="more-grid-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               </span>
-              <div class="more-link-content">
-                <span class="more-link-title">User Manual &amp; Guide</span>
-                <span class="more-link-desc">Explore features, offline usage &amp; guidance</span>
-              </div>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+              <span class="more-grid-title">Manual</span>
             </button>
 
-            <button id="more-link-admin" class="more-menu-link-item" onclick="App.openMoreLink('admin')" style="display: none;">
-              <span class="more-link-icon" style="color: #E11D48;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <!-- Admin Console (Shown for Admin Only) -->
+            <button id="more-link-admin" class="more-grid-btn" onclick="App.openMoreLink('admin')" style="display: none; color: #E11D48;">
+              <span class="more-grid-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </span>
-              <div class="more-link-content">
-                <span class="more-link-title">Admin Console</span>
-                <span class="more-link-desc">System monitoring, users &amp; audit logs</span>
-              </div>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="more-link-arrow"><polyline points="9 18 15 12 9 6"/></svg>
+              <span class="more-grid-title">Admin</span>
             </button>
           </div>
         </div>

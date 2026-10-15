@@ -127,8 +127,10 @@ global.Utilities = {
     const hash = crypto.createHash('sha256').update(str).digest();
     return Array.from(hash).map(b => (b > 127 ? b - 256 : b));
   },
-  formatString: (format, num) => {
-    return String(num).padStart(6, '0');
+  formatString: (format, ...args) => {
+    if (format === '%04d') return String(args[0]).padStart(4, '0');
+    if (format === '%06d') return String(args[0]).padStart(6, '0');
+    return String(args[0]);
   },
   formatDate: (date, tz, format) => {
     const d = new Date(date.toLocaleString('en-US', { timeZone: tz }));
@@ -186,7 +188,9 @@ doPost({
     contents: JSON.stringify({ action: 'request_otp', email: 'regularuser@example.com' })
   }
 });
-const regOtp = sentEmails[sentEmails.length - 1].body.match(/([0-9]{6})/)[1];
+const lastEmail = sentEmails[sentEmails.length - 1];
+const regOtp = lastEmail.body.match(/code is ([0-9]{4})/)[1];
+assert.ok(lastEmail.subject.includes(regOtp), 'Email subject must include 4-digit OTP');
 const regVerify = JSON.parse(doPost({
   postData: {
     contents: JSON.stringify({ action: 'verify_otp', email: 'regularuser@example.com', otp: regOtp })
@@ -203,7 +207,9 @@ doPost({
     contents: JSON.stringify({ action: 'request_otp', email: 'poornaprasad12344@gmail.com' })
   }
 });
-const adminOtp = sentEmails[sentEmails.length - 1].body.match(/([0-9]{6})/)[1];
+const adminEmail = sentEmails[sentEmails.length - 1];
+const adminOtp = adminEmail.body.match(/code is ([0-9]{4})/)[1];
+assert.ok(adminEmail.subject.includes(adminOtp), 'Admin email subject must include 4-digit OTP');
 const adminVerify = JSON.parse(doPost({
   postData: {
     contents: JSON.stringify({ action: 'verify_otp', email: 'poornaprasad12344@gmail.com', otp: adminOtp })

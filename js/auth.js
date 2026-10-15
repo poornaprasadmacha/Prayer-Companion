@@ -137,7 +137,7 @@ const Auth = {
     const cleanOtp = (otp || '').trim();
 
     if (!cleanEmail || !cleanOtp) {
-      throw new Error('Please enter both your email and the 6-digit verification code.');
+      throw new Error('Please enter both your email and the 4-digit verification code.');
     }
 
     const apiUrl = this.getApiUrl();

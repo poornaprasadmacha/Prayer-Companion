@@ -383,7 +383,7 @@ function handleRequestOtp(payload) {
     }
   }
 
-  const otp = Utilities.formatString('%06d', Math.floor(Math.random() * 1000000));
+  const otp = Utilities.formatString('%04d', Math.floor(Math.random() * 10000));
   const salt = generateRandomString(16);
   const otpHash = hashSha256(salt + otp);
   const requestId = 'req_' + generateRandomString(16);
@@ -403,7 +403,7 @@ function handleRequestOtp(payload) {
   ]);
 
   try {
-    const emailSubject = "Your Prayerly Verification Code";
+    const emailSubject = `${otp} is your Prayerly verification code`;
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; border: 1px solid #B5E0F2; border-radius: 12px; background: #FFFFFF;">
         <div style="text-align: center; margin-bottom: 24px;">

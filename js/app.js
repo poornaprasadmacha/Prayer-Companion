@@ -70,11 +70,57 @@ const App = {
 
     // 8. Check Landing Screen / Welcome Window State
     this.checkLandingState();
+
+    // 9. Multilingual Cycling Brand Title (3s interval, frequent Telugu)
+    this.initMultilingualLogoTitle();
   },
 
   // ==========================================================================
   // NAVIGATION & ROUTING
   // ==========================================================================
+
+  initMultilingualLogoTitle() {
+    const brandTitleEl = document.getElementById('brand-title-text');
+    if (!brandTitleEl) return;
+
+    // Multilingual prayer words cycling every 3 seconds (frequently repeating Telugu as requested)
+    const words = [
+      'Prayerly',         // English
+      'ప్రార్థన',          // Telugu
+      'Prayerly',         // English
+      'பிரார்த்தனை',      // Tamil
+      'Prayerly',         // English
+      'ప్రార్థన',          // Telugu
+      'Prayerly',         // English
+      'प्रार्थना',         // Hindi
+      'Prayerly',         // English
+      'ప్రార్థన',          // Telugu
+      'Prayerly',         // English
+      'প্রার্থনা',         // Bengali
+      'Prayerly',         // English
+      'പ്രാർത്ഥന',       // Malayalam
+      'Prayerly',         // English
+      'ప్రార్థన',          // Telugu
+      'Prayerly',         // English
+      'ಪ್ರಾರ್ಥನೆ',        // Kannada
+      'Prayerly',         // English
+      'Oración',          // Spanish
+      'Prayerly',         // English
+      'Oratio',           // Latin
+      'Prayerly',         // English
+      'Προσευχή'         // Greek
+    ];
+
+    let wordIndex = 0;
+    setInterval(() => {
+      wordIndex = (wordIndex + 1) % words.length;
+      brandTitleEl.classList.add('switching');
+      setTimeout(() => {
+        brandTitleEl.textContent = words[wordIndex];
+        brandTitleEl.classList.remove('switching');
+      }, 260);
+    }, 3000);
+  },
 
   initTheme() {
     const savedTheme = localStorage.getItem('PRAYERLY_THEME') || 'light';
@@ -178,6 +224,24 @@ const App = {
     document.documentElement.setAttribute('data-theme-color', color);
     document.body.setAttribute('data-theme-color', color);
     localStorage.setItem('prayerly_theme_color', color);
+
+    // Update meta theme-color tag dynamically for browser chrome & address bars
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      const isDark = document.body.classList.contains('dark-theme');
+      if (isDark) {
+        metaTheme.setAttribute('content', '#0B1120');
+      } else {
+        const themeHexMap = {
+          navy: '#023E8A',
+          olive: '#556B2F',
+          emerald: '#0F766E',
+          amber: '#B45309',
+          purple: '#6D28D9'
+        };
+        metaTheme.setAttribute('content', themeHexMap[color] || '#023E8A');
+      }
+    }
 
     // Update buttons in modal
     document.querySelectorAll('.theme-color-dot').forEach(btn => {
@@ -831,16 +895,8 @@ const App = {
     } else {
       // All active prayers completed for today!
       html += `
-        <div class="all-prayed-banner">
-          <div class="all-prayed-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div>
-            <h4>All Prayer Points Completed Today!</h4>
-            <p>
-              You have prayed through all your active requests. Focus on resting in God's peace.
-            </p>
-          </div>
+        <div class="all-prayed-banner-wrapper">
+          <img src="assets/prayers-completed.svg" alt="Rested in God's Peace - All Prayers Completed" class="all-prayed-banner-img">
         </div>
       `;
     }
@@ -1234,7 +1290,7 @@ const App = {
         <div class="prayer-card-header">
           <div class="prayer-tags">
             <span class="badge badge-category">${UI.escape(r.category || 'General')}</span>
-            <span class="badge badge-person"><span class="badge-icon">${Icons.person}</span> ${UI.escape(r.display_name)}</span>
+            <span class="badge badge-person">${UI.escape(r.display_name)}</span>
           </div>
           <div class="prayer-date">${new Date(r.created_at).toLocaleDateString()}</div>
         </div>
@@ -1243,7 +1299,7 @@ const App = {
         ${r.shared_description ? `<p class="prayer-desc">${UI.escape(r.shared_description)}</p>` : ''}
 
         <div class="community-supporters-banner">
-          <span class="supporters-badge"><span class="badge-icon">${Icons.prayerHands}</span> <strong>${r.supporters_count}</strong> companion${r.supporters_count === 1 ? '' : 's'} praying</span>
+          <span class="supporters-badge"><strong>${r.supporters_count}</strong> companion${r.supporters_count === 1 ? '' : 's'} praying</span>
         </div>
 
         <div class="prayer-card-footer">
@@ -1383,7 +1439,7 @@ const App = {
     container.innerHTML = list.map(item => `
       <div class="answered-card" data-id="${item.answered_id}">
         <div class="answered-card-header">
-          <span class="badge badge-answered"><span class="badge-icon">${Icons.sparkles}</span> God Answered</span>
+          <span class="badge badge-answered">Answered</span>
           <span class="answered-date">Answered on: ${item.answered_date}</span>
         </div>
         <h3 class="prayer-title">${UI.escape(item.prayer_title)}</h3>
@@ -1451,7 +1507,7 @@ const App = {
     container.innerHTML = entries.map(e => `
       <div class="thanksgiving-card" data-id="${e.entry_id}">
         <div class="thanksgiving-header">
-          <span class="badge badge-thanksgiving"><span class="badge-icon">${Icons.heart}</span> ${UI.escape(e.category || 'Praise')}</span>
+          <span class="badge badge-thanksgiving">${UI.escape(e.category || 'Praise')}</span>
           <span class="thanksgiving-date">${e.entry_date}</span>
         </div>
         <h3 class="thanksgiving-title">${UI.escape(e.title)}</h3>
@@ -1930,8 +1986,8 @@ const App = {
           showStep('email');
           return;
         }
-        if (!otp || otp.length !== 6) {
-          showAlert('Please enter the complete 6-digit verification code.');
+        if (!otp || otp.length !== 4) {
+          showAlert('Please enter the complete 4-digit verification code.');
           if (otpInput) otpInput.focus();
           return;
         }
@@ -1976,11 +2032,11 @@ const App = {
           if (btnVerifyOtp) btnVerifyOtp.click();
         }
       };
-      // Auto verify when 6 digits are typed
+      // Auto verify when 4 digits are typed
       otpInput.oninput = (e) => {
         const cleaned = e.target.value.replace(/\D/g, '');
         e.target.value = cleaned;
-        if (cleaned.length === 6) {
+        if (cleaned.length === 4) {
           if (btnVerifyOtp) btnVerifyOtp.click();
         }
       };
