@@ -184,7 +184,7 @@ const step2Svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" 
   <!-- Bottom Clarification Label -->
   <rect x="65" y="200" width="270" height="24" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1" />
   <text x="200" y="216" text-anchor="middle" fill="#A3E635" font-family="'Inter', sans-serif" font-size="11" font-weight="600" letter-spacing="0.4">
-    PRAYED MOVES DOWN &bull; CLEAR FOCUS
+    PRAYED MOVES DOWN &#8226; CLEAR FOCUS
   </text>
 </svg>`;
 
@@ -336,7 +336,7 @@ const step4Svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" 
   <!-- Bottom Title Badge -->
   <rect x="70" y="200" width="260" height="24" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1" />
   <text x="200" y="216" text-anchor="middle" fill="#38BDF8" font-family="'Inter', sans-serif" font-size="11" font-weight="600" letter-spacing="0.4">
-    100% PRIVATE &bull; LOCAL &amp; CLOUD SYNC
+    100% PRIVATE &#8226; LOCAL &amp; CLOUD SYNC
   </text>
 </svg>`;
 

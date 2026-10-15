@@ -37,7 +37,7 @@
   <!-- Textbook Header Banner -->
   <g transform="translate(230, 36)">
     <text text-anchor="middle" y="0" font-family="'Georgia', serif" font-size="10.5" font-weight="700" letter-spacing="1.5" fill="#8C6D53" text-transform="uppercase">
-      &bull; SACRED SCRIPTURE PRAYER DIARY &bull;
+      &#8226; SACRED SCRIPTURE PRAYER DIARY &#8226;
     </text>
     <line x1="-120" y1="6" x2="120" y2="6" stroke="#C2B29F" stroke-width="0.8" />
   </g>
@@ -47,7 +47,7 @@
     Hezekiah Spreading the Letter Before the Lord
   </text>
   <text x="230" y="78" text-anchor="middle" font-family="'Georgia', serif" font-size="11" font-style="italic" fill="#785B43">
-    2 Kings 19:14-19 &bull; Laying Anxious Threatening Letters Before God
+    2 Kings 19:14-19 &#8226; Laying Anxious Threatening Letters Before God
   </text>
 
   <!-- Textbook Engraved Illustration Frame -->

@@ -37,7 +37,7 @@
   <!-- Textbook Header Banner -->
   <g transform="translate(230, 36)">
     <text text-anchor="middle" y="0" font-family="'Georgia', serif" font-size="10.5" font-weight="700" letter-spacing="1.5" fill="#8C6D53" text-transform="uppercase">
-      &bull; SACRED SCRIPTURE PRAYER DIARY &bull;
+      &#8226; SACRED SCRIPTURE PRAYER DIARY &#8226;
     </text>
     <line x1="-120" y1="6" x2="120" y2="6" stroke="#C2B29F" stroke-width="0.8" />
   </g>
@@ -47,7 +47,7 @@
     Elijah's Fire on Mount Carmel
   </text>
   <text x="230" y="78" text-anchor="middle" font-family="'Georgia', serif" font-size="11" font-style="italic" fill="#785B43">
-    1 Kings 18:36-39 &bull; A Bold 63-Word Prayer That Answered with Fire
+    1 Kings 18:36-39 &#8226; A Bold 63-Word Prayer That Answered with Fire
   </text>
 
   <!-- Textbook Engraved Illustration Frame -->

@@ -62,10 +62,10 @@ const heroPreviewSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380
     <g transform="translate(40, 108)">
       <rect width="300" height="96" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
       <rect x="0" y="0" width="5" height="96" rx="2" fill="#023E8A"/>
-      <text x="16" y="24" font-family="'Inter', sans-serif" font-size="10" font-weight="700" fill="#023E8A" letter-spacing="0.5">TODAY'S SCRIPTURE &bull; 1 THESS 5:16-18</text>
+      <text x="16" y="24" font-family="'Inter', sans-serif" font-size="10" font-weight="700" fill="#023E8A" letter-spacing="0.5">TODAY'S SCRIPTURE &#8226; 1 THESS 5:16-18</text>
       <text x="16" y="46" font-family="'Inter', sans-serif" font-size="12" font-weight="500" fill="#1E293B">"Rejoice always, pray without ceasing,</text>
       <text x="16" y="64" font-family="'Inter', sans-serif" font-size="12" font-weight="500" fill="#1E293B">give thanks in all circumstances..."</text>
-      <text x="16" y="84" font-family="'Inter', sans-serif" font-size="10.5" font-weight="600" fill="#64748B">Tap for meditation reflection &rarr;</text>
+      <text x="16" y="84" font-family="'Inter', sans-serif" font-size="10.5" font-weight="600" fill="#64748B">Tap for meditation reflection &#8594;</text>
     </g>
 
     <!-- Streak Badge -->
@@ -104,7 +104,7 @@ const heroPreviewSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380
       <circle cx="26" cy="37" r="10" fill="#10B981"/>
       <path d="M22 37 l3 3 l6 -6" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       <text x="46" y="34" font-family="'Inter', sans-serif" font-size="12.5" font-weight="600" fill="#334155">Guidance in Work Decisions</text>
-      <text x="46" y="50" font-family="'Inter', sans-serif" font-size="10.5" font-weight="500" fill="#10B981">Prayed Today &bull; Rested in God</text>
+      <text x="46" y="50" font-family="'Inter', sans-serif" font-size="10.5" font-weight="500" fill="#10B981">Prayed Today &#8226; Rested in God</text>
     </g>
 
     <!-- Bottom App Navigation Bar -->
@@ -177,7 +177,7 @@ const completedBannerSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0
     All prayer points for today are lifted up in faith.
   </text>
   <text x="160" y="96" font-family="'Inter', -apple-system, sans-serif" font-size="12" font-weight="400" fill="#059669">
-    "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God." &mdash; Phil 4:6
+    "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God." &#8212; Phil 4:6
   </text>
 
   <!-- Done Pill Badge -->

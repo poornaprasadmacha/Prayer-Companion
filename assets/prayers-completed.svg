@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 130" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 130" width="680" height="130">
   <defs>
     <linearGradient id="compGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#F0FDF4"/>
@@ -33,20 +33,20 @@
   </g>
 
   <!-- Typography Content -->
-  <text x="160" y="52" font-family="'Inter', -apple-system, sans-serif" font-size="18" font-weight="700" fill="#065F46" letter-spacing="-0.3px">
+  <text x="160" y="50" font-family="'Inter', -apple-system, sans-serif" font-size="18" font-weight="700" fill="#065F46" letter-spacing="-0.3px">
     Rested in God's Peace
   </text>
-  <text x="160" y="75" font-family="'Inter', -apple-system, sans-serif" font-size="13.5" font-weight="500" fill="#047857">
+  <text x="160" y="74" font-family="'Inter', -apple-system, sans-serif" font-size="13.5" font-weight="500" fill="#047857">
     All prayer points for today are lifted up in faith.
   </text>
   <text x="160" y="96" font-family="'Inter', -apple-system, sans-serif" font-size="12" font-weight="400" fill="#059669">
-    "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God." &mdash; Phil 4:6
+    "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God." &#8212; Phil 4:6
   </text>
 
   <!-- Done Pill Badge -->
-  <g transform="translate(560, 48)">
+  <g transform="translate(560, 49)">
     <rect width="90" height="32" rx="16" fill="#10B981"/>
-    <path d="M578 64 l4 4 l8 -8" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <text x="618" y="69" font-family="'Inter', sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">Completed</text>
+    <path d="M18 16 l4 4 l8 -8" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="54" y="20" font-family="'Inter', sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">Completed</text>
   </g>
 </svg>

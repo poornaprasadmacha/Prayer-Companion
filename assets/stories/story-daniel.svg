@@ -37,7 +37,7 @@
   <!-- Textbook Header Banner -->
   <g transform="translate(230, 36)">
     <text text-anchor="middle" y="0" font-family="'Georgia', serif" font-size="10.5" font-weight="700" letter-spacing="1.5" fill="#8C6D53" text-transform="uppercase">
-      &bull; SACRED SCRIPTURE PRAYER DIARY &bull;
+      &#8226; SACRED SCRIPTURE PRAYER DIARY &#8226;
     </text>
     <line x1="-120" y1="6" x2="120" y2="6" stroke="#C2B29F" stroke-width="0.8" />
   </g>
@@ -47,7 +47,7 @@
     Daniel's Uncompromised Prayer Chamber
   </text>
   <text x="230" y="78" text-anchor="middle" font-family="'Georgia', serif" font-size="11" font-style="italic" fill="#785B43">
-    Daniel 6:10-23 &bull; Three Times Daily Facing Jerusalem
+    Daniel 6:10-23 &#8226; Three Times Daily Facing Jerusalem
   </text>
 
   <!-- Textbook Engraved Illustration Frame -->
@@ -74,7 +74,7 @@
       <circle cx="16" cy="14" r="7" fill="#4A3525" />
       <path d="M 16 21 Q 8 38, 2 56 L 30 56 Q 24 38, 16 21 Z" fill="#5E4330" />
       <path d="M 14 30 L 26 26" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" />
-      <text x="-10" y="70" font-family="'Georgia', serif" font-size="8.5" fill="#6B4B32">Morning &bull; Noon &bull; Evening</text>
+      <text x="-10" y="70" font-family="'Georgia', serif" font-size="8.5" fill="#6B4B32">Morning &#8226; Noon &#8226; Evening</text>
     </g>
 
     <!-- Peaceful Lion in Den with mouth shut -->
