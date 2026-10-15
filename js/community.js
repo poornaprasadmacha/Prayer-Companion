@@ -85,6 +85,60 @@ const Community = {
   },
 
   /**
+   * Internal in-memory cache
+   */
+  _cache: null,
+
+  /**
+   * Retrieve cached community requests from IndexedDB or localStorage
+   */
+  async getCachedRequests() {
+    if (this._cache && Array.isArray(this._cache.requests)) {
+      return this._cache;
+    }
+    try {
+      if (window.AppDB) {
+        const record = await AppDB.get('settings', 'community_requests_cache');
+        if (record && record.data && Array.isArray(record.data.requests)) {
+          this._cache = record.data;
+          return this._cache;
+        }
+      }
+    } catch (_) {}
+    try {
+      const raw = localStorage.getItem('PRAYERLY_COMMUNITY_CACHE');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.requests)) {
+          this._cache = parsed;
+          return this._cache;
+        }
+      }
+    } catch (_) {}
+    return null;
+  },
+
+  /**
+   * Persist community requests to IndexedDB and localStorage
+   */
+  async saveCachedRequests(data) {
+    if (!data || !Array.isArray(data.requests)) return;
+    this._cache = data;
+    try {
+      if (window.AppDB) {
+        await AppDB.put('settings', {
+          key: 'community_requests_cache',
+          data: data,
+          updated_at: Date.now()
+        });
+      }
+    } catch (_) {}
+    try {
+      localStorage.setItem('PRAYERLY_COMMUNITY_CACHE', JSON.stringify(data));
+    } catch (_) {}
+  },
+
+  /**
    * Fetch community requests with filtering and pagination
    */
   async getRequests({ filterType = 'recent', category = 'all', search = '', page = 1, limit = 15 } = {}) {
@@ -111,6 +165,12 @@ const Community = {
     if (!data.success) {
       throw new Error(data.error || 'Failed to load community requests.');
     }
+
+    // Auto-update cache on default feed view
+    if (filterType === 'recent' && category === 'all' && !search && page === 1) {
+      await this.saveCachedRequests(data);
+    }
+
     return data;
   },
 
@@ -135,6 +195,24 @@ const Community = {
 
     const data = await response.json();
     if (!data.success) throw new Error(data.error || 'Failed to record commitment.');
+
+    // Update in-memory & IndexedDB cache optimistically
+    try {
+      const cached = await this.getCachedRequests();
+      if (cached && Array.isArray(cached.requests)) {
+        const target = cached.requests.find(r => r.request_id === requestId);
+        if (target) {
+          target.is_committed_by_me = Boolean(data.is_committed);
+          if (data.supporters_count !== undefined) {
+            target.supporters_count = data.supporters_count;
+          } else {
+            target.supporters_count = Math.max(0, (target.supporters_count || 0) + (data.is_committed ? 1 : -1));
+          }
+          await this.saveCachedRequests(cached);
+        }
+      }
+    } catch (_) {}
+
     return data;
   },
 

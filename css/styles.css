@@ -14,12 +14,23 @@
   --navy-700: #0077B6;
   --navy-50: #F0F7FF;
 
-  --teal-900: #134E4A;
-  --teal-700: #0F766E;
-  --teal-600: #0D9488;
-  --teal-500: #14B8A6;
-  --teal-50: #F0FDFA;
-  --teal-100: #CCFBF1;
+  /* Eye-Friendly Soothing Olive Green Palette */
+  --olive-900: #2C3916;
+  --olive-800: #3E511E;
+  --olive-700: #4B6324;
+  --olive-600: #59772B;
+  --olive-500: #6B8E23;
+  --olive-200: #C2D5A4;
+  --olive-100: #DCE8CB;
+  --olive-50: #F4F6EC;
+
+  /* Aliased for smooth compatibility across app */
+  --teal-900: #2C3916;
+  --teal-700: #4B6324;
+  --teal-600: #59772B;
+  --teal-500: #6B8E23;
+  --teal-50: #F4F6EC;
+  --teal-100: #DCE8CB;
 
   --amber-600: #D97706;
   --amber-50: #FFFBEB;
@@ -713,16 +724,16 @@ body {
 }
 
 .prayer-card .btn-pray.btn-prayed {
-  background: #ECFDF5 !important;
-  color: #065F46 !important;
-  border-color: #A7F3D0 !important;
+  background: var(--olive-50) !important;
+  color: var(--olive-800) !important;
+  border-color: var(--olive-200) !important;
   box-shadow: none !important;
 }
 
 .prayer-card .btn-pray.btn-prayed:hover {
-  background: #D1FAE5 !important;
-  border-color: #6EE7B7 !important;
-  color: #065F46 !important;
+  background: var(--olive-100) !important;
+  border-color: #A3B882 !important;
+  color: var(--olive-900) !important;
 }
 
 .prayer-card .btn-secondary {
@@ -756,16 +767,58 @@ body {
   letter-spacing: 0.5px;
 }
 
+/* Collapsible Prayed Today Dropdown Button */
+.prayer-section-toggle-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 0px !important;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+  margin-bottom: 8px;
+}
+
+.prayer-section-toggle-btn:hover {
+  background: var(--bg-hover, #F8FAFC);
+  border-color: #CBD5E1;
+}
+
+.prayed-toggle-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
 .all-prayed-banner {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #ECFDF5;
-  border: 1px solid #A7F3D0;
+  background: var(--olive-50);
+  border: 1px solid var(--olive-200);
   border-radius: 0px !important;
   box-shadow: none !important;
   padding: 12px 14px;
   margin-bottom: 14px;
+}
+
+.all-prayed-banner h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--olive-800) !important;
+  margin: 0 0 2px 0;
+}
+
+.all-prayed-banner p {
+  font-size: 12px;
+  color: var(--olive-700) !important;
+  margin: 0;
+  line-height: 1.4;
 }
 
 .all-prayed-icon {
@@ -774,9 +827,10 @@ body {
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: #D1FAE5;
+  background: #E3ECCF;
   border-radius: 50%;
   flex-shrink: 0;
+  color: var(--olive-700);
 }
 
 .prayer-action-buttons {
@@ -885,17 +939,17 @@ body {
 }
 
 .btn-prayed {
-  background: #ECFDF5 !important;
-  color: #065F46 !important;
-  border-color: #A7F3D0 !important;
+  background: var(--olive-50) !important;
+  color: var(--olive-800) !important;
+  border-color: var(--olive-200) !important;
   font-weight: 600;
   box-shadow: none !important;
 }
 
 .btn-prayed:hover {
-  background: #D1FAE5 !important;
-  border-color: #6EE7B7 !important;
-  color: #065F46 !important;
+  background: var(--olive-100) !important;
+  border-color: #A3B882 !important;
+  color: var(--olive-900) !important;
 }
 
 .icon-btn {
@@ -1197,12 +1251,12 @@ body {
 }
 
 .testimony-box {
-  background: #F0FDF4;
-  border: 1px dashed #86EFAC;
+  background: var(--olive-50);
+  border: 1px dashed var(--olive-200);
   border-radius: 0px !important;
   padding: 12px 14px;
   font-size: 13px;
-  color: #14532D;
+  color: var(--olive-800);
   margin: 12px 0;
   line-height: 1.6;
 }
@@ -1793,13 +1847,21 @@ body.dark-theme {
   --navy-900: #38BDF8;
   --navy-800: #0EA5E9;
   --navy-700: #0284C7;
-  --navy-50: #0F172A;
+  /* Dark Theme Eye-Friendly Olive Green */
+  --olive-900: #DCE8CB;
+  --olive-800: #C2D5A4;
+  --olive-700: #A8C27B;
+  --olive-600: #8FA85B;
+  --olive-500: #759048;
+  --olive-50: rgba(60, 80, 28, 0.3);
+  --olive-100: rgba(142, 178, 68, 0.35);
 
-  --teal-900: #CCFBF1;
-  --teal-700: #2DD4BF;
-  --teal-600: #14B8A6;
-  --teal-50: #134E4A;
-  --teal-100: #115E59;
+  --teal-900: #DCE8CB;
+  --teal-700: #A8C27B;
+  --teal-600: #8FA85B;
+  --teal-500: #759048;
+  --teal-50: rgba(60, 80, 28, 0.3);
+  --teal-100: rgba(142, 178, 68, 0.35);
 
   --amber-600: #FBBF24;
   --amber-50: #451A03;
@@ -1949,25 +2011,48 @@ body.dark-theme .prayer-card .btn-pray:hover {
   background: #1D4ED8 !important;
 }
 
-body.dark-theme .prayer-card .btn-pray.btn-prayed {
-  background: rgba(16, 185, 129, 0.15) !important;
-  border-color: rgba(16, 185, 129, 0.4) !important;
-  color: #34D399 !important;
+body.dark-theme .prayer-card .btn-pray.btn-prayed,
+body.dark-theme .btn-prayed {
+  background: rgba(107, 142, 35, 0.22) !important;
+  border-color: rgba(142, 178, 68, 0.45) !important;
+  color: #C5DC98 !important;
+}
+
+body.dark-theme .prayer-card .btn-pray.btn-prayed:hover,
+body.dark-theme .btn-prayed:hover {
+  background: rgba(107, 142, 35, 0.32) !important;
+  border-color: rgba(168, 194, 123, 0.6) !important;
+  color: #D6E8B0 !important;
+}
+
+body.dark-theme .prayer-section-toggle-btn {
+  background: var(--bg-card);
+  border-color: var(--border-light);
+}
+
+body.dark-theme .prayer-section-toggle-btn:hover {
+  background: #1E293B;
+  border-color: #475569;
 }
 
 body.dark-theme .all-prayed-banner {
-  background: rgba(6, 78, 59, 0.35) !important;
-  border-color: #047857 !important;
+  background: rgba(60, 80, 28, 0.35) !important;
+  border-color: rgba(142, 178, 68, 0.4) !important;
   border-radius: 0px !important;
   box-shadow: none !important;
 }
 
 body.dark-theme .all-prayed-banner h4 {
-  color: #6EE7B7 !important;
+  color: #D6E8B0 !important;
 }
 
 body.dark-theme .all-prayed-banner p {
-  color: #A7F3D0 !important;
+  color: #BED696 !important;
+}
+
+body.dark-theme .all-prayed-icon {
+  background: rgba(107, 142, 35, 0.35) !important;
+  color: #C5DC98 !important;
 }
 
 body.dark-theme .prayer-section-title {

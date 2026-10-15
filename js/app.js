@@ -15,6 +15,7 @@ const App = {
   communityFilter: 'recent',
   communityCategory: 'all',
   communityPage: 1,
+  prayedTodayExpanded: false,
 
   async init() {
     console.log('Initializing Prayer Companion with Community & Admin...');
@@ -243,6 +244,15 @@ const App = {
     const shareAppBtn = document.getElementById('btn-share-app');
     if (shareAppBtn) {
       shareAppBtn.addEventListener('click', () => this.shareApp());
+    }
+
+    // App User Manual Button
+    const openManualBtn = document.getElementById('btn-open-manual');
+    if (openManualBtn) {
+      openManualBtn.addEventListener('click', (e) => {
+        if (e) e.preventDefault();
+        this.openManualModal();
+      });
     }
 
     // Short Name changed event
@@ -545,11 +555,11 @@ const App = {
       html += `
         <div class="all-prayed-banner">
           <div class="all-prayed-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: #059669;"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div>
-            <h4 style="font-size: 14px; font-weight: 700; color: #065F46; margin: 0 0 2px 0;">All Prayer Points Completed Today!</h4>
-            <p style="font-size: 12px; color: #047857; margin: 0; line-height: 1.4;">
+            <h4>All Prayer Points Completed Today!</h4>
+            <p>
               You have prayed through all your active requests. Focus on resting in God's peace.
             </p>
           </div>
@@ -558,12 +568,17 @@ const App = {
     }
 
     if (prayedPrayers.length > 0) {
+      const isExpanded = Boolean(this.prayedTodayExpanded);
       html += `
-        <div class="prayer-section-group prayed-section-group" style="margin-top: 12px;">
-          <div class="prayer-section-header-sub">
-            <span class="prayer-section-title" style="color: #059669;">Prayed Today (${prayedPrayers.length})</span>
-          </div>
-          <div class="prayed-cards-list">
+        <div class="prayer-section-group prayed-section-group" style="margin-top: 14px;">
+          <button id="btn-toggle-prayed-today" class="prayer-section-toggle-btn" aria-expanded="${isExpanded ? 'true' : 'false'}">
+            <span class="prayer-section-title" style="color: var(--olive-700, #4B6324); display: inline-flex; align-items: center; gap: 8px;">
+              <span class="prayed-toggle-arrow" style="display: inline-block; font-size: 11px; transition: transform 0.2s ease; transform: ${isExpanded ? 'rotate(90deg)' : 'rotate(0deg)'};">▶</span>
+              <span>Prayed Today (${prayedPrayers.length})</span>
+            </span>
+            <span class="prayed-toggle-hint">${isExpanded ? 'Tap to collapse' : 'Tap to view'}</span>
+          </button>
+          <div id="prayed-today-dropdown" class="prayed-cards-list" style="display: ${isExpanded ? 'block' : 'none'}; margin-top: 8px;">
             ${prayedPrayers.map(p => this.renderPrayerCardHtml(p, true, true)).join('')}
           </div>
         </div>
@@ -715,6 +730,28 @@ const App = {
   },
 
   attachPrayerCardActions(parentEl) {
+    // Dropdown toggle for Prayed Today
+    const toggleBtn = parentEl.querySelector('#btn-toggle-prayed-today');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.prayedTodayExpanded = !this.prayedTodayExpanded;
+        const dropdown = parentEl.querySelector('#prayed-today-dropdown');
+        const arrow = toggleBtn.querySelector('.prayed-toggle-arrow');
+        const hint = toggleBtn.querySelector('.prayed-toggle-hint');
+        if (dropdown) {
+          dropdown.style.display = this.prayedTodayExpanded ? 'block' : 'none';
+        }
+        if (arrow) {
+          arrow.style.transform = this.prayedTodayExpanded ? 'rotate(90deg)' : 'rotate(0deg)';
+        }
+        if (hint) {
+          hint.textContent = this.prayedTodayExpanded ? 'Tap to collapse' : 'Tap to view';
+        }
+        toggleBtn.setAttribute('aria-expanded', this.prayedTodayExpanded ? 'true' : 'false');
+      });
+    }
+
     const closeAllCardMenus = () => {
       document.querySelectorAll('.card-menu-dropdown.open').forEach(d => d.classList.remove('open'));
       document.querySelectorAll('.card-menu-btn.active').forEach(b => b.classList.remove('active'));
@@ -859,11 +896,26 @@ const App = {
     }
 
     const searchInput = document.getElementById('community-search-input');
-    const search = searchInput ? searchInput.value : '';
+    const search = searchInput ? searchInput.value.trim() : '';
+    const isDefaultQuery = (this.communityFilter === 'recent' && this.communityCategory === 'all' && !search && this.communityPage === 1);
 
-    try {
+    // 1. Instant cache retrieval for seamless, 0ms transitions without loading flicker
+    let hasRenderedCache = false;
+    if (isDefaultQuery) {
+      const cached = await Community.getCachedRequests();
+      if (cached && Array.isArray(cached.requests) && cached.requests.length > 0) {
+        this.renderCommunityCards(container, emptyState, cached);
+        hasRenderedCache = true;
+      }
+    }
+
+    // Only display loading state if cache is empty or unavailable
+    if (!hasRenderedCache && (!container.children.length || container.innerHTML.includes('Join the Prayer'))) {
       container.innerHTML = `<div style="text-align: center; padding: 24px; color: var(--text-muted);">Loading community prayer requests...</div>`;
+    }
 
+    // 2. Fetch fresh data from network in background (or foreground)
+    try {
       const data = await Community.getRequests({
         filterType: this.communityFilter,
         category: this.communityCategory,
@@ -872,69 +924,80 @@ const App = {
         limit: 15
       });
 
-      if (!data.requests || data.requests.length === 0) {
-        container.innerHTML = '';
-        if (emptyState) emptyState.style.display = 'block';
-        return;
+      // Update UI only if user is still on community view
+      if (this.currentTab === 'community') {
+        this.renderCommunityCards(container, emptyState, data);
       }
+    } catch (err) {
+      if (!hasRenderedCache) {
+        container.innerHTML = `<div class="empty-state-card" style="color: #DC2626;"><p>Could not load community requests: ${UI.escape(err.message)}</p></div>`;
+      } else {
+        console.warn('Background community sync note:', err);
+      }
+    }
+  },
 
-      if (emptyState) emptyState.style.display = 'none';
+  renderCommunityCards(container, emptyState, data) {
+    if (!data.requests || data.requests.length === 0) {
+      container.innerHTML = '';
+      if (emptyState) emptyState.style.display = 'block';
+      return;
+    }
 
-      container.innerHTML = data.requests.map(r => `
-        <div class="prayer-card community-card ${r.is_committed_by_me ? 'card-committed' : ''}" data-req-id="${r.request_id}">
-          <div class="prayer-card-header">
-            <div class="prayer-tags">
-              <span class="badge badge-category">${UI.escape(r.category || 'General')}</span>
-              <span class="badge badge-person"><span class="badge-icon">${Icons.person}</span> ${UI.escape(r.display_name)}</span>
-            </div>
-            <div class="prayer-date">${new Date(r.created_at).toLocaleDateString()}</div>
+    if (emptyState) emptyState.style.display = 'none';
+
+    container.innerHTML = data.requests.map(r => `
+      <div class="prayer-card community-card ${r.is_committed_by_me ? 'card-committed' : ''}" data-req-id="${r.request_id}">
+        <div class="prayer-card-header">
+          <div class="prayer-tags">
+            <span class="badge badge-category">${UI.escape(r.category || 'General')}</span>
+            <span class="badge badge-person"><span class="badge-icon">${Icons.person}</span> ${UI.escape(r.display_name)}</span>
           </div>
+          <div class="prayer-date">${new Date(r.created_at).toLocaleDateString()}</div>
+        </div>
 
-          <h3 class="prayer-title">${UI.escape(r.prayer_title)}</h3>
-          ${r.shared_description ? `<p class="prayer-desc">${UI.escape(r.shared_description)}</p>` : ''}
+        <h3 class="prayer-title">${UI.escape(r.prayer_title)}</h3>
+        ${r.shared_description ? `<p class="prayer-desc">${UI.escape(r.shared_description)}</p>` : ''}
 
-          <div class="community-supporters-banner">
-            <span class="supporters-badge"><span class="badge-icon">${Icons.prayerHands}</span> <strong>${r.supporters_count}</strong> companion${r.supporters_count === 1 ? '' : 's'} praying</span>
-          </div>
+        <div class="community-supporters-banner">
+          <span class="supporters-badge"><span class="badge-icon">${Icons.prayerHands}</span> <strong>${r.supporters_count}</strong> companion${r.supporters_count === 1 ? '' : 's'} praying</span>
+        </div>
 
-          <div class="prayer-card-footer">
-            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-              <button class="btn btn-pray ${r.is_committed_by_me ? 'btn-prayed' : ''}" data-action="toggle-commitment" data-req-id="${r.request_id}">
-                <span class="btn-icon">${r.is_committed_by_me ? Icons.checkCircle : Icons.prayerHands}</span>
-                <span>${r.is_committed_by_me ? 'I Am Praying' : 'I’ll Pray'}</span>
+        <div class="prayer-card-footer">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <button class="btn btn-pray ${r.is_committed_by_me ? 'btn-prayed' : ''}" data-action="toggle-commitment" data-req-id="${r.request_id}">
+              <span class="btn-icon">${r.is_committed_by_me ? Icons.checkCircle : Icons.prayerHands}</span>
+              <span>${r.is_committed_by_me ? 'I Am Praying' : 'I’ll Pray'}</span>
+            </button>
+            ${r.allow_encouragement ? `
+              <button class="btn btn-secondary btn-sm" data-action="view-encouragements" data-req-id="${r.request_id}">
+                <span class="btn-icon">${Icons.messageSquare}</span>
+                <span>Encourage</span>
               </button>
-              ${r.allow_encouragement ? `
-                <button class="btn btn-secondary btn-sm" data-action="view-encouragements" data-req-id="${r.request_id}">
-                  <span class="btn-icon">${Icons.messageSquare}</span>
-                  <span>Encourage</span>
-                </button>
-              ` : ''}
-            </div>
+            ` : ''}
+          </div>
 
-            <div class="prayer-action-buttons">
-              ${r.is_owner ? `
-                <button class="icon-btn" data-action="edit-community-req" data-req-id="${r.request_id}">
-                  <span class="btn-icon">${Icons.edit}</span>
-                  <span>Edit</span>
-                </button>
-                <button class="icon-btn icon-btn-danger" data-action="stop-sharing" data-req-id="${r.request_id}" title="Stop sharing this request">
-                  <span>Stop</span>
-                </button>
-              ` : `
-                <button class="icon-btn" data-action="report-content" data-req-id="${r.request_id}" title="Report inappropriate content">
-                  <span class="btn-icon">${Icons.flag}</span>
-                  <span>Report</span>
-                </button>
-              `}
-            </div>
+          <div class="prayer-action-buttons">
+            ${r.is_owner ? `
+              <button class="icon-btn" data-action="edit-community-req" data-req-id="${r.request_id}">
+                <span class="btn-icon">${Icons.edit}</span>
+                <span>Edit</span>
+              </button>
+              <button class="icon-btn icon-btn-danger" data-action="stop-sharing" data-req-id="${r.request_id}" title="Stop sharing this request">
+                <span>Stop</span>
+              </button>
+            ` : `
+              <button class="icon-btn" data-action="report-content" data-req-id="${r.request_id}" title="Report inappropriate content">
+                <span class="btn-icon">${Icons.flag}</span>
+                <span>Report</span>
+              </button>
+            `}
           </div>
         </div>
-      `).join('');
+      </div>
+    `).join('');
 
-      this.attachCommunityCardActions(container);
-    } catch (err) {
-      container.innerHTML = `<div class="empty-state-card" style="color: #DC2626;"><p>Could not load community requests: ${UI.escape(err.message)}</p></div>`;
-    }
+    this.attachCommunityCardActions(container);
   },
 
   attachCommunityCardActions(parentEl) {
@@ -1595,6 +1658,14 @@ const App = {
         this.renderHeader();
         await this.renderCurrentView();
       };
+    }
+  },
+
+  openManualModal() {
+    this.closeAllModals();
+    const modal = document.getElementById('modal-manual');
+    if (modal) {
+      modal.classList.add('active');
     }
   },
 
