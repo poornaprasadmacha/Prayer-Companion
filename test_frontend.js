@@ -17,6 +17,7 @@ const scripts = [
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',
   'assets/Prayerly.svg',
+  'assets/Prayerly.png',
   'js/icons.js',
   'js/content.js',
   'js/db.js',

@@ -644,31 +644,13 @@ body {
 
 .companion-header {
   margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-}
-
-.companion-title-heading {
-  margin: 0;
-  padding: 0;
-  border: none;
-  display: inline-flex;
-  align-items: center;
+  width: 100%;
 }
 
 .companion-title-img {
-  height: 52px;
-  max-height: 58px;
-  width: auto;
   max-width: 100%;
-  object-fit: contain;
+  height: auto;
   display: block;
-  filter: brightness(0.12);
-  transition: filter 0.2s ease;
-}
-
-body.dark-theme .companion-title-img {
-  filter: brightness(1) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
 }
 
 .sr-only {

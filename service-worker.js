@@ -4,7 +4,7 @@
  * and Cache-First strategy for static assets.
  */
 
-const CACHE_NAME = 'prayerly-v10';
+const CACHE_NAME = 'prayerly-v11';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -27,7 +27,8 @@ const STATIC_ASSETS = [
   './assets/icons/icon.svg',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
-  './assets/Prayerly.svg'
+  './assets/Prayerly.svg',
+  './assets/Prayerly.png'
 ];
 
 // Install Event - Pre-cache App Shell
