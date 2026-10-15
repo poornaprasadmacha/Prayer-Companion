@@ -564,7 +564,6 @@ body.dark-theme .user-badge-icon {
 .scripture-card {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-left: 4px solid var(--navy-900);
   border-radius: var(--radius-lg);
   padding: 22px 24px;
   margin-bottom: 24px;
@@ -1186,7 +1185,8 @@ body.dark-theme .page-banner-img {
    COMMUNITY PRAYER COMPANIONS (PRAY TOGETHER)
    ========================================================================== */
 .community-card {
-  border-left: 4px solid var(--navy-900);
+  border: 1px solid var(--border-light) !important;
+  border-left: 1px solid var(--border-light) !important;
 }
 
 .community-supporters-banner {
@@ -1344,13 +1344,13 @@ body.dark-theme .page-banner-img {
    ANSWERED PRAYERS & THANKSGIVING CARDS
    ========================================================================== */
 .answered-card {
-  background: #FFFFFF;
-  border: 1px solid #CCFBF1;
-  border-left: 4px solid var(--teal-600);
-  border-radius: 0px !important;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light) !important;
+  border-left: 1px solid var(--border-light) !important;
+  border-radius: var(--radius-md);
   padding: 18px 20px;
   margin-bottom: 14px;
-  box-shadow: var(--shadow-xs);
+  box-shadow: none !important;
 }
 
 .answered-card-header {
@@ -1377,13 +1377,13 @@ body.dark-theme .page-banner-img {
 }
 
 .thanksgiving-card {
-  background: #FFFFFF;
-  border: 1px solid var(--amber-100);
-  border-left: 4px solid var(--amber-600);
-  border-radius: 0px !important;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light) !important;
+  border-left: 1px solid var(--border-light) !important;
+  border-radius: var(--radius-md);
   padding: 18px 20px;
   margin-bottom: 14px;
-  box-shadow: var(--shadow-xs);
+  box-shadow: none !important;
 }
 
 .thanksgiving-header {

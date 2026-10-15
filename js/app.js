@@ -2788,7 +2788,7 @@ const App = {
           listContainer.innerHTML = '<div style="color: #718096; font-style: italic; padding: 10px;">No messages yet. Be the first to send a word of prayerful encouragement!</div>';
         } else {
           listContainer.innerHTML = res.messages.map(m => `
-            <div style="background: var(--bg-hover); border-left: 3px solid var(--olive-600); border-radius: 0px; padding: 8px 12px; margin-bottom: 8px; font-size: 13px;">
+            <div style="background: var(--bg-hover); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 8px; font-size: 13px;">
               <p style="margin: 0 0 4px 0; color: var(--text-primary);">${UI.escape(m.message_text)}</p>
               <span style="font-size: 11px; color: var(--text-muted);">${new Date(m.created_at).toLocaleDateString()}</span>
             </div>

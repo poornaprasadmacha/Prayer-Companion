@@ -486,7 +486,7 @@ const Admin = {
       }
 
       listEl.innerHTML = res.reports.map(r => `
-        <div class="prayer-card" style="margin-bottom: 12px; border-left: 4px solid ${r.status === 'pending' ? '#DC2626' : '#008080'};">
+        <div class="prayer-card" style="margin-bottom: 12px; border: 1px solid var(--border-light);">
           <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
             <span class="badge ${r.status === 'pending' ? 'badge-priority-high' : 'badge-answered'}">Status: ${r.status}</span>
             <span style="font-size: 11px; color: #718096;">Reported: ${new Date(r.created_at).toLocaleDateString()}</span>
