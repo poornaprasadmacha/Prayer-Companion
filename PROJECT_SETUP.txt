@@ -437,6 +437,15 @@ Sub-Views:
 4. Error: CORS or Network Error calling Apps Script
    Solution: Ensure Web App deployment access is set to "Anyone" and URL ends with `/exec`.
 
+5. Error: "Failed to send invitation email: You do not have permission to call MailApp.sendEmail"
+   Solution: Google Apps Script requires a one-time authorization grant from the script owner to send emails:
+   a. Open your Google Apps Script project in the editor (script.google.com).
+   b. Ensure `appsscript.json` includes `oauthScopes` for `script.send_mail` and `gmail.send`.
+   c. In the function dropdown on the toolbar, select `setupDatabase` and click "Run".
+   d. Google will display "Authorization required". Click "Review permissions".
+   e. Choose your Google account -> Click "Advanced" -> Click "Go to Prayer Companion (unsafe)" -> Click "Allow".
+   f. The frontend also includes an instant one-click fallback: `[ Open in Email App (mailto:) ]` pre-populated with recipient and text.
+
 ================================================================================
 23. GOOGLE APPS SCRIPT & GMAIL QUOTAS / LIMITS
 ================================================================================

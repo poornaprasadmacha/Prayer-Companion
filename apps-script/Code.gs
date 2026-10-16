@@ -2233,11 +2233,25 @@ function handleEmailAppToFriend(payload) {
   `;
 
   try {
-    MailApp.sendEmail({
-      to: friendEmail,
-      subject: subject,
-      htmlBody: htmlBody
-    });
+    let sent = false;
+    try {
+      GmailApp.sendEmail(friendEmail, subject, `Hi! Your friend invites you to Prayerly: https://poornaprasadmacha.github.io/Prayer-Companion/`, {
+        htmlBody: htmlBody,
+        name: senderName ? `${senderName} via Prayerly` : "Prayerly"
+      });
+      sent = true;
+    } catch (e1) {
+      Logger.log("GmailApp sendEmail fallback: " + e1.message);
+    }
+
+    if (!sent) {
+      MailApp.sendEmail({
+        to: friendEmail,
+        subject: subject,
+        htmlBody: htmlBody
+      });
+    }
+
     return createJsonResponse({
       success: true,
       message: `Invitation email sent successfully to ${friendEmail}!`

@@ -283,6 +283,50 @@ const AppDB = {
         localStorage.removeItem('PRAYERLY_COMMUNITY_CACHE');
       }
     } catch (_) {}
+  },
+
+  /**
+   * Completely wipe all IndexedDB stores and delete the database from local device.
+   */
+  async clearEntireDatabase() {
+    try {
+      const stores = ['prayers', 'prayer_history', 'answered_prayers', 'thanksgiving', 'sync_queue', 'community_requests', 'encouragements', 'commitments', 'bible_stories', 'settings'];
+      const db = await initDB().catch(() => null);
+      if (db) {
+        for (const storeName of stores) {
+          if (db.objectStoreNames.contains(storeName)) {
+            await new Promise((resolve) => {
+              try {
+                const tx = db.transaction(storeName, 'readwrite');
+                tx.objectStore(storeName).clear();
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => resolve();
+              } catch (_) {
+                resolve();
+              }
+            });
+          }
+        }
+        try {
+          db.close();
+        } catch (_) {}
+      }
+    } catch (_) {}
+
+    dbInstance = null;
+
+    if (typeof indexedDB !== 'undefined' && indexedDB.deleteDatabase) {
+      await new Promise((resolve) => {
+        try {
+          const req = indexedDB.deleteDatabase(DB_NAME);
+          req.onsuccess = () => resolve();
+          req.onerror = () => resolve();
+          req.onblocked = () => resolve();
+        } catch (_) {
+          resolve();
+        }
+      });
+    }
   }
 };
 

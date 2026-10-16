@@ -1121,6 +1121,16 @@ body.dark-theme .prayer-card-date {
   background: #BE123C;
 }
 
+.btn-saved-success {
+  background: #059669 !important;
+  border-color: #059669 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.3) !important;
+  cursor: default !important;
+  pointer-events: none;
+  transition: all 0.2s ease-in-out;
+}
+
 .btn-sm {
   padding: 6px 13px;
   font-size: 12px;

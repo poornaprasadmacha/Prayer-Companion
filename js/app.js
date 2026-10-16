@@ -328,9 +328,13 @@ const App = {
     const friendName = (friendNameInput ? friendNameInput.value : '').trim();
     const senderName = (senderNameInput ? senderNameInput.value : '').trim();
 
-    const showAlert = (msg, type = 'error') => {
+    const showAlert = (msg, type = 'error', isHtml = false) => {
       if (alertEl) {
-        alertEl.textContent = msg;
+        if (isHtml) {
+          alertEl.innerHTML = msg;
+        } else {
+          alertEl.textContent = msg;
+        }
         alertEl.className = `auth-alert auth-alert-${type}`;
         alertEl.style.display = 'block';
       }
@@ -340,6 +344,10 @@ const App = {
       showAlert('Please enter a valid email address for your friend.');
       return;
     }
+
+    const inviteSubject = `${senderName ? senderName + ' invites you to ' : ''}Prayerly — Daily Prayer & Thanksgiving Companion`;
+    const inviteBody = `Hi ${friendName || 'there'},\n\n${senderName ? senderName + ' has' : "I've"} been using Prayerly as a daily prayer and thanksgiving companion, and thought you would love it too!\n\nOpen Prayerly here:\nhttps://poornaprasadmacha.github.io/Prayer-Companion/\n\nWarm regards,\n${senderName || 'Your Friend'}`;
+    const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(inviteSubject)}&body=${encodeURIComponent(inviteBody)}`;
 
     try {
       if (sendBtn) {
@@ -356,12 +364,112 @@ const App = {
         }
       }, 1500);
     } catch (err) {
-      showAlert(err.message || 'Failed to send email. Please check backend connection.');
+      const isPermission = err.message && (err.message.includes('permission') || err.message.includes('MailApp') || err.message.includes('sendEmail'));
+      const errorHtml = `
+        <div style="margin-bottom: 8px;">
+          ${isPermission 
+            ? '<strong>One-Time Setup Required:</strong> Google Apps Script requires a one-time authorization in the script editor to send emails from the cloud. However, you can send directly now from your own email app:' 
+            : '<strong>Could not send via cloud:</strong> ' + UI.escape(err.message || 'Network error')}
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+          <a href="${mailtoUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; padding: 8px 12px;">
+            <span>Open in Email App (mailto:)</span>
+          </a>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-invite-text" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px;">
+            <span>Copy Invitation Text</span>
+          </button>
+        </div>
+      `;
+      showAlert(errorHtml, 'warning', true);
+
+      const copyBtn = document.getElementById('btn-copy-invite-text');
+      if (copyBtn) {
+        copyBtn.onclick = () => {
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(inviteBody).then(() => {
+              copyBtn.textContent = '✓ Copied to Clipboard!';
+              setTimeout(() => { copyBtn.textContent = 'Copy Invitation Text'; }, 2000);
+            }).catch(() => {
+              copyBtn.textContent = 'Failed to copy';
+            });
+          }
+        };
+      }
+
       if (sendBtn) {
         sendBtn.disabled = false;
-        sendBtn.textContent = 'Send Invitation Email';
+        sendBtn.textContent = 'Retry Cloud Send';
       }
     }
+  },
+
+  /**
+   * Completely wipe IndexedDB, CacheStorage, all cookies, localStorage,
+   * sessionStorage, and unregister Service Workers across the entire origin.
+   */
+  async clearAllClientData() {
+    // 1. IndexedDB
+    try {
+      if (typeof AppDB !== 'undefined' && AppDB.clearEntireDatabase) {
+        await AppDB.clearEntireDatabase();
+      }
+    } catch (e) {
+      console.warn('Error clearing IndexedDB:', e);
+    }
+
+    // 2. CacheStorage (Service Worker / PWA Caches)
+    try {
+      if (typeof window !== 'undefined' && 'caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      }
+    } catch (e) {
+      console.warn('Error clearing CacheStorage:', e);
+    }
+
+    // 3. Clear all Cookies completely
+    try {
+      if (typeof document !== 'undefined') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i];
+          const eqPos = cookie.indexOf('=');
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+          if (name) {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${window.location.pathname}; SameSite=Lax`;
+            if (window.location.hostname) {
+              document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${window.location.hostname}; path=/; SameSite=Lax`;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Error clearing cookies:', e);
+    }
+
+    // 4. LocalStorage & SessionStorage
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.clear();
+      }
+    } catch (e) {}
+
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.clear();
+      }
+    } catch (e) {}
+
+    // 5. Unregister Service Workers
+    try {
+      if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const registration of registrations) {
+          await registration.unregister();
+        }
+      }
+    } catch (e) {}
   },
 
   checkLandingState() {
@@ -1694,24 +1802,50 @@ const App = {
         </div>
         ${e.description ? `<p class="prayer-desc">${UI.escape(e.description)}</p>` : ''}
 
-        <div class="prayer-card-footer">
-          <div style="margin-left: auto; display: flex; gap: 8px;">
-            <button class="icon-btn" data-action="edit-tg" data-id="${e.entry_id}">
-              <span class="btn-icon">${Icons.edit}</span>
-              <span>Edit</span>
+        <div class="prayer-card-footer" style="justify-content: flex-end;">
+          <div class="card-menu-container">
+            <button class="card-menu-btn" data-action="toggle-card-menu" title="More options" aria-label="More options">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
             </button>
-            <button class="icon-btn icon-btn-danger" data-action="delete-tg" data-id="${e.entry_id}">
-              <span class="btn-icon">${Icons.trash}</span>
-              <span>Delete</span>
-            </button>
+            <div class="card-menu-dropdown">
+              <button class="card-menu-item" data-action="edit-tg" data-id="${e.entry_id}">
+                <span class="menu-item-icon">${Icons.edit}</span>
+                <span>Edit Entry</span>
+              </button>
+              <div class="card-menu-divider"></div>
+              <button class="card-menu-item item-danger" data-action="delete-tg" data-id="${e.entry_id}">
+                <span class="menu-item-icon">${Icons.trash}</span>
+                <span>Delete Entry</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     `;
     }).join('');
 
+    container.querySelectorAll('[data-action="toggle-card-menu"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const cardMenuContainer = btn.closest('.card-menu-container');
+        const dropdown = cardMenuContainer ? cardMenuContainer.querySelector('.card-menu-dropdown') : null;
+        const isOpen = dropdown && dropdown.classList.contains('open');
+
+        document.querySelectorAll('.card-menu-dropdown.open').forEach(d => d.classList.remove('open'));
+        document.querySelectorAll('.card-menu-btn.active').forEach(b => b.classList.remove('active'));
+
+        if (dropdown && !isOpen) {
+          dropdown.classList.add('open');
+          btn.classList.add('active');
+        }
+      });
+    });
+
     container.querySelectorAll('[data-action="edit-tg"]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.card-menu-dropdown.open').forEach(d => d.classList.remove('open'));
+        document.querySelectorAll('.card-menu-btn.active').forEach(b => b.classList.remove('active'));
         const id = e.currentTarget.getAttribute('data-id');
         const entry = await AppDB.get('thanksgiving', id);
         if (entry) this.openThanksgivingModal(entry);
@@ -1720,6 +1854,9 @@ const App = {
 
     container.querySelectorAll('[data-action="delete-tg"]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.card-menu-dropdown.open').forEach(d => d.classList.remove('open'));
+        document.querySelectorAll('.card-menu-btn.active').forEach(b => b.classList.remove('active'));
         const id = e.currentTarget.getAttribute('data-id');
         const ok = await UI.confirm({
           title: 'Delete Thanksgiving Entry',
@@ -2202,6 +2339,7 @@ const App = {
           avatarEl.textContent = val ? val.charAt(0).toUpperCase() : 'P';
         }
         this.renderHeader();
+        UI.showButtonSavedFeedback(saveShortNameBtn, 'Save');
       };
     }
 
@@ -2228,6 +2366,7 @@ const App = {
         }
 
         await Settings.saveSettings(newSettings);
+        UI.showButtonSavedFeedback(saveBtn, 'Save Preferences');
       };
     }
 
@@ -2282,13 +2421,12 @@ const App = {
       clearCacheBtn.onclick = async () => {
         const ok = await UI.confirm({
           title: 'Clear Local Cache',
-          message: 'Clear cached prayers on this browser? Your cloud data remains safe and will reload on your next sync.',
+          message: 'Clear all cached prayers, IndexedDB, cookies, and offline data from this browser?',
           confirmText: 'Clear Cache',
           isDestructive: true
         });
         if (ok) {
-          await AppDB.clearAllUserData(Auth.getUserId());
-          UI.toast('Local cache cleared', 'info');
+          await this.clearAllClientData();
           window.location.reload();
         }
       };
@@ -2306,16 +2444,13 @@ const App = {
       signOutBtn.onclick = async () => {
         const ok = await UI.confirm({
           title: 'Sign Out',
-          message: 'Do you want to sign out?',
+          message: 'Do you want to sign out and completely clear your local session, cache, and cookies?',
           confirmText: 'Sign Out'
         });
         if (ok) {
-          await Auth.logout(false);
-          UI.toast('Signed out', 'info');
-          this.switchView('dashboard');
-          this.renderHeader();
-          this.renderDashboard();
-          this.openAuthModal();
+          await Auth.logout(true);
+          await this.clearAllClientData();
+          window.location.reload();
         }
       };
     }
@@ -2331,7 +2466,7 @@ const App = {
         });
         if (ok) {
           await Settings.deleteAccount();
-          UI.toast('Account deleted', 'info');
+          await this.clearAllClientData();
           window.location.reload();
         }
       };

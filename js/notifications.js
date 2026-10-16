@@ -55,6 +55,25 @@ const UI = {
   },
 
   /**
+   * Inline button success feedback ("✓ Saved!") with automatic restoration
+   * @param {HTMLElement} btn
+   * @param {string|null} originalText
+   * @param {number} duration
+   */
+  showButtonSavedFeedback(btn, originalText = null, duration = 2000) {
+    if (!btn) return;
+    const original = originalText !== null ? originalText : btn.textContent;
+    btn.textContent = '✓ Saved!';
+    btn.classList.add('btn-saved-success');
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.classList.remove('btn-saved-success');
+      btn.disabled = false;
+    }, duration);
+  },
+
+  /**
    * Show modal confirmation dialog
    */
   confirm({ title = 'Confirm Action', message = 'Are you sure?', confirmText = 'Confirm', cancelText = 'Cancel', isDestructive = false }) {
