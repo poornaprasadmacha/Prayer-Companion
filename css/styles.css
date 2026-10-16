@@ -122,26 +122,77 @@ body {
   cursor: pointer;
 }
 
-.brand-header-logo {
-  height: 38px;
-  width: auto;
-  max-width: 190px;
-  object-fit: contain;
-  display: block;
-  user-select: none;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
+.brand-hands-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
 }
 
-.brand-header-logo:hover {
-  opacity: 0.9;
+.brand-hands-svg {
+  width: 22px;
+  height: 22px;
+  color: #1C559C;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand-wrapper:hover .brand-hands-svg {
+  transform: scale(1.08);
+}
+
+.brand-text-word {
+  font-family: 'Plus Jakarta Sans', 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  display: inline-flex;
+  align-items: baseline;
+  user-select: none;
+  line-height: 1;
+}
+
+.brand-char-p {
+  color: #1C559C;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.brand-char-rayer {
+  color: #5C97D6;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.brand-char-ly {
+  color: #669573;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 @media (max-width: 640px) {
-  .brand-header-logo {
-    height: 30px;
-    max-width: 150px;
+  .brand-char-p {
+    font-size: 20px;
   }
+  .brand-char-rayer,
+  .brand-char-ly {
+    font-size: 18px;
+  }
+  .brand-hands-svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.brand-text-word-sm .brand-char-p {
+  font-size: 16px;
+}
+
+.brand-text-word-sm .brand-char-rayer,
+.brand-text-word-sm .brand-char-ly {
+  font-size: 14.5px;
 }
 
 .brand-icon {
@@ -2341,9 +2392,20 @@ body.dark-theme .pwa-banner {
   box-shadow: none !important;
 }
 
-body.dark-theme .brand-header-logo,
-body.dark-theme .pwa-banner-logo {
-  filter: brightness(1.2) drop-shadow(0 0 1px rgba(255, 255, 255, 0.35));
+body.dark-theme .brand-hands-svg {
+  color: #60A5FA !important;
+}
+
+body.dark-theme .brand-char-p {
+  color: #60A5FA !important;
+}
+
+body.dark-theme .brand-char-rayer {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .brand-char-ly {
+  color: #86EFAC !important;
 }
 
 body.dark-theme .pwa-banner-title {
@@ -3550,6 +3612,29 @@ body.dark-theme .brand-special-logo::after {
   width: 100%;
   display: flex;
   justify-content: center;
+}
+
+.all-prayed-keep-praying-img {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+  margin: 0 auto;
+  box-shadow: none !important;
+  border: 1px solid var(--border-light);
+  user-select: none;
+}
+
+@media (max-width: 640px) {
+  .all-prayed-keep-praying-img {
+    max-width: 100%;
+    border-radius: 10px;
+  }
+}
+
+body.dark-theme .all-prayed-keep-praying-img {
+  border-color: #334155 !important;
 }
 
 .all-prayed-neon-banner {

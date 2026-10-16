@@ -186,7 +186,14 @@
   <header class="app-header">
     <div class="header-content">
       <div class="brand-wrapper" data-tab="dashboard" onclick="App.switchTab('dashboard')" title="Prayerly - A Peaceful Space for Daily Prayer" aria-label="Prayerly">
-        <img src="assets/prayerly-logo.png" alt="Prayerly" class="brand-header-logo" />
+        <span class="brand-hands-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="brand-hands-svg">
+            <path d="M7 11V7a2 2 0 0 1 4 0v4M11 7a2 2 0 0 1 4 0v4M15 8a2 2 0 0 1 4 0v5a7 7 0 0 1-7 7H9a7 7 0 0 1-7-7v-3a2 2 0 0 1 4 0v2"/>
+          </svg>
+        </span>
+        <span class="brand-text-word">
+          <span class="brand-char-p">P</span><span class="brand-char-rayer">rayer</span><span class="brand-char-ly">ly</span>
+        </span>
       </div>
 
       <!-- Desktop Navigation Bar (Symmetric Center on Desktop - Icons Only) -->
@@ -264,8 +271,12 @@
     <!-- PWA Installation Prompt Banner -->
     <div id="pwa-install-banner" class="pwa-banner" style="display: none;">
       <div class="pwa-banner-left">
-        <span class="pwa-banner-title">Install</span>
-        <img src="assets/prayerly-logo.png" alt="Prayerly" class="pwa-banner-logo" />
+        <span class="pwa-banner-title">
+          Install
+          <span class="brand-text-word brand-text-word-sm">
+            <span class="brand-char-p">P</span><span class="brand-char-rayer">rayer</span><span class="brand-char-ly">ly</span>
+          </span>
+        </span>
       </div>
       <div class="pwa-banner-actions">
         <button id="btn-pwa-dismiss" class="btn-pwa-later" type="button" aria-label="Dismiss install banner">Later</button>

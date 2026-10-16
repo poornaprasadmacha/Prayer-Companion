@@ -1116,12 +1116,7 @@ const App = {
       // All active prayers completed for today!
       html += `
         <div class="all-prayed-banner-wrapper">
-          <div class="all-prayed-neon-banner">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" class="all-prayed-neon-check">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-            <span class="all-prayed-neon-title">All Prayer Points Completed</span>
-          </div>
+          <img src="assets/keep-praying.png" alt="Keep praying!" class="all-prayed-keep-praying-img" />
         </div>
       `;
     }
