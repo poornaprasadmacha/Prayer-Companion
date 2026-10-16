@@ -270,13 +270,28 @@
 
     <!-- PWA Installation Prompt Banner -->
     <div id="pwa-install-banner" class="pwa-banner" style="display: none;">
-      <div>
-        <strong style="color: #023E8A; font-size: 14px;">Install Prayerly</strong>
-        <p style="font-size: 12px; color: #4A5568; margin-top: 2px;">Add to your home screen for quick daily prayer access and offline usage.</p>
+      <div class="pwa-banner-left">
+        <div class="pwa-banner-icon-wrap">
+          <img src="assets/icons/icon.svg" alt="Prayerly Icon" class="pwa-banner-icon" width="44" height="44">
+        </div>
+        <div class="pwa-banner-text">
+          <div class="pwa-banner-title-row">
+            <span class="pwa-banner-title">Install Prayerly</span>
+            <span class="pwa-banner-badge">Fast &amp; Offline</span>
+          </div>
+          <p class="pwa-banner-desc">Add to your home screen for 1-tap daily prayer, private offline journal &amp; timely reminders.</p>
+        </div>
       </div>
-      <div style="display: flex; gap: 6px;">
-        <button id="btn-pwa-dismiss" class="btn btn-secondary btn-sm">Later</button>
-        <button id="btn-pwa-install" class="btn btn-primary btn-sm">Install</button>
+      <div class="pwa-banner-actions">
+        <button id="btn-pwa-dismiss" class="btn-pwa-later" type="button" aria-label="Dismiss install banner">Later</button>
+        <button id="btn-pwa-install" class="btn-pwa-install" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="btn-pwa-install-icon">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Install</span>
+        </button>
       </div>
     </div>
 
