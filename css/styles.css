@@ -1900,6 +1900,185 @@ body.dark-theme .no-active-img-dark {
 }
 
 /* ==========================================================================
+   VECTOR EMOJI ART EMPTY STATES (PURE CODE, ZERO DELAY, SMOOTH ACROSS PAGES)
+   ========================================================================== */
+.art-empty-state {
+  text-align: center;
+  padding: 32px 16px 28px 16px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 12px auto;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.art-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 6px;
+}
+
+.art-sticker-wrap {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.08));
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.art-sticker-wrap:hover {
+  transform: rotate(-3deg) scale(1.05);
+}
+
+.art-sticker-svg {
+  width: 72px;
+  height: 72px;
+  display: block;
+}
+
+.art-heading {
+  font-family: 'Plus Jakarta Sans', 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  text-align: left;
+  margin: 0;
+}
+
+.art-title-dark {
+  color: var(--navy-900);
+  display: block;
+  font-weight: 800;
+}
+
+.art-title-accent {
+  color: #1C559C;
+  font-weight: 800;
+}
+
+.art-title-emerald {
+  color: #059669;
+  font-weight: 800;
+}
+
+.art-title-amber {
+  color: #D97706;
+  font-weight: 800;
+}
+
+.art-title-rose {
+  color: #E11D48;
+  font-weight: 800;
+}
+
+.art-title-indigo {
+  color: #4F46E5;
+  font-weight: 800;
+}
+
+.art-exclamation {
+  display: inline-block;
+  font-weight: 900;
+  transform: rotate(8deg) translate(1px, -1px);
+  margin-left: 2px;
+}
+
+.art-quote {
+  font-family: 'Plus Jakarta Sans', 'Outfit', 'Inter', sans-serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #1E3A8A;
+  font-weight: 500;
+  margin: 14px auto 0 auto;
+  max-width: 440px;
+  text-align: center;
+}
+
+.art-quote strong {
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.art-actions {
+  margin-top: 18px;
+}
+
+.art-actions .btn {
+  box-shadow: none !important;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 10px 22px;
+}
+
+@media (max-width: 640px) {
+  .art-empty-state {
+    padding: 24px 12px 20px 12px;
+  }
+  .art-header-flex {
+    gap: 12px;
+  }
+  .art-sticker-svg {
+    width: 60px;
+    height: 60px;
+  }
+  .art-heading {
+    font-size: 24px;
+  }
+  .art-quote {
+    font-size: 13.5px;
+    margin-top: 12px;
+  }
+}
+
+/* Dark Theme Overrides for Vector Art */
+body.dark-theme .art-empty-state {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme .art-title-dark {
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .art-title-accent {
+  color: #60A5FA !important;
+}
+
+body.dark-theme .art-title-emerald {
+  color: #34D399 !important;
+}
+
+body.dark-theme .art-title-amber {
+  color: #FBBF24 !important;
+}
+
+body.dark-theme .art-title-rose {
+  color: #FB7185 !important;
+}
+
+body.dark-theme .art-title-indigo {
+  color: #818CF8 !important;
+}
+
+body.dark-theme .art-quote {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .art-quote strong {
+  color: #F8FAFC !important;
+}
+
+/* ==========================================================================
    MODALS & TOASTS
    ========================================================================== */
 .modal-backdrop {

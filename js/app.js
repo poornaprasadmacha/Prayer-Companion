@@ -26,6 +26,11 @@ const App = {
     this.initTheme();
     this.initPwa();
 
+    // 1.5. Synchronous Local Device Hydration (< 1ms instant paint, zero stuck delay)
+    this.renderHeader();
+    this.renderDailyScripture();
+    this.renderCachedDashboardSync();
+
     // 2. Initialize Database & Auth with safe fallback
     let authState = { isAuthenticated: false, isLocal: true };
     try {
@@ -979,7 +984,7 @@ const App = {
     const quoteAuthorEl = document.getElementById('daily-quote-author');
     const devotionalImgEl = document.getElementById('daily-devotional-img');
 
-    const DEFAULT_DEVOTIONAL_IMG = 'https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=1200&q=80';
+    const DEFAULT_DEVOTIONAL_IMG = 'assets/daily-devotional.jpg';
 
     if (devotionalImgEl) {
       devotionalImgEl.onerror = () => {
@@ -1090,6 +1095,14 @@ const App = {
     if (activePrayers.length === 0) {
       container.innerHTML = '';
       if (emptyState) emptyState.style.display = 'block';
+      try {
+        localStorage.setItem('PRAYERLY_DASHBOARD_CACHE_V2', JSON.stringify({
+          html: '',
+          stats,
+          empty: true,
+          date: new Date().toDateString()
+        }));
+      } catch (_) {}
       return;
     }
 
@@ -1116,7 +1129,30 @@ const App = {
       // All active prayers completed for today!
       html += `
         <div class="all-prayed-banner-wrapper">
-          <img src="assets/keep-praying.png" alt="Keep praying!" class="all-prayed-keep-praying-img" />
+          <div class="art-empty-state" style="padding: 24px 16px;">
+            <div class="art-header-flex">
+              <div class="art-sticker-wrap">
+                <svg viewBox="0 0 100 100" class="art-sticker-svg" aria-hidden="true">
+                  <circle cx="53" cy="53" r="42" fill="rgba(0,0,0,0.12)" />
+                  <circle cx="50" cy="50" r="42" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.8" />
+                  <circle cx="48.5" cy="48.5" r="37.5" fill="#10B981" stroke="#0F172A" stroke-width="2.2" />
+                  <path d="M 33 44 Q 38 38 43 44" fill="none" stroke="#0F172A" stroke-width="3" stroke-linecap="round" />
+                  <path d="M 54 44 Q 59 38 64 44" fill="none" stroke="#0F172A" stroke-width="3" stroke-linecap="round" />
+                  <path d="M 34 54 Q 48.5 73 63 54" fill="#FFFFFF" stroke="#0F172A" stroke-width="3" stroke-linejoin="round" />
+                  <circle cx="31" cy="53" r="3.5" fill="#F87171" opacity="0.75" />
+                  <circle cx="66" cy="53" r="3.5" fill="#F87171" opacity="0.75" />
+                </svg>
+              </div>
+              <h2 class="art-heading">
+                <span class="art-title-dark">Keep</span>
+                <span class="art-title-emerald">Praying <span class="art-exclamation">!</span></span>
+              </h2>
+            </div>
+            <p class="art-quote">
+              All daily prayer points <strong>completed for today</strong>!<br>
+              "Rejoice always, <strong>pray without ceasing</strong>, give thanks."
+            </p>
+          </div>
         </div>
       `;
     }
@@ -1141,6 +1177,50 @@ const App = {
 
     container.innerHTML = html;
     this.attachPrayerCardActions(container);
+
+    try {
+      localStorage.setItem('PRAYERLY_DASHBOARD_CACHE_V2', JSON.stringify({
+        html,
+        stats,
+        empty: false,
+        date: new Date().toDateString()
+      }));
+    } catch (_) {}
+  },
+
+  renderCachedDashboardSync() {
+    try {
+      const raw = localStorage.getItem('PRAYERLY_DASHBOARD_CACHE_V2');
+      if (!raw) return false;
+      const c = JSON.parse(raw);
+      if (!c) return false;
+
+      if (c.stats) {
+        const totalEl = document.getElementById('stat-total-active');
+        const prayedEl = document.getElementById('stat-prayed-today');
+        const unprayedEl = document.getElementById('stat-unprayed-today');
+        const answeredEl = document.getElementById('stat-answered');
+        if (totalEl && c.stats.totalActive !== undefined) totalEl.textContent = c.stats.totalActive;
+        if (prayedEl && c.stats.prayedToday !== undefined) prayedEl.textContent = c.stats.prayedToday;
+        if (unprayedEl && c.stats.unprayedToday !== undefined) unprayedEl.textContent = c.stats.unprayedToday;
+        if (answeredEl && c.stats.totalAnswered !== undefined) answeredEl.textContent = c.stats.totalAnswered;
+      }
+
+      const container = document.getElementById('dashboard-prayers-container');
+      const emptyState = document.getElementById('dashboard-empty-state');
+
+      if (c.empty) {
+        if (emptyState) emptyState.style.display = 'block';
+        if (container) container.innerHTML = '';
+      } else if (c.html && container) {
+        container.innerHTML = c.html;
+        if (emptyState) emptyState.style.display = 'none';
+        this.attachPrayerCardActions(container);
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
   },
 
   // ==========================================================================

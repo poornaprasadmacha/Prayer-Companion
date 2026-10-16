@@ -289,7 +289,7 @@
       <div class="greeting-section">
         <div class="greeting-row">
           <div>
-            <h1 id="dashboard-greeting" class="greeting-title">Good morning</h1>
+            <h1 id="dashboard-greeting" class="greeting-title">Good morning, <span class="greeting-short-name" id="dashboard-user-name">Poorna</span></h1>
             <p id="dashboard-date" class="greeting-date">Today</p>
           </div>
           <div class="greeting-actions">
@@ -299,6 +299,20 @@
             </button>
           </div>
         </div>
+        <script>
+          (function() {
+            try {
+              var n = localStorage.getItem('prayer_user_short_name') || 'Poorna';
+              var now = new Date();
+              var h = now.getHours();
+              var g = h < 12 ? 'Good morning' : (h < 17 ? 'Good afternoon' : 'Good evening');
+              var gel = document.getElementById('dashboard-greeting');
+              if (gel) gel.innerHTML = g + ', <span class="greeting-short-name" id="dashboard-user-name">' + n + '</span>';
+              var del = document.getElementById('dashboard-date');
+              if (del) del.textContent = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            } catch(e) {}
+          })();
+        </script>
       </div>
 
       <!-- Dashboard Hero Split: Image Left, 4 Stats Right on Desktop -->
@@ -306,7 +320,7 @@
         <!-- Daily Devotional Card (Image-First) -->
         <div class="devotional-card">
           <div class="devotional-img-wrap">
-            <img id="daily-devotional-img" class="devotional-img" src="https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=1200&q=80" alt="Daily Devotional Inspiration" loading="lazy">
+            <img id="daily-devotional-img" class="devotional-img" src="assets/daily-devotional.jpg" alt="Daily Devotional Inspiration">
           </div>
           <div style="display: none;" aria-hidden="true">
             <button id="btn-copy-verse" style="display: none;" aria-hidden="true"></button>
@@ -344,11 +358,58 @@
       </div>
 
       <div id="dashboard-prayers-container"></div>
+      <script>
+        (function() {
+          try {
+            var raw = localStorage.getItem('PRAYERLY_DASHBOARD_CACHE_V2');
+            if (raw) {
+              var c = JSON.parse(raw);
+              if (c && c.stats) {
+                var t = document.getElementById('stat-total-active');
+                var p = document.getElementById('stat-prayed-today');
+                var u = document.getElementById('stat-unprayed-today');
+                var a = document.getElementById('stat-answered');
+                if (t && c.stats.totalActive !== undefined) t.textContent = c.stats.totalActive;
+                if (p && c.stats.prayedToday !== undefined) p.textContent = c.stats.prayedToday;
+                if (u && c.stats.unprayedToday !== undefined) u.textContent = c.stats.unprayedToday;
+                if (a && c.stats.totalAnswered !== undefined) a.textContent = c.stats.totalAnswered;
+              }
+              var cnt = document.getElementById('dashboard-prayers-container');
+              var emp = document.getElementById('dashboard-empty-state');
+              if (c && c.empty) {
+                if (emp) emp.style.display = 'block';
+                if (cnt) cnt.innerHTML = '';
+              } else if (c && c.html && cnt) {
+                cnt.innerHTML = c.html;
+                if (emp) emp.style.display = 'none';
+              }
+            }
+          } catch(e) {}
+        })();
+      </script>
 
-      <div id="dashboard-empty-state" class="no-active-empty-state" style="display: none;">
-        <img src="assets/no-active-prayers.png" alt="No active Prayer Points" class="no-active-prayers-img no-active-img-light" onclick="App.openPrayerModal()" />
-        <img src="assets/no-active-prayers-dark.png" alt="No active Prayer Points" class="no-active-prayers-img no-active-img-dark" onclick="App.openPrayerModal()" />
-        <div class="no-active-empty-actions">
+      <div id="dashboard-empty-state" class="art-empty-state" style="display: none;">
+        <div class="art-header-flex">
+          <div class="art-sticker-wrap" onclick="App.openPrayerModal()" style="cursor: pointer;" title="Add a prayer point">
+            <svg viewBox="0 0 100 100" class="art-sticker-svg" aria-hidden="true">
+              <circle cx="53" cy="53" r="42" fill="rgba(0,0,0,0.12)" />
+              <circle cx="50" cy="50" r="42" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.8" />
+              <circle cx="48.5" cy="48.5" r="37.5" fill="#3B82F6" stroke="#0F172A" stroke-width="2.2" />
+              <circle cx="37" cy="42" r="3.4" fill="#0F172A" />
+              <circle cx="60" cy="42" r="3.4" fill="#0F172A" />
+              <path d="M 34 65 Q 48.5 51 63 65" fill="none" stroke="#0F172A" stroke-width="3.2" stroke-linecap="round" />
+            </svg>
+          </div>
+          <h2 class="art-heading">
+            <span class="art-title-dark">No active</span>
+            <span class="art-title-accent">Prayer Points <span class="art-exclamation">!</span></span>
+          </h2>
+        </div>
+        <p class="art-quote">
+          Once <strong>Prayer</strong> becomes a <strong>Habit</strong>,<br>
+          <strong>Success</strong> becomes a <strong>Lifestyle</strong>
+        </p>
+        <div class="art-actions">
           <button class="btn btn-primary btn-sm" onclick="App.openPrayerModal()">+ Add Your First Prayer</button>
         </div>
       </div>
@@ -393,11 +454,31 @@
 
       <div id="prayers-list-container"></div>
 
-      <div id="prayers-empty-state" class="empty-state-card" style="display: none;">
-        <div class="empty-state-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width: 44px; height: 44px; color: var(--navy-900);"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+      <div id="prayers-empty-state" class="art-empty-state" style="display: none;">
+        <div class="art-header-flex">
+          <div class="art-sticker-wrap" onclick="App.openPrayerModal()" style="cursor: pointer;" title="Add a prayer">
+            <svg viewBox="0 0 100 100" class="art-sticker-svg" aria-hidden="true">
+              <rect x="14" y="16" width="76" height="72" rx="18" fill="rgba(0,0,0,0.12)" />
+              <rect x="11" y="13" width="76" height="72" rx="18" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.8" />
+              <rect x="14" y="16" width="70" height="66" rx="15" fill="#0284C7" stroke="#0F172A" stroke-width="2.2" />
+              <path d="M 24 32 Q 48 37 48 68 Q 24 64 24 32 Z" fill="#F0F9FF" stroke="#0F172A" stroke-width="2" />
+              <path d="M 74 32 Q 50 37 50 68 Q 74 64 74 32 Z" fill="#FFFFFF" stroke="#0F172A" stroke-width="2" />
+              <line x1="49" y1="34" x2="49" y2="68" stroke="#0F172A" stroke-width="2.5" />
+              <path d="M 45 20 L 49 46 L 53 20" fill="#EF4444" stroke="#0F172A" stroke-width="1.8" />
+            </svg>
+          </div>
+          <h2 class="art-heading">
+            <span class="art-title-dark">Your Prayer</span>
+            <span class="art-title-accent">Journal <span class="art-exclamation">!</span></span>
+          </h2>
         </div>
-        <p style="font-size: 13px; color: var(--text-secondary);">No prayer points matching your current filter.</p>
+        <p class="art-quote">
+          "Cast your burden on the <strong>Lord</strong>, and He will sustain you."<br>
+          No petitions matching your current filter.
+        </p>
+        <div class="art-actions">
+          <button class="btn btn-primary btn-sm" onclick="App.openPrayerModal()">+ Add New Prayer</button>
+        </div>
       </div>
     </section>
 
@@ -439,14 +520,29 @@
 
       <div id="community-requests-container"></div>
 
-      <div id="community-empty-state" class="empty-state-card" style="display: none;">
-        <div class="empty-state-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width: 44px; height: 44px; color: var(--teal-600);"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <div id="community-empty-state" class="art-empty-state" style="display: none;">
+        <div class="art-header-flex">
+          <div class="art-sticker-wrap" onclick="CommunityView.openShareModal()" style="cursor: pointer;" title="Share prayer request">
+            <svg viewBox="0 0 100 100" class="art-sticker-svg" aria-hidden="true">
+              <circle cx="53" cy="53" r="42" fill="rgba(0,0,0,0.12)" />
+              <circle cx="50" cy="50" r="42" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.8" />
+              <circle cx="48.5" cy="48.5" r="37.5" fill="#6366F1" stroke="#0F172A" stroke-width="2.2" />
+              <path d="M 43 26 C 43 23 48.5 23 48.5 26 L 48.5 66 C 48.5 70 38 68 38 62 L 38 42 C 38 34 43 32 43 26 Z" fill="#EEF2FF" stroke="#0F172A" stroke-width="2.4" stroke-linejoin="round" />
+              <path d="M 54 26 C 54 23 48.5 23 48.5 26 L 48.5 66 C 48.5 70 59 68 59 62 L 59 42 C 59 34 54 32 54 26 Z" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.4" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <h2 class="art-heading">
+            <span class="art-title-dark">Stand In The</span>
+            <span class="art-title-indigo">Gap <span class="art-exclamation">!</span></span>
+          </h2>
         </div>
-        <h3 style="color: var(--navy-900); margin-bottom: 4px; font-weight: 600;">No community prayer requests found</h3>
-        <p style="font-size: 13px; max-width: 400px; margin: 0 auto; color: var(--text-secondary);">
-          You can share a prayer point from your personal list by clicking <strong>"Share with Companions"</strong> on any prayer card.
+        <p class="art-quote">
+          "Bear one another's <strong>burdens</strong>, and so fulfill the law of Christ."<br>
+          Click <strong>"Share with Companions"</strong> to intercede together.
         </p>
+        <div class="art-actions">
+          <button class="btn btn-primary btn-sm" onclick="CommunityView.openShareModal()">+ Share Prayer Request</button>
+        </div>
       </div>
     </section>
 
@@ -463,13 +559,24 @@
 
       <div id="answered-list-container"></div>
 
-      <div id="answered-empty-state" class="empty-state-card" style="display: none;">
-        <div class="empty-state-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width: 44px; height: 44px; color: var(--amber-600);"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+      <div id="answered-empty-state" class="art-empty-state" style="display: none;">
+        <div class="art-header-flex">
+          <div class="art-sticker-wrap">
+            <svg viewBox="0 0 100 100" class="art-sticker-svg" aria-hidden="true">
+              <circle cx="53" cy="53" r="42" fill="rgba(0,0,0,0.12)" />
+              <circle cx="50" cy="50" r="42" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.8" />
+              <circle cx="48.5" cy="48.5" r="37.5" fill="#F59E0B" stroke="#0F172A" stroke-width="2.2" />
+              <polygon points="48.5,23 54,38 70,39 57,50 62,66 48.5,56 35,66 40,50 27,39 43,38" fill="#FEF08A" stroke="#0F172A" stroke-width="2.4" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <h2 class="art-heading">
+            <span class="art-title-dark">No Answered</span>
+            <span class="art-title-amber">Prayers Yet <span class="art-exclamation">!</span></span>
+          </h2>
         </div>
-        <h3 style="color: var(--navy-900); margin-bottom: 4px; font-weight: 600;">No answered prayers recorded yet</h3>
-        <p style="font-size: 13px; max-width: 400px; margin: 0 auto; color: var(--text-secondary);">
-          When God answers a prayer, click <strong>"God Answered"</strong> on any prayer card to record your testimony and celebrate His faithfulness.
+        <p class="art-quote">
+          "He who calls you is <strong>faithful</strong>, who also will do it."<br>
+          Click <strong>"God Answered"</strong> on any prayer card to celebrate testimonies.
         </p>
       </div>
     </section>
@@ -488,15 +595,29 @@
 
       <div id="thanksgiving-list-container"></div>
 
-      <div id="thanksgiving-empty-state" class="empty-state-card" style="display: none;">
-        <div class="empty-state-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width: 44px; height: 44px; color: var(--rose-600);"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+      <div id="thanksgiving-empty-state" class="art-empty-state" style="display: none;">
+        <div class="art-header-flex">
+          <div class="art-sticker-wrap" onclick="App.openThanksgivingModal()" style="cursor: pointer;" title="Add gratitude">
+            <svg viewBox="0 0 100 100" class="art-sticker-svg" aria-hidden="true">
+              <circle cx="53" cy="53" r="42" fill="rgba(0,0,0,0.12)" />
+              <circle cx="50" cy="50" r="42" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.8" />
+              <circle cx="48.5" cy="48.5" r="37.5" fill="#EC4899" stroke="#0F172A" stroke-width="2.2" />
+              <path d="M 48.5 68 C 30 54 26 42 26 34 C 26 27 31 22 38 22 C 43 22 46.5 25 48.5 28 C 50.5 25 54 22 59 22 C 66 22 71 27 71 34 C 71 42 67 54 48.5 68 Z" fill="#FEE2E2" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round" />
+              <path d="M 20 20 L 25 24 M 77 20 L 72 24 M 48.5 12 L 48.5 17" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" />
+            </svg>
+          </div>
+          <h2 class="art-heading">
+            <span class="art-title-dark">Count Your</span>
+            <span class="art-title-rose">Blessings <span class="art-exclamation">!</span></span>
+          </h2>
         </div>
-        <h3 style="color: var(--navy-900); margin-bottom: 4px; font-weight: 600;">Your gratitude journal is empty</h3>
-        <p style="font-size: 13px; max-width: 400px; margin: 0 auto 12px auto; color: var(--text-secondary);">
-          Record blessings, thankfulness, and praises even when unrelated to a specific petition.
+        <p class="art-quote">
+          "Enter into His gates with <strong>thanksgiving</strong> and praise."<br>
+          Gratitude turns what we have into more than enough.
         </p>
-        <button class="btn btn-primary btn-sm" onclick="App.openThanksgivingModal()">+ Record Today's Thanksgiving</button>
+        <div class="art-actions">
+          <button class="btn btn-primary btn-sm" onclick="App.openThanksgivingModal()">+ Record Today's Thanksgiving</button>
+        </div>
       </div>
     </section>
 
