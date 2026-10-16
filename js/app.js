@@ -1193,21 +1193,14 @@ const App = {
     const cardStatusClass = isPrayed ? 'card-prayed' : '';
     const hasDesc = Boolean(prayer.description && prayer.description.trim());
     const dateText = UI.formatDate(prayer.created_at || prayer.target_date);
-    const catTag = prayer.category ? prayer.category.toLowerCase() : '';
-    const priorityTag = prayer.priority && prayer.priority !== 'Medium' ? prayer.priority.toLowerCase() : '';
-    const personTag = prayer.person_name ? prayer.person_name.toLowerCase() : '';
 
     return `
       <div class="prayer-card ${cardStatusClass}" data-id="${prayer.prayer_id}">
-        <h3 class="prayer-title">${UI.escape(prayer.title)}</h3>
-        ${hasDesc ? `<div class="prayer-desc">${UI.escape(prayer.description.trim())}</div>` : ''}
-
-        <div class="prayer-meta-row">
-          ${dateText ? `<span class="prayer-meta-date">${dateText}</span>` : ''}
-          ${catTag ? `<span class="pill-tag">${UI.escape(catTag)}</span>` : ''}
-          ${priorityTag ? `<span class="pill-tag">${UI.escape(priorityTag)}</span>` : ''}
-          ${personTag ? `<span class="pill-tag">${UI.escape(personTag)}</span>` : ''}
+        <div class="prayer-card-header">
+          <h3 class="prayer-title">${UI.escape(prayer.title)}</h3>
+          ${dateText ? `<span class="prayer-card-date">${dateText}</span>` : ''}
         </div>
+        ${hasDesc ? `<div class="prayer-desc">${UI.escape(prayer.description.trim())}</div>` : ''}
 
         <div class="prayer-card-footer">
           <div class="prayer-primary-group">
@@ -1473,18 +1466,13 @@ const App = {
 
     container.innerHTML = data.requests.map(r => {
       const dateText = UI.formatDate(r.created_at);
-      const catTag = (r.category || 'General').toLowerCase();
-      const personTag = (r.display_name || 'Companion').toLowerCase();
       return `
       <div class="prayer-card community-card ${r.is_committed_by_me ? 'card-committed' : ''}" data-req-id="${r.request_id}">
-        <h3 class="prayer-title">${UI.escape(r.prayer_title)}</h3>
-        ${r.shared_description ? `<p class="prayer-desc">${UI.escape(r.shared_description)}</p>` : ''}
-
-        <div class="prayer-meta-row">
-          ${dateText ? `<span class="prayer-meta-date">${dateText}</span>` : ''}
-          <span class="pill-tag">${UI.escape(catTag)}</span>
-          <span class="pill-tag">${UI.escape(personTag)}</span>
+        <div class="prayer-card-header">
+          <h3 class="prayer-title">${UI.escape(r.prayer_title)}</h3>
+          ${dateText ? `<span class="prayer-card-date">${dateText}</span>` : ''}
         </div>
+        ${r.shared_description ? `<p class="prayer-desc">${UI.escape(r.shared_description)}</p>` : ''}
 
         <div class="community-supporters-banner">
           <span class="supporters-badge"><strong>${r.supporters_count}</strong> companion${r.supporters_count === 1 ? '' : 's'} praying</span>
@@ -1627,10 +1615,12 @@ const App = {
 
     container.innerHTML = list.map(item => {
       const dateText = UI.formatDate(item.answered_date || item.created_at);
-      const catTag = item.category ? item.category.toLowerCase() : '';
       return `
       <div class="prayer-card answered-card" data-id="${item.answered_id}">
-        <h3 class="prayer-title">${UI.escape(item.prayer_title)}</h3>
+        <div class="prayer-card-header">
+          <h3 class="prayer-title">${UI.escape(item.prayer_title)}</h3>
+          ${dateText ? `<span class="prayer-card-date">${dateText}</span>` : ''}
+        </div>
         ${item.prayer_description ? `<p class="prayer-desc">${UI.escape(item.prayer_description)}</p>` : ''}
         ${item.testimony ? `
           <div class="testimony-box">
@@ -1638,12 +1628,6 @@ const App = {
             <p style="margin: 4px 0 0 0;">${UI.escape(item.testimony)}</p>
           </div>
         ` : ''}
-
-        <div class="prayer-meta-row">
-          ${dateText ? `<span class="prayer-meta-date">${dateText}</span>` : ''}
-          <span class="pill-tag">answered</span>
-          ${catTag ? `<span class="pill-tag">${UI.escape(catTag)}</span>` : ''}
-        </div>
 
         <div class="answered-card-footer">
           <button class="btn btn-secondary btn-sm" data-action="restore-answered" data-id="${item.answered_id}">
@@ -1702,16 +1686,13 @@ const App = {
 
     container.innerHTML = entries.map(e => {
       const dateText = UI.formatDate(e.entry_date || e.created_at);
-      const catTag = (e.category || 'Praise').toLowerCase();
       return `
       <div class="prayer-card thanksgiving-card" data-id="${e.entry_id}">
-        <h3 class="prayer-title">${UI.escape(e.title)}</h3>
-        ${e.description ? `<p class="prayer-desc">${UI.escape(e.description)}</p>` : ''}
-
-        <div class="prayer-meta-row">
-          ${dateText ? `<span class="prayer-meta-date">${dateText}</span>` : ''}
-          <span class="pill-tag">${UI.escape(catTag)}</span>
+        <div class="prayer-card-header">
+          <h3 class="prayer-title">${UI.escape(e.title)}</h3>
+          ${dateText ? `<span class="prayer-card-date">${dateText}</span>` : ''}
         </div>
+        ${e.description ? `<p class="prayer-desc">${UI.escape(e.description)}</p>` : ''}
 
         <div class="prayer-card-footer">
           <div style="margin-left: auto; display: flex; gap: 8px;">

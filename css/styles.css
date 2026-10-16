@@ -835,8 +835,8 @@ body.dark-theme .page-banner-img {
   border-left: 1px solid var(--border-light) !important;
   border-radius: 0px !important;
   box-shadow: none !important;
-  padding: 12px 14px;
-  margin-bottom: 8px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
@@ -854,61 +854,50 @@ body.dark-theme .page-banner-img {
   box-shadow: none !important;
 }
 
+.prayer-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
 .prayer-title {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0 0 4px 0;
-  line-height: 1.4;
+  margin: 0;
+  line-height: 1.35;
+  flex: 1;
+}
+
+.prayer-card-date {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94A3B8; /* Low fade */
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+  letter-spacing: 0.01em;
+}
+
+body.dark-theme .prayer-card-date {
+  color: #64748B; /* Low fade in dark mode */
 }
 
 .prayer-desc {
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--text-secondary);
-  line-height: 1.5;
-  margin: 0 0 8px 0;
+  line-height: 1.45;
+  margin: 2px 0 6px 0;
   white-space: pre-line;
   word-break: break-word;
 }
 
-.prayer-meta-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 6px 0 10px 0;
-}
-
-.prayer-meta-date {
-  font-size: 13px;
-  font-weight: 600;
-  color: #1E40AF;
-  margin-right: 4px;
-  display: inline-flex;
-  align-items: center;
-}
-
-body.dark-theme .prayer-meta-date {
-  color: #38BDF8;
-}
-
+/* Hide labels row across cards as requested */
+.prayer-meta-row,
 .pill-tag {
-  display: inline-block;
-  background: #1E3A8A;
-  color: #FFFFFF;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 2.5px 8px;
-  border-radius: 4px;
-  line-height: 1.35;
-  white-space: nowrap;
-}
-
-body.dark-theme .pill-tag {
-  background: #0F284E;
-  color: #BAE6FD;
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  display: none !important;
 }
 
 .prayer-card-footer {
@@ -916,9 +905,9 @@ body.dark-theme .pill-tag {
   align-items: center;
   justify-content: space-between;
   border-top: 1px solid var(--border-subtle);
-  padding-top: 8px;
-  margin-top: 6px;
-  gap: 8px;
+  padding-top: 6px;
+  margin-top: 4px;
+  gap: 6px;
 }
 
 .prayer-primary-group {
@@ -932,10 +921,10 @@ body.dark-theme .pill-tag {
   color: #FFFFFF;
   border: 1px solid var(--navy-900);
   border-radius: 0px !important;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
-  padding: 5px 12px;
-  min-height: 32px;
+  padding: 4px 10px;
+  min-height: 28px;
   box-shadow: none !important;
   transition: all 0.15s ease;
 }
@@ -962,14 +951,14 @@ body.dark-theme .pill-tag {
 
 .prayer-card .btn-secondary {
   border-radius: 0px !important;
-  min-height: 32px;
-  padding: 5px 10px;
-  font-size: 12px;
+  min-height: 28px;
+  padding: 4px 8px;
+  font-size: 11.5px;
 }
 
 .prayer-card .card-menu-btn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 0px !important;
 }
 
