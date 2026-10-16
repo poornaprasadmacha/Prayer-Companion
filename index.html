@@ -271,16 +271,12 @@
     <!-- PWA Installation Prompt Banner -->
     <div id="pwa-install-banner" class="pwa-banner" style="display: none;">
       <div class="pwa-banner-left">
-        <div class="pwa-banner-icon-wrap">
-          <img src="assets/icons/icon.svg" alt="Prayerly Icon" class="pwa-banner-icon" width="44" height="44">
+        <div class="pwa-banner-icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="pwa-banner-cross-icon">
+            <path d="M12 2v20M7 7h10"/>
+          </svg>
         </div>
-        <div class="pwa-banner-text">
-          <div class="pwa-banner-title-row">
-            <span class="pwa-banner-title">Install Prayerly</span>
-            <span class="pwa-banner-badge">Fast &amp; Offline</span>
-          </div>
-          <p class="pwa-banner-desc">Add to your home screen for 1-tap daily prayer, private offline journal &amp; timely reminders.</p>
-        </div>
+        <span class="pwa-banner-title">Install Prayerly</span>
       </div>
       <div class="pwa-banner-actions">
         <button id="btn-pwa-dismiss" class="btn-pwa-later" type="button" aria-label="Dismiss install banner">Later</button>
