@@ -860,6 +860,70 @@
       </div>
     </section>
 
+    <!-- ====================================================================
+         VIEW 8B: BIBLE PRAYER STORY DETAIL (FULL-PAGE DEVOTIONAL READER)
+         ==================================================================== -->
+    <section id="view-story-detail" class="view-panel">
+      <!-- Back Navigation Bar -->
+      <div class="story-detail-top-nav" style="margin-bottom: 18px;">
+        <button class="btn btn-secondary btn-sm" onclick="App.backToStoriesList()" style="display: inline-flex; align-items: center; gap: 6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;"><polyline points="15 18 9 12 15 6"/></svg>
+          <span>Back to Bible Stories</span>
+        </button>
+      </div>
+
+      <!-- Story Hero Banner Frame -->
+      <div id="story-detail-hero-wrap" class="story-detail-hero-wrap" style="max-width: 680px; margin: 0 auto 20px auto;">
+        <img id="story-detail-img" src="" alt="Story illustration" class="story-detail-hero-img" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border-light); display: block;" />
+      </div>
+
+      <!-- Content Container -->
+      <div class="story-detail-content-wrap" style="max-width: 680px; margin: 0 auto;">
+        <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 8px;">
+          <span id="story-detail-scripture" class="story-scripture-citation" style="font-size: 13px; font-weight: 600; color: #1E40AF;"></span>
+        </div>
+
+        <h1 id="story-detail-title" class="story-reader-headline" style="font-size: 22px; margin-bottom: 8px;"></h1>
+        <p id="story-detail-summary" class="story-reader-summary-lead" style="font-size: 14px; margin-bottom: 18px;"></p>
+
+        <!-- Scripture Narrative Card -->
+        <div class="story-reader-narrative-card">
+          <div class="story-parchment-header">
+            <span class="story-parchment-label">Sacred Scripture Narrative</span>
+          </div>
+          <div id="story-detail-narrative" class="story-reader-content"></div>
+        </div>
+
+        <!-- Spiritual Principle / Takeaway Box -->
+        <div class="story-takeaway-box">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px; color: #D97706;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #92400E;">Spiritual Principle</span>
+          </div>
+          <p id="story-detail-takeaway" style="font-size: 13.5px; color: #78350F; margin: 0; line-height: 1.5;"></p>
+        </div>
+
+        <!-- Personal Prayer Application Box -->
+        <div class="story-application-box">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px; color: var(--navy-900);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--navy-900);">Your Devotional Application</span>
+          </div>
+          <p id="story-detail-application" style="font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.5;"></p>
+        </div>
+
+        <!-- Action Bar at Bottom -->
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-light); display: flex; gap: 12px; justify-content: space-between; flex-wrap: wrap;">
+          <button class="btn btn-secondary" onclick="App.backToStoriesList()">
+            &larr; Back to Bible Stories
+          </button>
+          <button id="btn-story-detail-pray" class="btn btn-primary" style="flex: 1; max-width: 320px;">
+            + Pray With This Scripture
+          </button>
+        </div>
+      </div>
+    </section>
+
     <section id="view-settings" class="view-panel">
       <div class="section-header">
         <h2 class="section-title">Settings</h2>

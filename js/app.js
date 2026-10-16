@@ -1023,7 +1023,12 @@ const App = {
       // All active prayers completed for today!
       html += `
         <div class="all-prayed-banner-wrapper">
-          <img src="assets/prayers-completed.svg?v=19" alt="All Prayer Points Completed!" class="all-prayed-banner-img" onerror="this.onerror=null; this.parentElement.innerHTML=App.getPrayersCompletedBannerSvg();">
+          <div class="all-prayed-neon-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" class="all-prayed-neon-check">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span class="all-prayed-neon-title">All Prayer Points Completed</span>
+          </div>
         </div>
       `;
     }
@@ -1202,11 +1207,22 @@ const App = {
   renderPrayerCardHtml(prayer, isPrayed, isDashboard = false) {
     const cardStatusClass = isPrayed ? 'card-prayed' : '';
     const hasDesc = Boolean(prayer.description && prayer.description.trim());
+    const dateText = UI.formatDate(prayer.created_at || prayer.target_date);
+    const catTag = prayer.category ? prayer.category.toLowerCase() : '';
+    const priorityTag = prayer.priority && prayer.priority !== 'Medium' ? prayer.priority.toLowerCase() : '';
+    const personTag = prayer.person_name ? prayer.person_name.toLowerCase() : '';
 
     return `
       <div class="prayer-card ${cardStatusClass}" data-id="${prayer.prayer_id}">
         <h3 class="prayer-title">${UI.escape(prayer.title)}</h3>
         ${hasDesc ? `<div class="prayer-desc">${UI.escape(prayer.description.trim())}</div>` : ''}
+
+        <div class="prayer-meta-row">
+          ${dateText ? `<span class="prayer-meta-date">${dateText}</span>` : ''}
+          ${catTag ? `<span class="pill-tag">${UI.escape(catTag)}</span>` : ''}
+          ${priorityTag ? `<span class="pill-tag">${UI.escape(priorityTag)}</span>` : ''}
+          ${personTag ? `<span class="pill-tag">${UI.escape(personTag)}</span>` : ''}
+        </div>
 
         <div class="prayer-card-footer">
           <div class="prayer-primary-group">
@@ -1470,18 +1486,20 @@ const App = {
 
     if (emptyState) emptyState.style.display = 'none';
 
-    container.innerHTML = data.requests.map(r => `
+    container.innerHTML = data.requests.map(r => {
+      const dateText = UI.formatDate(r.created_at);
+      const catTag = (r.category || 'General').toLowerCase();
+      const personTag = (r.display_name || 'Companion').toLowerCase();
+      return `
       <div class="prayer-card community-card ${r.is_committed_by_me ? 'card-committed' : ''}" data-req-id="${r.request_id}">
-        <div class="prayer-card-header">
-          <div class="prayer-tags">
-            <span class="badge badge-category">${UI.escape(r.category || 'General')}</span>
-            <span class="badge badge-person">${UI.escape(r.display_name)}</span>
-          </div>
-          <div class="prayer-date">${new Date(r.created_at).toLocaleDateString()}</div>
-        </div>
-
         <h3 class="prayer-title">${UI.escape(r.prayer_title)}</h3>
         ${r.shared_description ? `<p class="prayer-desc">${UI.escape(r.shared_description)}</p>` : ''}
+
+        <div class="prayer-meta-row">
+          ${dateText ? `<span class="prayer-meta-date">${dateText}</span>` : ''}
+          <span class="pill-tag">${UI.escape(catTag)}</span>
+          <span class="pill-tag">${UI.escape(personTag)}</span>
+        </div>
 
         <div class="community-supporters-banner">
           <span class="supporters-badge"><strong>${r.supporters_count}</strong> companion${r.supporters_count === 1 ? '' : 's'} praying</span>
@@ -1621,12 +1639,11 @@ const App = {
 
     if (emptyState) emptyState.style.display = 'none';
 
-    container.innerHTML = list.map(item => `
-      <div class="answered-card" data-id="${item.answered_id}">
-        <div class="answered-card-header">
-          <span class="badge badge-answered">Answered</span>
-          <span class="answered-date">Answered on: ${item.answered_date}</span>
-        </div>
+    container.innerHTML = list.map(item => {
+      const dateText = UI.formatDate(item.answered_date || item.created_at);
+      const catTag = item.category ? item.category.toLowerCase() : '';
+      return `
+      <div class="prayer-card answered-card" data-id="${item.answered_id}">
         <h3 class="prayer-title">${UI.escape(item.prayer_title)}</h3>
         ${item.prayer_description ? `<p class="prayer-desc">${UI.escape(item.prayer_description)}</p>` : ''}
         ${item.testimony ? `
@@ -1635,6 +1652,13 @@ const App = {
             <p style="margin: 4px 0 0 0;">${UI.escape(item.testimony)}</p>
           </div>
         ` : ''}
+
+        <div class="prayer-meta-row">
+          ${dateText ? `<span class="prayer-meta-date">${dateText}</span>` : ''}
+          <span class="pill-tag">answered</span>
+          ${catTag ? `<span class="pill-tag">${UI.escape(catTag)}</span>` : ''}
+        </div>
+
         <div class="answered-card-footer">
           <button class="btn btn-secondary btn-sm" data-action="restore-answered" data-id="${item.answered_id}">
             Move Back to Active
@@ -1689,26 +1713,34 @@ const App = {
 
     if (emptyState) emptyState.style.display = 'none';
 
-    container.innerHTML = entries.map(e => `
-      <div class="thanksgiving-card" data-id="${e.entry_id}">
-        <div class="thanksgiving-header">
-          <span class="badge badge-thanksgiving">${UI.escape(e.category || 'Praise')}</span>
-          <span class="thanksgiving-date">${e.entry_date}</span>
+    container.innerHTML = entries.map(e => {
+      const dateText = UI.formatDate(e.entry_date || e.created_at);
+      const catTag = (e.category || 'Praise').toLowerCase();
+      return `
+      <div class="prayer-card thanksgiving-card" data-id="${e.entry_id}">
+        <h3 class="prayer-title">${UI.escape(e.title)}</h3>
+        ${e.description ? `<p class="prayer-desc">${UI.escape(e.description)}</p>` : ''}
+
+        <div class="prayer-meta-row">
+          ${dateText ? `<span class="prayer-meta-date">${dateText}</span>` : ''}
+          <span class="pill-tag">${UI.escape(catTag)}</span>
         </div>
-        <h3 class="thanksgiving-title">${UI.escape(e.title)}</h3>
-        ${e.description ? `<p class="thanksgiving-desc">${UI.escape(e.description)}</p>` : ''}
-        <div class="thanksgiving-footer">
-          <button class="icon-btn" data-action="edit-tg" data-id="${e.entry_id}">
-            <span class="btn-icon">${Icons.edit}</span>
-            <span>Edit</span>
-          </button>
-          <button class="icon-btn icon-btn-danger" data-action="delete-tg" data-id="${e.entry_id}">
-            <span class="btn-icon">${Icons.trash}</span>
-            <span>Delete</span>
-          </button>
+
+        <div class="prayer-card-footer">
+          <div style="margin-left: auto; display: flex; gap: 8px;">
+            <button class="icon-btn" data-action="edit-tg" data-id="${e.entry_id}">
+              <span class="btn-icon">${Icons.edit}</span>
+              <span>Edit</span>
+            </button>
+            <button class="icon-btn icon-btn-danger" data-action="delete-tg" data-id="${e.entry_id}">
+              <span class="btn-icon">${Icons.trash}</span>
+              <span>Delete</span>
+            </button>
+          </div>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
 
     container.querySelectorAll('[data-action="edit-tg"]').forEach(btn => {
       btn.addEventListener('click', async (e) => {
@@ -1918,52 +1950,46 @@ const App = {
 
     try {
       this.closeAllModals();
-      const modal = document.getElementById('modal-story-reader');
-      if (!modal) return;
 
-      const imgEl = document.getElementById('story-reader-img');
-      const catEl = document.getElementById('story-reader-category');
-      const scripEl = document.getElementById('story-reader-scripture');
-      const titleEl = document.getElementById('story-reader-title');
-      const summaryEl = document.getElementById('story-reader-summary');
-      const contentEl = document.getElementById('story-reader-content');
-      const takeawayEl = document.getElementById('story-reader-takeaway');
-      const appEl = document.getElementById('story-reader-application');
-      const prayNowBtn = document.getElementById('btn-story-pray-now');
+      // 1. Populate Full-Page Devotional Story View
+      const detailImg = document.getElementById('story-detail-img');
+      const detailScrip = document.getElementById('story-detail-scripture');
+      const detailTitle = document.getElementById('story-detail-title');
+      const detailSummary = document.getElementById('story-detail-summary');
+      const detailNarrative = document.getElementById('story-detail-narrative');
+      const detailTakeaway = document.getElementById('story-detail-takeaway');
+      const detailApp = document.getElementById('story-detail-application');
+      const detailPrayBtn = document.getElementById('btn-story-detail-pray');
 
-      if (imgEl) {
-        imgEl.src = story.image || story.coverImage || '';
-        imgEl.alt = story.title;
-      }
-      if (catEl) {
-        catEl.style.display = 'none';
-      }
-      if (scripEl) {
-        scripEl.textContent = story.reference || story.scripture || '';
-      }
-      if (titleEl) {
-        titleEl.textContent = story.title;
-      }
-      if (summaryEl) {
-        summaryEl.textContent = story.summary;
-      }
+      const narrativeParagraphs = Array.isArray(story.narrative) && story.narrative.length > 0
+        ? story.narrative
+        : [story.summary, story.scriptureQuote].filter(Boolean);
 
-      if (contentEl) {
-        const narrativeParagraphs = Array.isArray(story.narrative) && story.narrative.length > 0
-          ? story.narrative
-          : [story.summary, story.scriptureQuote].filter(Boolean);
-        contentEl.innerHTML = narrativeParagraphs.map(p => `<p>${UI.escape(p)}</p>`).join('');
+      if (detailImg) {
+        detailImg.src = story.image || story.coverImage || '';
+        detailImg.alt = story.title;
       }
-      if (takeawayEl) {
-        takeawayEl.textContent = story.keyTakeaway || story.takeaway || '';
+      if (detailScrip) {
+        detailScrip.textContent = story.reference || story.scripture || '';
       }
-      if (appEl) {
-        appEl.textContent = story.application || story.prayerApplication || '';
+      if (detailTitle) {
+        detailTitle.textContent = story.title;
+      }
+      if (detailSummary) {
+        detailSummary.textContent = story.summary;
+      }
+      if (detailNarrative) {
+        detailNarrative.innerHTML = narrativeParagraphs.map(p => `<p>${UI.escape(p)}</p>`).join('');
+      }
+      if (detailTakeaway) {
+        detailTakeaway.textContent = story.keyTakeaway || story.takeaway || '';
+      }
+      if (detailApp) {
+        detailApp.textContent = story.application || story.prayerApplication || '';
       }
 
-      if (prayNowBtn) {
-        prayNowBtn.onclick = () => {
-          this.closeAllModals();
+      if (detailPrayBtn) {
+        detailPrayBtn.onclick = () => {
           const appText = story.application || story.prayerApplication || '';
           const refText = story.reference || story.scripture || '';
           this.openPrayerModal({
@@ -1975,10 +2001,36 @@ const App = {
         };
       }
 
-      modal.classList.add('active');
+      // Also populate legacy modal elements for DOM safety
+      const imgEl = document.getElementById('story-reader-img');
+      const scripEl = document.getElementById('story-reader-scripture');
+      const titleEl = document.getElementById('story-reader-title');
+      const summaryEl = document.getElementById('story-reader-summary');
+      const contentEl = document.getElementById('story-reader-content');
+      const takeawayEl = document.getElementById('story-reader-takeaway');
+      const appEl = document.getElementById('story-reader-application');
+      if (imgEl) { imgEl.src = story.image || story.coverImage || ''; imgEl.alt = story.title; }
+      if (scripEl) scripEl.textContent = story.reference || story.scripture || '';
+      if (titleEl) titleEl.textContent = story.title;
+      if (summaryEl) summaryEl.textContent = story.summary;
+      if (contentEl) contentEl.innerHTML = narrativeParagraphs.map(p => `<p>${UI.escape(p)}</p>`).join('');
+      if (takeawayEl) takeawayEl.textContent = story.keyTakeaway || story.takeaway || '';
+      if (appEl) appEl.textContent = story.application || story.prayerApplication || '';
+
+      // 2. Switch to full-page reader view panel (No popup modal!)
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+      const detailView = document.getElementById('view-story-detail');
+      if (detailView) {
+        detailView.classList.add('active');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error('[Stories] Failed to open story reader:', err);
     }
+  },
+
+  backToStoriesList() {
+    this.switchTab('stories');
   },
 
   // ==========================================================================

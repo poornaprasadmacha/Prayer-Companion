@@ -800,6 +800,46 @@ body.dark-theme .page-banner-img {
   word-break: break-word;
 }
 
+.prayer-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 10px 0;
+}
+
+.prayer-meta-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1E40AF;
+  margin-right: 4px;
+  display: inline-flex;
+  align-items: center;
+}
+
+body.dark-theme .prayer-meta-date {
+  color: #38BDF8;
+}
+
+.pill-tag {
+  display: inline-block;
+  background: #1E3A8A;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2.5px 8px;
+  border-radius: 4px;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+body.dark-theme .pill-tag {
+  background: #0F284E;
+  color: #BAE6FD;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
 .prayer-card-footer {
   display: flex;
   align-items: center;
@@ -3246,22 +3286,52 @@ body.dark-theme .brand-special-logo::after {
 }
 
 /* ==========================================================================
-   ALL PRAYERS COMPLETED BANNER GRAPHIC
+   ALL PRAYERS COMPLETED BANNER (NEON GREEN PROFESSIONAL)
    ========================================================================== */
 .all-prayed-banner-wrapper {
-  margin: 16px 0;
+  margin: 12px 0 16px 0;
   width: 100%;
   display: flex;
   justify-content: center;
 }
 
-.all-prayed-banner-img {
-  width: 100%;
+.all-prayed-neon-banner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.32);
+  border-radius: var(--radius-md, 8px);
+  text-align: center;
   max-width: 100%;
-  height: auto;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-light);
-  display: block;
+}
+
+body.dark-theme .all-prayed-neon-banner {
+  background: rgba(0, 230, 118, 0.1);
+  border-color: rgba(0, 230, 118, 0.32);
+}
+
+.all-prayed-neon-check {
+  width: 18px;
+  height: 18px;
+  color: #059669;
+}
+
+body.dark-theme .all-prayed-neon-check {
+  color: #00E676;
+}
+
+.all-prayed-neon-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #059669;
+  letter-spacing: -0.2px;
+}
+
+body.dark-theme .all-prayed-neon-title {
+  color: #00E676;
 }
 
 /* ==========================================================================
@@ -3950,6 +4020,31 @@ body.dark-theme .level-4 { background: #34D399; }
   padding-top: 10px;
   border-top: 1px solid var(--border-subtle);
   margin-top: auto;
+}
+
+.story-detail-hero-wrap {
+  width: 100%;
+  max-height: 280px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  background: var(--bg-hover, #F8FAFC);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.story-detail-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.story-detail-top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .story-reader-modal-card {

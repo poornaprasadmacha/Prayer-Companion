@@ -98,6 +98,40 @@ const UI = {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  },
+
+  formatDate(dateVal) {
+    if (!dateVal) return '';
+    let d;
+    if (dateVal instanceof Date) {
+      d = dateVal;
+    } else if (typeof dateVal === 'number') {
+      d = new Date(dateVal);
+    } else if (typeof dateVal === 'string') {
+      const trimmed = dateVal.trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+        const parts = trimmed.split('-');
+        d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      } else {
+        d = new Date(trimmed);
+      }
+    } else {
+      d = new Date(dateVal);
+    }
+
+    if (isNaN(d.getTime())) return String(dateVal);
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const day = d.getDate();
+    const month = months[d.getMonth()];
+    const year = d.getFullYear();
+    const currentYear = new Date().getFullYear();
+
+    if (year === currentYear) {
+      return `${day} ${month}`;
+    } else {
+      return `${day} ${month}, ${year}`;
+    }
   }
 };
 
