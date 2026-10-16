@@ -345,15 +345,12 @@
 
       <div id="dashboard-prayers-container"></div>
 
-      <div id="dashboard-empty-state" class="empty-state-card" style="display: none;">
-        <div class="empty-state-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width: 44px; height: 44px; color: var(--navy-900);"><path d="M7 11V7a2 2 0 0 1 4 0v4M11 7a2 2 0 0 1 4 0v4M15 8a2 2 0 0 1 4 0v5a7 7 0 0 1-7 7H9a7 7 0 0 1-7-7v-3a2 2 0 0 1 4 0v2"/></svg>
+      <div id="dashboard-empty-state" class="no-active-empty-state" style="display: none;">
+        <img src="assets/no-active-prayers.png" alt="No active Prayer Points" class="no-active-prayers-img no-active-img-light" onclick="App.openPrayerModal()" />
+        <img src="assets/no-active-prayers-dark.png" alt="No active Prayer Points" class="no-active-prayers-img no-active-img-dark" onclick="App.openPrayerModal()" />
+        <div class="no-active-empty-actions">
+          <button class="btn btn-primary btn-sm" onclick="App.openPrayerModal()">+ Add Your First Prayer</button>
         </div>
-        <h3 style="color: var(--navy-900); margin-bottom: 4px; font-weight: 600;">No active prayer points</h3>
-        <p style="font-size: 13px; max-width: 380px; margin: 0 auto 16px auto; color: var(--text-secondary);">
-          Commit your concerns, family, loved ones, and spiritual growth to the Lord in prayer.
-        </p>
-        <button class="btn btn-primary btn-sm" onclick="App.openPrayerModal()">+ Add Your First Prayer</button>
       </div>
     </section>
 

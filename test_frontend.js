@@ -18,6 +18,8 @@ const scripts = [
   'assets/icons/icon-512.png',
   'assets/Prayerly.svg',
   'assets/Prayerly.png',
+  'assets/no-active-prayers.png',
+  'assets/no-active-prayers-dark.png',
   'assets/answered-prayers.png',
   'assets/pray-for-others.png',
   'assets/thanksgiving.png',

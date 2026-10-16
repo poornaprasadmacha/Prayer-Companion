@@ -1829,6 +1829,76 @@ body.dark-theme .prayer-card-date {
   height: 24px;
 }
 
+.no-active-empty-state {
+  text-align: center;
+  padding: 18px 12px 24px 12px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-active-prayers-img {
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  display: block;
+  margin: 0 auto;
+  cursor: pointer;
+  user-select: none;
+  background: transparent !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.no-active-prayers-img:hover {
+  transform: scale(1.02);
+}
+
+.no-active-img-dark {
+  display: none !important;
+}
+
+.no-active-img-light {
+  display: block !important;
+}
+
+body.dark-theme .no-active-empty-state {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme .no-active-img-light {
+  display: none !important;
+}
+
+body.dark-theme .no-active-img-dark {
+  display: block !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.no-active-empty-actions {
+  margin-top: 14px;
+}
+
+.no-active-empty-actions .btn {
+  box-shadow: none !important;
+}
+
+@media (max-width: 640px) {
+  .no-active-prayers-img {
+    max-width: 100%;
+  }
+}
+
 /* ==========================================================================
    MODALS & TOASTS
    ========================================================================== */
