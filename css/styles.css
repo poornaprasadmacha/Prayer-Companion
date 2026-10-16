@@ -122,6 +122,29 @@ body {
   cursor: pointer;
 }
 
+.brand-header-logo {
+  height: 38px;
+  width: auto;
+  max-width: 190px;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand-wrapper:hover .brand-header-logo {
+  transform: scale(1.03);
+  opacity: 0.95;
+}
+
+@media (max-width: 640px) {
+  .brand-header-logo {
+    height: 32px;
+    max-width: 160px;
+  }
+}
+
 .brand-hands-icon {
   display: inline-flex;
   align-items: center;
@@ -2390,6 +2413,11 @@ body.dark-theme .pwa-banner {
   background: #1E293B !important;
   border-color: #334155 !important;
   box-shadow: none !important;
+}
+
+body.dark-theme .brand-header-logo,
+body.dark-theme .pwa-banner-logo {
+  filter: brightness(1.2) contrast(1.05) drop-shadow(0 0 1px rgba(255, 255, 255, 0.35));
 }
 
 body.dark-theme .brand-hands-svg {
