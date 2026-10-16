@@ -152,6 +152,25 @@ const VerseNotifications = {
     return 'Notification' in window;
   },
 
+  isEnabled() {
+    return localStorage.getItem('prayerly_verse_notifications_enabled') === 'true';
+  },
+
+  async setDailyVerseNotification(enable) {
+    if (!enable) {
+      localStorage.setItem('prayerly_verse_notifications_enabled', 'false');
+      return true;
+    }
+    if (!this.isSupported()) {
+      return false;
+    }
+    if (Notification.permission === 'granted') {
+      localStorage.setItem('prayerly_verse_notifications_enabled', 'true');
+      return true;
+    }
+    return await this.requestPermission();
+  },
+
   getPermission() {
     if (!this.isSupported()) return 'unsupported';
     return Notification.permission;
