@@ -72,10 +72,7 @@ const App = {
     // 8. Check Landing Screen / Welcome Window State
     this.checkLandingState();
 
-    // 9. Multilingual Cycling Brand Title (3s interval, frequent Telugu)
-    this.initMultilingualLogoTitle();
-
-    // 10. Start Scripture Verse Notifications Scheduler
+    // 9. Start Scripture Verse Notifications Scheduler
     if (typeof VerseNotifications !== 'undefined' && VerseNotifications.startScheduler) {
       VerseNotifications.startScheduler();
     }
@@ -84,66 +81,6 @@ const App = {
   // ==========================================================================
   // NAVIGATION & ROUTING
   // ==========================================================================
-
-  initMultilingualLogoTitle() {
-    const brandTitleEl = document.getElementById('brand-title-text');
-    const langTickerEl = document.getElementById('brand-lang-ticker');
-    const landingLangTickerEl = document.getElementById('landing-lang-ticker');
-
-    // 1. Keep Special Logo text for Prayerly permanently
-    if (brandTitleEl) {
-      brandTitleEl.textContent = 'Prayerly';
-    }
-
-    // 2. Multilingual prayer words cycling next to Prayerly every 3 seconds (frequently repeating Telugu as requested)
-    const languages = [
-      { word: 'ప్రార్థన', label: 'Telugu' },
-      { word: 'பிரார்த்தனை', label: 'Tamil' },
-      { word: 'ప్రార్థన', label: 'Telugu' },
-      { word: 'प्रार्थना', label: 'Hindi' },
-      { word: 'ప్రార్థన', label: 'Telugu' },
-      { word: 'প্রার্থনা', label: 'Bengali' },
-      { word: 'ప్రార్థన', label: 'Telugu' },
-      { word: 'പ്രാർത്ഥന', label: 'Malayalam' },
-      { word: 'ప్రార్థన', label: 'Telugu' },
-      { word: 'ಪ್ರಾರ್ಥನೆ', label: 'Kannada' },
-      { word: 'ప్రార్థన', label: 'Telugu' },
-      { word: 'Oración', label: 'Spanish' },
-      { word: 'ప్రార్థన', label: 'Telugu' },
-      { word: 'Oratio', label: 'Latin' },
-      { word: 'ప్రార్థన', label: 'Telugu' },
-      { word: 'Prayer', label: 'English' },
-      { word: 'ప్రార్థన', label: 'Telugu' },
-      { word: 'Προσευχή', label: 'Greek' },
-      { word: 'ప్రార్థన', label: 'Telugu' },
-      { word: 'Prière', label: 'French' },
-      { word: 'ప్రార్థన', label: 'Telugu' },
-      { word: 'Gebet', label: 'German' }
-    ];
-
-    let wordIndex = 0;
-    const tickerElements = [langTickerEl, landingLangTickerEl].filter(Boolean);
-    if (!tickerElements.length) return;
-
-    const updateTicker = () => {
-      const item = languages[wordIndex];
-      tickerElements.forEach(el => el.classList.add('switching'));
-      setTimeout(() => {
-        tickerElements.forEach(el => {
-          el.textContent = item.word;
-          el.title = `${item.label}: ${item.word} (Prayer)`;
-          el.classList.remove('switching');
-        });
-      }, 260);
-      wordIndex = (wordIndex + 1) % languages.length;
-    };
-
-    // Initial render
-    updateTicker();
-
-    // Cycle every 3 seconds
-    setInterval(updateTicker, 3000);
-  },
 
   initTheme() {
     const savedTheme = localStorage.getItem('PRAYERLY_THEME') || 'light';
@@ -1951,25 +1888,27 @@ const App = {
 
     if (emptyState) emptyState.style.display = 'none';
 
-    container.innerHTML = stories.map(story => `
+    container.innerHTML = stories.map(story => {
+      const imgSrc = story.image || story.coverImage || '';
+      const scriptureRef = story.reference || story.scripture || '';
+      return `
       <div class="story-card" onclick="App.openStoryReader('${story.id}')">
         <div class="story-card-img-wrap">
-          <img src="${story.coverImage}" alt="${UI.escape(story.title)}" class="story-card-img" loading="lazy" />
+          <img src="${imgSrc}" alt="${UI.escape(story.title)}" class="story-card-img" loading="lazy" />
         </div>
         <div class="story-card-body">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span class="story-category-tag">${UI.escape(story.category)}</span>
-            <span class="story-scripture-citation">${UI.escape(story.scripture)}</span>
+          <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 6px;">
+            <span class="story-scripture-citation">${UI.escape(scriptureRef)}</span>
           </div>
           <h3 class="story-card-title">${UI.escape(story.title)}</h3>
           <p class="story-card-summary">${UI.escape(story.summary)}</p>
           <div class="story-card-footer">
-            <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 500;">Textbook Edition</span>
             <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); App.openStoryReader('${story.id}')">Read Story &rarr;</button>
           </div>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   },
 
   openStoryReader(storyId) {
@@ -1977,48 +1916,69 @@ const App = {
     const story = BibleStories.getById(storyId);
     if (!story) return;
 
-    this.closeAllModals();
-    const modal = document.getElementById('modal-story-reader');
-    if (!modal) return;
+    try {
+      this.closeAllModals();
+      const modal = document.getElementById('modal-story-reader');
+      if (!modal) return;
 
-    const imgEl = document.getElementById('story-reader-img');
-    const catEl = document.getElementById('story-reader-category');
-    const scripEl = document.getElementById('story-reader-scripture');
-    const titleEl = document.getElementById('story-reader-title');
-    const summaryEl = document.getElementById('story-reader-summary');
-    const contentEl = document.getElementById('story-reader-content');
-    const takeawayEl = document.getElementById('story-reader-takeaway');
-    const appEl = document.getElementById('story-reader-application');
-    const prayNowBtn = document.getElementById('btn-story-pray-now');
+      const imgEl = document.getElementById('story-reader-img');
+      const catEl = document.getElementById('story-reader-category');
+      const scripEl = document.getElementById('story-reader-scripture');
+      const titleEl = document.getElementById('story-reader-title');
+      const summaryEl = document.getElementById('story-reader-summary');
+      const contentEl = document.getElementById('story-reader-content');
+      const takeawayEl = document.getElementById('story-reader-takeaway');
+      const appEl = document.getElementById('story-reader-application');
+      const prayNowBtn = document.getElementById('btn-story-pray-now');
 
-    if (imgEl) {
-      imgEl.src = story.coverImage;
-      imgEl.alt = story.title;
+      if (imgEl) {
+        imgEl.src = story.image || story.coverImage || '';
+        imgEl.alt = story.title;
+      }
+      if (catEl) {
+        catEl.style.display = 'none';
+      }
+      if (scripEl) {
+        scripEl.textContent = story.reference || story.scripture || '';
+      }
+      if (titleEl) {
+        titleEl.textContent = story.title;
+      }
+      if (summaryEl) {
+        summaryEl.textContent = story.summary;
+      }
+
+      if (contentEl) {
+        const narrativeParagraphs = Array.isArray(story.narrative) && story.narrative.length > 0
+          ? story.narrative
+          : [story.summary, story.scriptureQuote].filter(Boolean);
+        contentEl.innerHTML = narrativeParagraphs.map(p => `<p>${UI.escape(p)}</p>`).join('');
+      }
+      if (takeawayEl) {
+        takeawayEl.textContent = story.keyTakeaway || story.takeaway || '';
+      }
+      if (appEl) {
+        appEl.textContent = story.application || story.prayerApplication || '';
+      }
+
+      if (prayNowBtn) {
+        prayNowBtn.onclick = () => {
+          this.closeAllModals();
+          const appText = story.application || story.prayerApplication || '';
+          const refText = story.reference || story.scripture || '';
+          this.openPrayerModal({
+            title: `Prayer inspired by ${story.title}`,
+            description: `${appText}\n\nClaimed Scripture: ${refText}`,
+            category: 'Spiritual Growth',
+            priority: 'Medium'
+          });
+        };
+      }
+
+      modal.classList.add('active');
+    } catch (err) {
+      console.error('[Stories] Failed to open story reader:', err);
     }
-    if (catEl) catEl.textContent = story.category;
-    if (scripEl) scripEl.textContent = story.scripture;
-    if (titleEl) titleEl.textContent = story.title;
-    if (summaryEl) summaryEl.textContent = story.summary;
-
-    if (contentEl) {
-      contentEl.innerHTML = story.narrative.map(p => `<p>${UI.escape(p)}</p>`).join('');
-    }
-    if (takeawayEl) takeawayEl.textContent = story.takeaway;
-    if (appEl) appEl.textContent = story.prayerApplication;
-
-    if (prayNowBtn) {
-      prayNowBtn.onclick = () => {
-        this.closeAllModals();
-        this.openPrayerModal({
-          title: `Prayer inspired by ${story.title}`,
-          description: `${story.prayerApplication}\n\nClaimed Scripture: ${story.scripture}`,
-          category: 'Spiritual Growth',
-          priority: 'Medium'
-        });
-      };
-    }
-
-    modal.classList.add('active');
   },
 
   // ==========================================================================
