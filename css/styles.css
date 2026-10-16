@@ -343,6 +343,12 @@ body.dark-theme .user-badge-icon {
   position: relative;
 }
 
+.nav-tab-btn > *,
+.bottom-nav-item > *,
+.card-menu-btn > * {
+  pointer-events: none;
+}
+
 .nav-tab-btn svg {
   width: 20px;
   height: 20px;

@@ -366,14 +366,8 @@ const App = {
 
   checkLandingState() {
     const landing = document.getElementById('landing-screen');
-    if (!landing) return;
-    const modeSelected = localStorage.getItem('prayerly_mode_selected') === 'true';
-    const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn();
-    if (!modeSelected && !isLoggedIn) {
-      landing.style.display = 'flex';
-    } else {
+    if (landing) {
       landing.style.display = 'none';
-      this.checkOnboardingState();
     }
   },
 
@@ -393,7 +387,6 @@ const App = {
     }
     this.renderHeader();
     await this.renderCurrentView();
-    this.checkOnboardingState();
   },
 
   // ==========================================================================
@@ -401,16 +394,8 @@ const App = {
   // ==========================================================================
 
   checkOnboardingState() {
-    const landing = document.getElementById('landing-screen');
-    if (landing && landing.style.display !== 'none' && landing.style.display !== '') {
-      return; // Do not interrupt landing screen selection
-    }
-    const completed = localStorage.getItem('prayerly_onboarding_completed') === 'true';
-    if (!completed) {
-      setTimeout(() => {
-        this.openOnboarding(0);
-      }, 200);
-    }
+    // Suppress automatic popup on startup to keep app clean and distraction-free
+    return;
   },
 
   openOnboarding(step = 0) {
@@ -1537,7 +1522,8 @@ const App = {
           </div>
         </div>
       </div>
-    `).join('');
+      `;
+    }).join('');
 
     this.attachCommunityCardActions(container);
   },
@@ -1668,7 +1654,8 @@ const App = {
           </button>
         </div>
       </div>
-    `).join('');
+      `;
+    }).join('');
 
     container.querySelectorAll('[data-action="restore-answered"]').forEach(btn => {
       btn.addEventListener('click', async (e) => {

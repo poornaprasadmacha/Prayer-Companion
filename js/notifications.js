@@ -11,6 +11,11 @@ const UI = {
    * @param {number} durationMs
    */
   toast(message, type = 'info', durationMs = 3200) {
+    // Suppress routine popups / toasts (settings changed, prayer added, prayed, etc.) to keep the app smooth and distraction-free
+    if (type !== 'error') {
+      return;
+    }
+
     let container = document.getElementById('toast-container');
     if (!container) {
       container = document.createElement('div');
