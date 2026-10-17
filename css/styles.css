@@ -7,12 +7,52 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Core Palette — Default Navy Blue */
-  --navy-950: #0A1128;
-  --navy-900: #023E8A;
+  color-scheme: light;
+
+  /* ========================================================================
+     CENTRAL THEME SYSTEM — LIGHT MODE SPECIFICATION
+     ======================================================================== */
+  --bg-primary: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-header: rgba(255, 255, 255, 0.96);
+  --bg-nav: rgba(255, 255, 255, 0.96);
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-light: #94A3B8;
+
+  --accent-primary: #084B9A;
+  --accent-interactive: #2563EB;
+  --accent-soft: #EFF6FF;
+  --accent-light: #DBEAFE;
+
+  --border-primary: #E2E8F0;
+  --border-subtle: #F1F5F9;
+
+  --success: #15803D;
+  --success-bg: #F0FDF4;
+  --warning: #B45309;
+  --warning-bg: #FFFBEB;
+  --danger: #B91C1C;
+  --danger-bg: #FEF2F2;
+
+  /* Surfaces & Background Compatibility */
+  --bg-app: var(--bg-primary);
+  --bg-card-subtle: var(--border-subtle);
+  --bg-hover: var(--border-subtle);
+
+  /* Borders & Dividers */
+  --border-light: var(--border-primary);
+  --border-focus: var(--accent-interactive);
+
+  /* Executive Brand Aliases */
+  --navy-950: #0F172A;
+  --navy-900: #084B9A;
   --navy-800: #00509D;
   --navy-700: #0077B6;
-  --navy-50: #F0F7FF;
+  --navy-50: #EFF6FF;
 
   /* Soothing Olive Green Palette */
   --olive-900: #2C3916;
@@ -39,24 +79,7 @@
   --rose-600: #E11D48;
   --rose-50: #FFF1F2;
 
-  /* Surfaces & Backgrounds */
-  --bg-app: #F8FAFC;
-  --bg-card: #FFFFFF;
-  --bg-card-subtle: #F1F5F9;
-  --bg-hover: #F8FAFC;
-
-  /* Typography Colors */
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #64748B;
-  --text-light: #94A3B8;
-
-  /* Borders & Dividers */
-  --border-light: #E2E8F0;
-  --border-subtle: #F1F5F9;
-  --border-focus: #023E8A;
-
-  /* Shadows — Disabled for crisp executive flat design */
+  /* Shadows — Disabled for crisp modern flat design */
   --shadow-xs: none;
   --shadow-sm: none;
   --shadow-md: none;
@@ -69,7 +92,7 @@
   --radius-lg: 14px;
   --radius-pill: 9999px;
 
-  /* Container — Optimized for high-end Desktop experience */
+  /* Container */
   --max-width: 1100px;
 }
 
@@ -874,7 +897,32 @@ body.dark-theme .user-badge-icon {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+}
+
+/* Prevent double bottom margin on mobile when stats-grid is nested inside hero split */
+.dashboard-hero-split .stats-grid {
+  margin-bottom: 0 !important;
+}
+
+@media (max-width: 640px) {
+  .greeting-section {
+    margin-bottom: 14px;
+  }
+  .dashboard-hero-split {
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .dashboard-hero-split .stats-grid {
+    margin-bottom: 0 !important;
+    gap: 10px;
+  }
+  .home-bible-plan-widget {
+    margin-bottom: 14px;
+  }
+  .section-header {
+    margin-bottom: 12px;
+  }
 }
 
 @media (min-width: 880px) {
@@ -883,6 +931,7 @@ body.dark-theme .user-badge-icon {
     grid-template-columns: 1fr 1fr;
     gap: 20px;
     align-items: stretch;
+    margin-bottom: 24px;
   }
 
   .dashboard-hero-split .devotional-card {
@@ -924,7 +973,7 @@ body.dark-theme .user-badge-icon {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
 @media (min-width: 600px) {
@@ -2525,31 +2574,59 @@ body.dark-theme .art-quote strong {
 
 /* ==========================================================================
    NIGHT / DARK THEME SPECIFICATION
+   Refined Charcoal-Navy Palette: #111827 surface, #1F2937 cards, #273449 elevated.
+   Zero pure black (#000000), zero harsh glowing shadows.
    ========================================================================== */
+[data-theme="dark"],
 html.dark-theme,
 body.dark-theme {
   color-scheme: dark;
 }
 
+[data-theme="dark"],
 body.dark-theme {
-  --bg-app: #0B1120;
-  --bg-card: #1E293B;
-  --bg-card-subtle: #0F172A;
-  --bg-hover: #334155;
+  /* Foundational Dark Theme Tokens */
+  --bg-primary: #111827;
+  --bg-header: #111827;
+  --bg-nav: #0F172A;
+  --bg-card: #1F2937;
+  --bg-elevated: #273449;
 
-  --text-primary: #F8FAFC;
+  --text-primary: #F1F5F9;
   --text-secondary: #CBD5E1;
   --text-muted: #94A3B8;
   --text-light: #64748B;
 
+  --accent-primary: #38BDF8;
+  --accent-interactive: #60A5FA;
+  --accent-soft: #172554;
+  --accent-light: #1E3A8A;
+
+  --border-primary: #334155;
+  --border-subtle: #293548;
+
+  --success: #86EFAC;
+  --success-bg: #14532D;
+  --warning: #FCD34D;
+  --warning-bg: #78350F;
+  --danger: #FCA5A5;
+  --danger-bg: #7F1D1D;
+
+  /* Aliased Surfaces & Borders for full app compatibility */
+  --bg-app: #111827;
+  --bg-card-subtle: #273449;
+  --bg-hover: #293548;
+
   --border-light: #334155;
-  --border-subtle: #1E293B;
+  --border-subtle: #293548;
   --border-focus: #38BDF8;
 
-  --navy-950: #F8FAFC;
+  --navy-950: #F1F5F9;
   --navy-900: #38BDF8;
-  --navy-800: #0EA5E9;
+  --navy-800: #60A5FA;
   --navy-700: #0284C7;
+  --navy-50: #172554;
+
   /* Dark Theme Eye-Friendly Olive Green */
   --olive-900: #DCE8CB;
   --olive-800: #C2D5A4;
@@ -2573,22 +2650,24 @@ body.dark-theme {
   --rose-600: #FB7185;
   --rose-50: #4C0519;
 
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
-  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+  /* Flat modern zero-glow dark surfaces */
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-modal: none;
 
   background-color: var(--bg-app);
   color: var(--text-primary);
 }
 
 body.dark-theme .app-header {
-  background: rgba(15, 23, 42, 0.95);
+  background: rgba(17, 24, 39, 0.96);
   border-bottom-color: var(--border-light);
 }
 
 body.dark-theme .desktop-nav {
+  background: rgba(15, 23, 42, 0.98);
   border-top-color: var(--border-light);
 }
 
@@ -2633,21 +2712,26 @@ body.dark-theme .manual-card,
 body.dark-theme .answered-card,
 body.dark-theme .thanksgiving-card,
 body.dark-theme .testimony-box,
-body.dark-theme .story-card {
+body.dark-theme .story-card,
+body.dark-theme .home-bible-card,
+body.dark-theme .bible-plan-choice-card,
+body.dark-theme .bible-plan-active-day-card,
+body.dark-theme .bible-plan-upcoming-card,
+body.dark-theme .bible-plan-folder-card {
   background: var(--bg-card) !important;
   border-color: var(--border-light) !important;
   color: var(--text-primary) !important;
 }
 
 body.dark-theme .empty-state-card {
-  background: #1E293B !important;
+  background: #1F2937 !important;
   border: 1px dashed #334155 !important;
   color: #CBD5E1 !important;
 }
 
 body.dark-theme .empty-state-card h2,
 body.dark-theme .empty-state-card h3 {
-  color: #F8FAFC !important;
+  color: #F1F5F9 !important;
 }
 
 body.dark-theme .empty-state-card p {
@@ -5318,8 +5402,136 @@ body.dark-theme .bible-plan-tab-item.active {
 }
 
 /* ==========================================================================
+   SMOOTH THEME TRANSITIONS (Specification Section 12)
+   180ms subtle transition across surfaces and typography;
+   supports prefers-reduced-motion.
+   ========================================================================== */
+body,
+header,
+nav,
+section,
+article,
+button,
+input,
+textarea,
+select,
+.app-header,
+.desktop-nav,
+.mobile-bottom-nav,
+.stat-card,
+.prayer-card,
+.settings-card,
+.modal-card,
+.home-bible-card,
+.devotional-card {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  header,
+  nav,
+  section,
+  article,
+  button,
+  input,
+  textarea,
+  select,
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   APPEARANCE / THEME SELECTOR CONTROLS
+   Compact, accessible, 3-mode selector (Light, Dark, System)
+   ========================================================================== */
+.theme-mode-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.theme-mode-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px 8px;
+  min-height: 52px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition: all 180ms ease;
+}
+
+.theme-mode-btn svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+}
+
+.theme-mode-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+}
+
+.theme-mode-btn.active {
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--accent-primary) !important;
+  font-weight: 600 !important;
+}
+
+body.dark-theme .theme-mode-btn {
+  background: var(--bg-elevated);
+  border-color: var(--border-primary);
+  color: var(--text-secondary);
+}
+
+body.dark-theme .theme-mode-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+}
+
+body.dark-theme .theme-mode-btn.active {
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--accent-primary) !important;
+}
+
+/* Dark mode primary button high-contrast WCAG AAA */
+body.dark-theme .btn-primary {
+  background: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  color: #0F172A !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme .btn-primary:hover {
+  background: var(--accent-interactive) !important;
+  border-color: var(--accent-interactive) !important;
+  color: #FFFFFF !important;
+}
+
+/* ==========================================================================
    HOME SCREEN BIBLE WIDGET
-   Strictly Zero Background Tints, Crisp Corners, Zero Shadows
+   Serene, Eye-Soothing Christian Devotional Card
+   Light: Soft #FFFFFF card, gentle #EFF6FF badge, calming #084B9A left border
+   Dark: Deep #1F2937 card, soft #172554 badge, gentle #38BDF8 left border
    ========================================================================== */
 
 .home-bible-plan-widget {
@@ -5328,9 +5540,10 @@ body.dark-theme .bible-plan-tab-item.active {
 
 .home-bible-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-light);
-  border-radius: 4px;
-  padding: 14px 16px;
+  border: 1px solid var(--border-primary);
+  border-left: 3.5px solid var(--accent-primary);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
   box-shadow: none !important;
 }
 
@@ -5338,6 +5551,7 @@ body.dark-theme .bible-plan-tab-item.active {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
@@ -5346,11 +5560,21 @@ body.dark-theme .bible-plan-tab-item.active {
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .home-bible-plan-label {
-  font-size: 11.5px;
-  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-primary);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-light);
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .home-bible-reading-row {
@@ -5359,26 +5583,35 @@ body.dark-theme .bible-plan-tab-item.active {
 
 .home-bible-passage {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-primary);
+  line-height: 1.4;
 }
 
 .home-bible-sunday-row {
   font-size: 12px;
   color: var(--text-secondary);
   margin-bottom: 6px;
-  padding-top: 4px;
+  padding-top: 6px;
   border-top: 1px solid var(--border-subtle);
+}
+
+.home-bible-sunday-badge {
+  color: var(--warning);
+  font-weight: 600;
 }
 
 .home-bible-prayer-row {
   font-size: 12.5px;
   font-style: italic;
   color: var(--text-secondary);
-  line-height: 1.45;
+  line-height: 1.5;
+  margin-top: 8px;
   margin-bottom: 12px;
-  padding-top: 6px;
-  border-top: 1px solid var(--border-subtle);
+  padding: 7px 11px;
+  background: var(--bg-card-subtle);
+  border-left: 2.5px solid var(--accent-interactive);
+  border-radius: 0 4px 4px 0;
 }
 
 .home-bible-actions {
@@ -5388,16 +5621,35 @@ body.dark-theme .bible-plan-tab-item.active {
 }
 
 .home-bible-actions .btn {
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   box-shadow: none !important;
 }
 
-/* Dark Theme Reset */
-body.dark-theme .home-bible-card,
+/* Dark Theme Specific Overrides for Home Bible Card */
+body.dark-theme .home-bible-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border-primary) !important;
+  border-left: 3.5px solid var(--accent-primary) !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme .home-bible-plan-label {
+  background: var(--accent-soft) !important;
+  color: var(--accent-primary) !important;
+  border-color: rgba(56, 189, 248, 0.25) !important;
+}
+
+body.dark-theme .home-bible-prayer-row {
+  background: var(--bg-elevated) !important;
+  border-left-color: var(--accent-primary) !important;
+  color: var(--text-secondary) !important;
+}
+
 body.dark-theme .bible-plan-choice-card,
 body.dark-theme .bible-plan-active-day-card,
 body.dark-theme .bible-plan-upcoming-card,
 body.dark-theme .bible-plan-completed-celebration-card {
   box-shadow: none !important;
 }
+
 

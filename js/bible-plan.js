@@ -444,7 +444,7 @@ const BiblePlan = {
 
         ${sundayWorship ? `
           <div class="home-bible-sunday-row">
-            <span>Sunday Worship: <strong>${sundayWorship.passage}</strong></span>
+            <span class="home-bible-sunday-badge">Sunday Worship:</span> <strong>${sundayWorship.passage}</strong>
           </div>
         ` : ''}
 

@@ -4,9 +4,11 @@
  * Community Prayer Companions, Admin Dashboard, and Settings.
  */
 
-document.addEventListener('DOMContentLoaded', async () => {
-  await App.init();
-});
+if (typeof document !== 'undefined' && document.addEventListener) {
+  document.addEventListener('DOMContentLoaded', async () => {
+    await App.init();
+  });
+}
 
 const App = {
   currentTab: 'dashboard',
@@ -99,53 +101,171 @@ const App = {
   // NAVIGATION & ROUTING
   // ==========================================================================
 
-  initTheme() {
-    const savedTheme = localStorage.getItem('PRAYERLY_THEME') || 'light';
-    const isDark = savedTheme === 'dark';
-    this.applyTheme(isDark);
+  // ==========================================================================
+  // CENTRAL THEME SYSTEM (LIGHT / DARK / SYSTEM DEFAULT)
+  // Fully reactive, 3-mode theme system with live OS matching.
+  // ==========================================================================
 
+  initTheme() {
+    // 1. Initialize OS Media Query Listener for Live Dynamic System Theme Updates
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      this._systemDarkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      this._systemDarkListener = () => {
+        if (this.getTheme() === 'system') {
+          this.applyTheme('system');
+        }
+      };
+      try {
+        this._systemDarkMediaQuery.addEventListener('change', this._systemDarkListener);
+      } catch (err) {
+        try {
+          this._systemDarkMediaQuery.addListener(this._systemDarkListener);
+        } catch (e2) {}
+      }
+    }
+
+    // 2. Load Saved Theme ('system' default)
+    const savedTheme = this.getTheme();
+    this.applyTheme(savedTheme);
+
+    // 3. Header Theme Toggle Button Click Listener (Cycle: Light -> Dark -> System -> Light)
     const toggleBtn = document.getElementById('theme-toggle-btn');
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
-        this.toggleTheme();
+        this.cycleTheme();
       });
     }
 
     this.initPreferences();
   },
 
-  toggleTheme() {
-    const currentlyDark = document.body.classList.contains('dark-theme');
-    const nextDark = !currentlyDark;
-    this.applyTheme(nextDark);
-    localStorage.setItem('PRAYERLY_THEME', nextDark ? 'dark' : 'light');
-    const moreNightLabel = document.getElementById('more-nightmode-label');
-    if (moreNightLabel) {
-      moreNightLabel.textContent = nextDark ? 'Light Mode' : 'Night Mode';
+  getTheme() {
+    try {
+      const saved = localStorage.getItem('PRAYERLY_THEME');
+      if (saved === 'light' || saved === 'dark' || saved === 'system') {
+        return saved;
+      }
+    } catch (e) {}
+    return 'system';
+  },
+
+  setTheme(mode, showToast = false) {
+    const validModes = ['light', 'dark', 'system'];
+    if (!validModes.includes(mode)) mode = 'system';
+
+    try {
+      localStorage.setItem('PRAYERLY_THEME', mode);
+    } catch (e) {}
+
+    this.applyTheme(mode);
+
+    if (showToast && typeof UI !== 'undefined' && UI.toast) {
+      const modeNames = {
+        light: 'Light Theme',
+        dark: 'Dark Theme',
+        system: 'System Default'
+      };
+      UI.toast(`Theme set to ${modeNames[mode] || mode}`, 'info');
     }
   },
 
-  applyTheme(isDark) {
-    if (isDark) {
-      document.documentElement.classList.add('dark-theme');
-      document.body.classList.add('dark-theme');
+  cycleTheme() {
+    const current = this.getTheme();
+    let next = 'dark';
+    if (current === 'light') next = 'dark';
+    else if (current === 'dark') next = 'system';
+    else next = 'light';
+    this.setTheme(next, true);
+  },
+
+  toggleTheme() {
+    this.cycleTheme();
+  },
+
+  applyTheme(mode) {
+    if (!mode) mode = this.getTheme();
+    const validModes = ['light', 'dark', 'system'];
+    if (!validModes.includes(mode)) mode = 'system';
+
+    let isDark = false;
+    if (mode === 'dark') {
+      isDark = true;
+    } else if (mode === 'light') {
+      isDark = false;
     } else {
-      document.documentElement.classList.remove('dark-theme');
-      document.body.classList.remove('dark-theme');
+      isDark = (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
-    const sunIcon = document.querySelector('#theme-toggle-btn .icon-sun');
-    const moonIcon = document.querySelector('#theme-toggle-btn .icon-moon');
-    if (sunIcon && moonIcon) {
-      sunIcon.style.display = isDark ? 'none' : 'inline-flex';
-      moonIcon.style.display = isDark ? 'inline-flex' : 'none';
-    }
-    const moreNightLabel = document.getElementById('more-nightmode-label');
-    if (moreNightLabel) {
-      moreNightLabel.textContent = isDark ? 'Light Mode' : 'Night Mode';
-    }
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (metaTheme) {
-      metaTheme.setAttribute('content', isDark ? '#0B1120' : '#023E8A');
+
+    // Update Root and Body Classes / Attributes
+    if (typeof document !== 'undefined') {
+      if (document.documentElement && document.documentElement.classList) {
+        if (isDark) {
+          document.documentElement.classList.add('dark-theme');
+          if (document.documentElement.setAttribute) document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark-theme');
+          if (document.documentElement.setAttribute) document.documentElement.setAttribute('data-theme', 'light');
+        }
+      }
+
+      if (document.body && document.body.classList) {
+        if (isDark) {
+          document.body.classList.add('dark-theme');
+        } else {
+          document.body.classList.remove('dark-theme');
+        }
+      }
+
+      // Update Header Toggle Button Icons & Accessibility
+      const sunIcon = document.querySelector ? document.querySelector('#theme-toggle-btn .icon-sun') : null;
+      const moonIcon = document.querySelector ? document.querySelector('#theme-toggle-btn .icon-moon') : null;
+      const sysIcon = document.querySelector ? document.querySelector('#theme-toggle-btn .icon-system') : null;
+      const headerToggleBtn = document.getElementById ? document.getElementById('theme-toggle-btn') : null;
+
+      if (headerToggleBtn) {
+        if (mode === 'light') {
+          if (sunIcon) sunIcon.style.display = 'inline-flex';
+          if (moonIcon) moonIcon.style.display = 'none';
+          if (sysIcon) sysIcon.style.display = 'none';
+          headerToggleBtn.title = 'Theme: Light (Click to switch to Dark)';
+          headerToggleBtn.setAttribute('aria-label', 'Theme: Light');
+        } else if (mode === 'dark') {
+          if (sunIcon) sunIcon.style.display = 'none';
+          if (moonIcon) moonIcon.style.display = 'inline-flex';
+          if (sysIcon) sysIcon.style.display = 'none';
+          headerToggleBtn.title = 'Theme: Dark (Click to switch to System)';
+          headerToggleBtn.setAttribute('aria-label', 'Theme: Dark');
+        } else {
+          if (sunIcon) sunIcon.style.display = 'none';
+          if (moonIcon) moonIcon.style.display = 'none';
+          if (sysIcon) sysIcon.style.display = 'inline-flex';
+          headerToggleBtn.title = `Theme: System (${isDark ? 'Dark' : 'Light'}) (Click to switch to Light)`;
+          headerToggleBtn.setAttribute('aria-label', 'Theme: System Default');
+        }
+      }
+
+      // Sync All 3-Mode Theme Selector Buttons across Settings & More Modal
+      if (document.querySelectorAll) {
+        document.querySelectorAll('.theme-mode-btn').forEach(btn => {
+          const btnMode = btn.getAttribute('data-theme-mode');
+          if (btnMode === mode) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+      }
+
+      const moreNightLabel = document.getElementById ? document.getElementById('more-nightmode-label') : null;
+      if (moreNightLabel) {
+        moreNightLabel.textContent = isDark ? 'Light Mode' : 'Night Mode';
+      }
+
+      // Update Meta Theme Color for Mobile Browser Chrome
+      const metaTheme = document.querySelector ? document.querySelector('meta[name="theme-color"]') : null;
+      if (metaTheme) {
+        metaTheme.setAttribute('content', isDark ? '#111827' : '#084B9A');
+      }
     }
   },
 
@@ -207,16 +327,16 @@ const App = {
     if (metaTheme) {
       const isDark = document.body.classList.contains('dark-theme');
       if (isDark) {
-        metaTheme.setAttribute('content', '#0B1120');
+        metaTheme.setAttribute('content', '#111827');
       } else {
         const themeHexMap = {
-          navy: '#023E8A',
+          navy: '#084B9A',
           olive: '#556B2F',
           emerald: '#0F766E',
           amber: '#B45309',
           purple: '#6D28D9'
         };
-        metaTheme.setAttribute('content', themeHexMap[color] || '#023E8A');
+        metaTheme.setAttribute('content', themeHexMap[color] || '#084B9A');
       }
     }
 
@@ -3230,7 +3350,13 @@ const App = {
   }
 };
 
-window.App = App;
-window.openPrayerModal = (existingPrayer) => App.openPrayerModal(existingPrayer);
-window.openThanksgivingModal = (existingTg) => App.openThanksgivingModal(existingTg);
-window.closeAllModals = () => App.closeAllModals();
+if (typeof window !== 'undefined') {
+  window.App = App;
+  window.openPrayerModal = (existingPrayer) => App.openPrayerModal(existingPrayer);
+  window.openThanksgivingModal = (existingTg) => App.openThanksgivingModal(existingTg);
+  window.closeAllModals = () => App.closeAllModals();
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = App;
+}

@@ -74,8 +74,21 @@
   <script>
     (function() {
       try {
-        if (localStorage.getItem('PRAYERLY_THEME') === 'dark') {
+        var saved = localStorage.getItem('PRAYERLY_THEME') || 'system';
+        var isDark = false;
+        if (saved === 'dark') {
+          isDark = true;
+        } else if (saved === 'light') {
+          isDark = false;
+        } else {
+          isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+        if (isDark) {
           document.documentElement.classList.add('dark-theme');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark-theme');
+          document.documentElement.setAttribute('data-theme', 'light');
         }
       } catch (e) {}
     })();
@@ -236,12 +249,15 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 5px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
           <span class="signin-text">Sign In</span>
         </button>
-        <button id="theme-toggle-btn" class="icon-btn theme-toggle-btn" title="Toggle Light / Night Mode" aria-label="Toggle Night Mode">
+        <button id="theme-toggle-btn" class="icon-btn theme-toggle-btn" title="Theme (Light / Dark / System)" aria-label="Toggle Theme">
           <span class="icon-sun">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
           </span>
           <span class="icon-moon" style="display: none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </span>
+          <span class="icon-system" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
           </span>
         </button>
         <span id="user-email-badge" class="user-badge" title="Account Settings" style="display: none;">
@@ -1113,7 +1129,33 @@
         </div>
       </div>
 
-      <!-- 2. CLOUD SYNCHRONIZATION -->
+      <!-- 2. APPEARANCE & THEME (Light / Dark / System) -->
+      <div class="settings-card" style="margin-bottom: 14px;">
+        <div class="settings-card-header-simple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="settings-section-icon"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <div>
+            <h3 class="settings-card-title">Appearance</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 0;">Choose your preferred theme.</p>
+          </div>
+        </div>
+
+        <div class="theme-mode-selector" style="margin-top: 12px;">
+          <button type="button" class="theme-mode-btn" data-theme-mode="light" onclick="App.setTheme('light', true)" aria-label="Light Mode">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            <span>Light</span>
+          </button>
+          <button type="button" class="theme-mode-btn" data-theme-mode="dark" onclick="App.setTheme('dark', true)" aria-label="Dark Mode">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            <span>Dark</span>
+          </button>
+          <button type="button" class="theme-mode-btn" data-theme-mode="system" onclick="App.setTheme('system', true)" aria-label="System Default Theme">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+            <span>System</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. CLOUD SYNCHRONIZATION -->
       <div class="settings-card" style="margin-bottom: 14px;">
         <div class="settings-sync-header">
           <div class="settings-sync-title-group">
@@ -1839,14 +1881,29 @@
           </div>
         </div>
 
-        <!-- SECTION 2: THEME COLORS & NIGHT MODE -->
+        <!-- SECTION 2: THEME & COLOR PALETTE -->
         <div class="more-menu-section">
           <div class="more-section-title-row">
-            <span class="more-section-title">Theme Colors</span>
-            <button id="more-nightmode-toggle" class="btn btn-secondary btn-sm" onclick="App.toggleTheme()" style="padding: 4px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-              <span id="more-nightmode-label">Night Mode</span>
+            <span class="more-section-title">Theme Mode</span>
+            <span id="more-nightmode-label" style="display: none;">Night Mode</span>
+          </div>
+          <div class="theme-mode-selector" style="margin-top: 8px; margin-bottom: 12px;">
+            <button type="button" class="theme-mode-btn" data-theme-mode="light" onclick="App.setTheme('light', true)" aria-label="Light Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+              <span>Light</span>
             </button>
+            <button type="button" class="theme-mode-btn" data-theme-mode="dark" onclick="App.setTheme('dark', true)" aria-label="Dark Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+              <span>Dark</span>
+            </button>
+            <button type="button" class="theme-mode-btn" data-theme-mode="system" onclick="App.setTheme('system', true)" aria-label="System Default Theme">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+              <span>System</span>
+            </button>
+          </div>
+
+          <div class="more-section-title-row" style="margin-top: 10px;">
+            <span class="more-section-title">Accent Colors</span>
           </div>
           <div class="theme-color-palette" style="margin-top: 10px;">
             <button class="theme-color-dot" data-theme="olive" onclick="App.setThemeColor('olive')" title="Olive Green (Calming & Gentle on Eyes)">
