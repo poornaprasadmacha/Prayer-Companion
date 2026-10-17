@@ -29,6 +29,9 @@ const App = {
     // 1.5. Synchronous Local Device Hydration (< 1ms instant paint, zero stuck delay)
     this.renderHeader();
     this.renderDailyScripture();
+    if (typeof BiblePlan !== 'undefined') {
+      BiblePlan.renderHomeWidget();
+    }
     this.renderCachedDashboardSync();
 
     // 2. Initialize Database & Auth with safe fallback
@@ -52,6 +55,15 @@ const App = {
       Admin.init();
     } catch (err) {
       console.warn('Admin init note:', err);
+    }
+
+    // 4.5. Initialize Bible Plan Module
+    try {
+      if (typeof BiblePlan !== 'undefined') {
+        BiblePlan.init();
+      }
+    } catch (err) {
+      console.warn('BiblePlan init note:', err);
     }
 
     // 5. Render Local-First Interface Immediately (< 50ms)
@@ -822,7 +834,7 @@ const App = {
 
     const mobileMoreBtn = document.getElementById('btn-mobile-more');
     if (mobileMoreBtn) {
-      if (tabName === 'settings' || tabName === 'history' || tabName === 'stories') {
+      if (tabName === 'settings' || tabName === 'history' || tabName === 'stories' || tabName === 'bible-plan') {
         mobileMoreBtn.classList.add('active');
       } else {
         mobileMoreBtn.classList.remove('active');
@@ -865,6 +877,11 @@ const App = {
         break;
       case 'stories':
         await this.renderStoriesView();
+        break;
+      case 'bible-plan':
+        if (typeof BiblePlan !== 'undefined') {
+          BiblePlan.render();
+        }
         break;
       case 'admin':
         Admin.loadOverview();
@@ -1061,6 +1078,9 @@ const App = {
   },
 
   async renderDashboard() {
+    if (typeof BiblePlan !== 'undefined') {
+      BiblePlan.renderHomeWidget();
+    }
     const stats = await Tracking.getTodayStats();
     const totalEl = document.getElementById('stat-total-active');
     const prayedEl = document.getElementById('stat-prayed-today');

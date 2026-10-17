@@ -51,6 +51,8 @@ const scripts = [
   'js/admin.js',
   'js/settings.js',
   'js/notifications.js',
+  'js/bible-plan-data.js',
+  'js/bible-plan.js',
   'js/app.js'
 ];
 
@@ -262,7 +264,10 @@ const requiredIds = [
   'btn-test-verse-notification',
   'btn-export-pdf-settings',
   'btn-settings-read-stories',
-  'printable-prayer-summary'
+  'printable-prayer-summary',
+  // 365-Day Bible Reading Plan
+  'view-bible-plan',
+  'home-bible-reading-card'
 ];
 
 requiredIds.forEach(id => {
@@ -271,4 +276,142 @@ requiredIds.forEach(id => {
 });
 
 console.log(`\n✓ All ${requiredIds.length} critical DOM element IDs verified in index.html!`);
-console.log('✓ Frontend verification passed successfully.\n');
+
+// ============================================================================
+// VERIFY BIBLE READING PLAN DATA INTEGRITY
+// ============================================================================
+console.log('\nVerifying 365-Day Bible Reading Plan data integrity...');
+
+const BiblePlanData = require('./js/bible-plan-data.js');
+
+assert.ok(Array.isArray(BiblePlanData.plans), 'BiblePlanData.plans must be an array');
+assert.strictEqual(BiblePlanData.plans.length, 2, 'Exactly 2 Bible reading plans must exist');
+
+const plan1 = BiblePlanData.plans.find(p => p.id === 'plan_canonical');
+assert.ok(plan1, 'Plan 1 (plan_canonical) must exist');
+assert.strictEqual(plan1.days.length, 365, 'Plan 1 must have exactly 365 days');
+assert.strictEqual(plan1.days[0].day, 1, 'Plan 1 must start on Day 1');
+assert.strictEqual(plan1.days[364].day, 365, 'Plan 1 must end on Day 365');
+assert.ok(plan1.days[0].reading.includes('Genesis'), 'Day 1 must start with Genesis');
+assert.ok(plan1.days[364].reading.includes('Revelation'), 'Day 365 must end with Revelation');
+
+const plan2 = BiblePlanData.plans.find(p => p.id === 'plan_morning_night');
+assert.ok(plan2, 'Plan 2 (plan_morning_night) must exist');
+assert.strictEqual(plan2.days.length, 365, 'Plan 2 must have exactly 365 days');
+assert.ok(plan2.days[0].morning, 'Plan 2 must have morning reading');
+assert.ok(plan2.days[0].night, 'Plan 2 must have night reading');
+
+// Check Sunday Worship on every 7th day
+assert.strictEqual(BiblePlanData.sundayWorship.length, 52, '52 Sunday worship readings must exist');
+for (let d = 7; d <= 365; d += 7) {
+  assert.strictEqual(plan1.days[d - 1].isSunday, true, `Day ${d} must be flagged as Sunday in Plan 1`);
+  assert.ok(plan1.days[d - 1].worshipReading, `Day ${d} must include worship reading in Plan 1`);
+  assert.strictEqual(plan2.days[d - 1].isSunday, true, `Day ${d} must be flagged as Sunday in Plan 2`);
+  assert.ok(plan2.days[d - 1].worshipReading, `Day ${d} must include worship reading in Plan 2`);
+}
+
+// Check Daily Prayer Wisdom on all 365 days
+for (let i = 0; i < 365; i++) {
+  const w1 = plan1.days[i].prayerWisdom;
+  assert.ok(w1 && w1.theme && w1.text, `Day ${i + 1} must include prayer wisdom theme and text in Plan 1`);
+  const w2 = plan2.days[i].prayerWisdom;
+  assert.ok(w2 && w2.theme && w2.text, `Day ${i + 1} must include prayer wisdom theme and text in Plan 2`);
+}
+
+console.log('✓ Verified Plan 1 (Canonical/Thematic): 365 days with Genesis to Revelation sequence');
+console.log('✓ Verified Plan 2 (Morning NT + Night OT): 365 days with dual daily portions');
+console.log('✓ Verified 52 Sunday worship and praise readings on every 7th day');
+console.log('✓ Verified 365 daily prayer wisdom reflections');
+
+// ============================================================================
+// VERIFY BIBLE PLAN CONTROLLER LOGIC (OFFLINE STORAGE, UNCHECK, RESET GUARDS)
+// ============================================================================
+console.log('\nVerifying BiblePlan controller logic and strict completion rules...');
+
+// Mock browser localStorage and DOM
+const mockStorage = {};
+global.localStorage = {
+  getItem: (k) => mockStorage[k] || null,
+  setItem: (k, v) => { mockStorage[k] = String(v); },
+  removeItem: (k) => { delete mockStorage[k]; }
+};
+global.window = {
+  dispatchEvent: () => {},
+  addEventListener: () => {}
+};
+global.confirm = () => true;
+
+// Mock DOM elements
+const mockElements = {
+  'view-bible-plan': { innerHTML: '', style: {} },
+  'home-bible-reading-card': { innerHTML: '', style: { display: 'none' } }
+};
+global.document = {
+  getElementById: (id) => mockElements[id] || null
+};
+global.BiblePlanData = BiblePlanData;
+
+const BiblePlan = require('./js/bible-plan.js');
+
+// 1. Initial State (No plan selected)
+const initialState = BiblePlan.getState();
+assert.strictEqual(initialState.activePlanId, null, 'Initially activePlanId must be null');
+assert.strictEqual(initialState.completedDays.length, 0, 'Initially completedDays must be empty');
+
+// Home widget strictly hidden when no plan chosen
+BiblePlan.renderHomeWidget();
+assert.strictEqual(mockElements['home-bible-reading-card'].style.display, 'none', 'Home widget must be strictly hidden if no plan is chosen');
+console.log('✓ Verified: Home screen widget is strictly hidden when no plan is selected');
+
+// 2. Select Plan 1
+BiblePlan.selectPlan('plan_canonical');
+const stateAfterSelect = BiblePlan.getState();
+assert.strictEqual(stateAfterSelect.activePlanId, 'plan_canonical', 'Active plan must be plan_canonical');
+assert.strictEqual(BiblePlan.getCurrentDayNumber(), 1, 'Current uncompleted day must start at Day 1');
+
+// Home widget now visible
+BiblePlan.renderHomeWidget();
+assert.strictEqual(mockElements['home-bible-reading-card'].style.display, 'block', 'Home widget must be displayed once a plan is selected');
+assert.ok(mockElements['home-bible-reading-card'].innerHTML.includes('Day 1'), 'Home widget must display Day 1');
+console.log('✓ Verified: Home screen widget displays Day 1 when plan is selected');
+
+// 3. Mark Day 1 complete -> Next active day unfolds to Day 2
+BiblePlan.toggleDay(1);
+assert.deepStrictEqual(BiblePlan.getState().completedDays, [1], 'Day 1 must be marked complete');
+assert.strictEqual(BiblePlan.getCurrentDayNumber(), 2, 'Current uncompleted day must advance to Day 2');
+
+BiblePlan.renderHomeWidget();
+assert.ok(mockElements['home-bible-reading-card'].innerHTML.includes('Day 2'), 'Home widget must now display Day 2');
+console.log('✓ Verified: Day 1 folds back and Day 2 unfolds as active reading');
+
+// 4. Strict Guard: Read Again MUST NOT be allowed when < 365 days
+BiblePlan.readAgain();
+assert.strictEqual(BiblePlan.getState().completedDays.length, 1, 'Read Again must be strictly ignored when not all 365 days are completed');
+console.log('✓ Verified: "Read Again" is strictly guarded and cannot be triggered early');
+
+// 5. Complete all 365 days
+const fullState = BiblePlan.getState();
+fullState.completedDays = Array.from({ length: 365 }, (_, i) => i + 1);
+BiblePlan.saveState(fullState);
+
+assert.strictEqual(BiblePlan.isAllCompleted(), true, 'isAllCompleted() must return true when 365 days completed');
+
+BiblePlan.render();
+const planHtml = mockElements['view-bible-plan'].innerHTML;
+assert.ok(planHtml.includes('Complete Bible Reading Finished!'), 'Celebration message must be rendered on completion');
+assert.ok(planHtml.includes('Read Again (Start New Round)'), 'Read Again button must be rendered on completion');
+
+// Test Read Again resets safely and increments round
+BiblePlan.readAgain();
+const stateAfterReset = BiblePlan.getState();
+assert.strictEqual(stateAfterReset.completedDays.length, 0, 'Completed days must be reset to 0');
+assert.strictEqual(stateAfterReset.historyRound, 2, 'History round must increment to 2');
+console.log('✓ Verified: "Read Again" resets cleanly to Round 2 once all 365 days are completed');
+
+// Verify zero emojis in generated markup
+const emojiRegex = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u;
+assert.ok(!emojiRegex.test(planHtml), 'No emojis should be present in Bible Plan view');
+console.log('✓ Verified: Strictly zero emojis in Bible Plan interface');
+
+console.log('✓ Frontend and Bible Plan verification passed successfully.\n');
+

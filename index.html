@@ -352,6 +352,9 @@
         </div>
       </div>
 
+      <!-- Conditional 365-Day Bible Reading Card (Strictly only visible when a plan is active) -->
+      <div id="home-bible-reading-card" class="home-bible-plan-widget" style="display: none;"></div>
+
       <div class="section-header">
         <h2 class="section-title">Today's Prayer Points</h2>
         <button id="btn-quick-add" class="btn btn-primary btn-sm" onclick="App.openPrayerModal()">+ Quick Add</button>
@@ -1072,6 +1075,13 @@
           </button>
         </div>
       </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 9: 365-DAY BIBLE READING PLAN (FULL VIEW)
+         ==================================================================== -->
+    <section id="view-bible-plan" class="view-panel">
+      <!-- Dynamically populated by BiblePlan.render() -->
     </section>
 
     <section id="view-settings" class="view-panel">
@@ -1905,6 +1915,14 @@
               <span class="more-grid-title">Stories</span>
             </button>
 
+            <!-- 365-Day Bible Reading Plan -->
+            <button class="more-grid-btn" onclick="App.openMoreLink('bible-plan')">
+              <span class="more-grid-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </span>
+              <span class="more-grid-title">Bible Plan</span>
+            </button>
+
             <!-- Admin Console (Shown for Admin Only) -->
             <button id="more-link-admin" class="more-grid-btn" onclick="App.openMoreLink('admin')" style="display: none; color: #E11D48;">
               <span class="more-grid-icon">
@@ -2077,6 +2095,8 @@
   <script src="js/admin.js"></script>
   <script src="js/settings.js"></script>
   <script src="js/notifications.js"></script>
+  <script src="js/bible-plan-data.js"></script>
+  <script src="js/bible-plan.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
