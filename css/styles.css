@@ -4926,31 +4926,30 @@ body.dark-theme .story-application-box {
 
 /* ==========================================================================
    365-DAY BIBLE READING PLAN STYLES
-   Minimal, Dignified, Zero Shadows, Zero Emojis
+   Minimal, Flat, Zero Rounded Corners, Zero Shadows, Zero Tints
    ========================================================================== */
 
 .bible-plan-container {
-  max-width: 740px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 8px 12px 60px 12px;
+  padding: 6px 12px 60px 12px;
 }
 
 .bible-plan-top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
-  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .bible-plan-back-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: 6px 12px;
+  border-radius: 4px;
+  padding: 5px 10px;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
@@ -4965,61 +4964,20 @@ body.dark-theme .story-application-box {
   letter-spacing: -0.01em;
 }
 
-.bible-plan-switch-btn {
-  display: inline-flex;
-  align-items: center;
-  background: transparent;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: 5px 10px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  box-shadow: none !important;
+.bible-plan-sub-lead {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 16px 0;
 }
 
-/* Plan Selection Cards */
-.bible-plan-intro-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: 18px 20px;
-  margin-bottom: 20px;
-  box-shadow: none !important;
-}
-
-.bible-plan-intro-badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--primary);
-  margin-bottom: 6px;
-}
-
-.bible-plan-intro-title {
-  font-size: 19px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0 0 8px 0;
-}
-
-.bible-plan-intro-desc {
-  font-size: 13.5px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin: 0;
-}
-
+/* Two Plan Choice Cards */
 .bible-plan-cards-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 12px;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 580px) {
   .bible-plan-cards-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -5027,163 +4985,115 @@ body.dark-theme .story-application-box {
 
 .bible-plan-choice-card {
   background: var(--bg-card);
-  border: 1.5px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: 20px;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   box-shadow: none !important;
 }
 
-.bible-plan-choice-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.bible-plan-pill {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 4px;
-  background: rgba(2, 62, 138, 0.08);
-  color: var(--primary);
-  border: 1px solid rgba(2, 62, 138, 0.2);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.bible-plan-pill-sub {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
 .bible-plan-choice-name {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
 }
 
 .bible-plan-choice-desc {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-secondary);
   line-height: 1.45;
   margin: 0 0 16px 0;
   flex: 1;
 }
 
-.bible-plan-features-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 18px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.bible-plan-feature-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.bible-plan-feature-item svg {
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
 .bible-plan-select-btn {
-  width: 100%;
+  border-radius: 4px;
   box-shadow: none !important;
 }
 
-/* Active Plan Progress Banner */
-.bible-plan-progress-card {
+/* Plan Switcher Tabs (Instant 1-Click Switching) */
+.bible-plan-tab-switch {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.bible-plan-tab-item {
+  flex: 1;
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: 16px 18px;
-  margin-bottom: 16px;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: center;
+  transition: none !important;
   box-shadow: none !important;
 }
 
-.bible-plan-progress-header {
+.bible-plan-tab-item.active {
+  background: var(--navy-900);
+  color: #FFFFFF;
+  border-color: var(--navy-900);
+  font-weight: 600;
+}
+
+body.dark-theme .bible-plan-tab-item.active {
+  background: #0284C7;
+  border-color: #0284C7;
+}
+
+/* Progress Header */
+.bible-plan-progress-row {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
+  align-items: baseline;
+  margin-bottom: 8px;
 }
 
-.bible-plan-active-title {
-  font-size: 16.5px;
+.bible-plan-progress-main {
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 6px 0 0 0;
 }
 
-.bible-plan-round-badge {
-  display: inline-block;
+.bible-plan-round-text {
   font-size: 11px;
   font-weight: 600;
-  color: #16A34A;
-  background: rgba(22, 163, 74, 0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-top: 4px;
-}
-
-.bible-plan-progress-stat {
-  text-align: right;
-}
-
-.bible-plan-stat-num {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.bible-plan-stat-denom {
-  font-size: 13px;
   color: var(--text-muted);
-  font-weight: 500;
+  margin-left: 8px;
 }
 
-.bible-plan-bar-wrapper {
-  background: var(--bg-card-subtle);
-  border: 1px solid var(--border-subtle);
-  height: 8px;
-  border-radius: 4px;
+.bible-plan-progress-counter {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.bible-plan-progress-line {
+  background: var(--border-subtle);
+  height: 3px;
+  border-radius: 2px;
+  margin-bottom: 16px;
   overflow: hidden;
-  margin-bottom: 6px;
 }
 
-.bible-plan-bar-fill {
+.bible-plan-progress-fill {
   background: var(--primary);
   height: 100%;
   transition: width 0.3s ease;
 }
 
-.bible-plan-bar-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11.5px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-/* Active Day Card (Unfolded) */
+/* Active Day Card */
 .bible-plan-active-day-card {
   background: var(--bg-card);
-  border: 1.5px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: 18px 20px;
-  margin-bottom: 16px;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
   box-shadow: none !important;
 }
 
@@ -5191,141 +5101,97 @@ body.dark-theme .story-application-box {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
-.bible-plan-day-badge-col {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.bible-plan-day-number-badge {
-  font-size: 13.5px;
+.bible-plan-day-title {
+  font-size: 14.5px;
   font-weight: 700;
-  background: var(--navy-900);
-  color: #FFFFFF;
-  padding: 3px 10px;
-  border-radius: 4px;
-}
-
-.bible-plan-day-category {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 .bible-plan-mark-btn {
-  display: inline-flex;
-  align-items: center;
+  border-radius: 4px;
   box-shadow: none !important;
-  font-size: 13px;
 }
 
 .bible-plan-reading-box {
-  background: var(--bg-card-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  margin-bottom: 14px;
+  padding: 8px 0;
+  margin-bottom: 12px;
 }
 
-.bible-plan-reading-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-}
-
-.bible-plan-main-passage {
-  font-size: 19px;
+.bible-plan-passage-text {
+  font-size: 17px;
   font-weight: 700;
   color: var(--text-primary);
   display: block;
 }
 
-.bible-plan-dual-reading-row {
+.bible-plan-dual-box {
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
 }
 
-@media (min-width: 500px) {
-  .bible-plan-dual-reading-row {
+@media (min-width: 480px) {
+  .bible-plan-dual-box {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-.bible-plan-sub-reading-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-}
-
-.bible-plan-sub-tag {
-  display: block;
-  font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--primary);
-  margin-bottom: 4px;
-  letter-spacing: 0.03em;
-}
-
-.bible-plan-sub-passage {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-primary);
-  display: block;
-}
-
-/* Sunday Worship & Praise Spotlight */
-.bible-plan-worship-spotlight-card {
-  background: rgba(217, 119, 6, 0.04);
-  border: 1px solid rgba(217, 119, 6, 0.3);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  margin-bottom: 14px;
-  box-shadow: none !important;
-}
-
-.bible-plan-worship-header {
+.bible-plan-dual-col {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.bible-plan-worship-label {
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #B45309;
-}
-
-.bible-plan-worship-passage {
-  font-size: 15.5px;
-  font-weight: 700;
-  color: var(--text-primary);
-  display: block;
-  margin-bottom: 2px;
-}
-
-.bible-plan-worship-theme {
-  font-size: 12px;
+.bible-plan-reading-lead {
+  font-size: 11px;
   font-weight: 600;
-  color: #B45309;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Sunday Worship (Only Displayed on Actual Sundays) */
+.bible-plan-sunday-worship-card {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.bible-plan-sunday-lead {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  display: block;
   margin-bottom: 4px;
 }
 
-.bible-plan-worship-verse {
+.bible-plan-sunday-passage {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+}
+
+.bible-plan-sunday-verse {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin: 3px 0 0 0;
+  line-height: 1.4;
+}
+
+/* Prayer Wisdom Box */
+.bible-plan-prayer-box {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.bible-plan-prayer-text {
   font-size: 12.5px;
   font-style: italic;
   color: var(--text-secondary);
@@ -5333,52 +5199,12 @@ body.dark-theme .story-application-box {
   margin: 0;
 }
 
-/* Daily Prayer Wisdom Box */
-.bible-plan-prayer-wisdom-card {
-  background: var(--bg-card-subtle);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  box-shadow: none !important;
-}
-
-.bible-plan-wisdom-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
-}
-
-.bible-plan-wisdom-title {
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-}
-
-.bible-plan-wisdom-text {
-  font-size: 13.5px;
-  font-style: italic;
-  line-height: 1.5;
-  color: var(--text-primary);
-  margin: 0 0 6px 0;
-}
-
-.bible-plan-wisdom-theme {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-align: right;
-}
-
-/* Completed Days Folded Drawer (Accordion) */
+/* Folded Drawer */
 .bible-plan-folded-drawer {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  margin-bottom: 16px;
-  overflow: hidden;
+  border-radius: 4px;
+  margin-bottom: 14px;
   box-shadow: none !important;
 }
 
@@ -5387,44 +5213,25 @@ body.dark-theme .story-application-box {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: var(--bg-card-subtle);
+  padding: 10px 14px;
+  background: transparent;
   border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
   cursor: pointer;
   box-shadow: none !important;
-  color: var(--text-primary);
 }
 
-.bible-plan-folder-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.bible-plan-folder-title {
-  font-size: 13.5px;
-  font-weight: 600;
-}
-
-.bible-plan-folder-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
+.bible-plan-folder-hint {
+  font-size: 11.5px;
   color: var(--text-muted);
-}
-
-.bible-plan-folder-chevron {
-  transition: transform 0.2s ease;
-}
-
-.bible-plan-folder-chevron.rotated {
-  transform: rotate(180deg);
+  font-weight: normal;
 }
 
 .bible-plan-folded-content {
   border-top: 1px solid var(--border-subtle);
-  max-height: 380px;
+  max-height: 320px;
   overflow-y: auto;
 }
 
@@ -5432,8 +5239,10 @@ body.dark-theme .story-application-box {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
+  padding: 8px 14px;
   border-bottom: 1px solid var(--border-subtle);
+  font-size: 12.5px;
+  color: var(--text-secondary);
   gap: 10px;
 }
 
@@ -5441,313 +5250,154 @@ body.dark-theme .story-application-box {
   border-bottom: none;
 }
 
-.bible-plan-history-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.bible-plan-history-day {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-.bible-plan-history-reading {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.bible-plan-history-sunday {
-  font-size: 11.5px;
-  color: #B45309;
-  font-weight: 500;
-}
-
-.bible-plan-history-uncheck-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+.bible-plan-uncheck-btn {
   background: transparent;
-  border: 1px solid rgba(22, 163, 74, 0.3);
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #16A34A;
+  border: 1px solid var(--border-light);
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: var(--text-muted);
   cursor: pointer;
   box-shadow: none !important;
 }
 
-/* Upcoming Days Preview */
+/* Upcoming Card */
 .bible-plan-upcoming-card {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  margin-bottom: 16px;
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
   box-shadow: none !important;
 }
 
-.bible-plan-upcoming-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
 .bible-plan-upcoming-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.bible-plan-upcoming-sub {
   font-size: 11.5px;
+  font-weight: 600;
   color: var(--text-muted);
-}
-
-.bible-plan-upcoming-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
 }
 
 .bible-plan-upcoming-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 8px 10px;
-  background: var(--bg-card-subtle);
-  border-radius: 4px;
-  gap: 8px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  padding: 4px 0;
 }
 
-.bible-plan-upcoming-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.bible-plan-upcoming-day {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.bible-plan-upcoming-passage {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.bible-plan-upcoming-cat {
-  font-size: 11px;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-/* Celebration & Read Again Card (strictly 365 completed) */
+/* Completion Celebration & Read Again */
 .bible-plan-completed-celebration-card {
   background: var(--bg-card);
-  border: 1.5px solid #16A34A;
-  border-radius: var(--radius-md);
-  padding: 24px 20px;
-  margin-bottom: 20px;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 20px 18px;
+  margin-bottom: 16px;
   text-align: center;
   box-shadow: none !important;
 }
 
 .bible-plan-celebration-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0 0 8px 0;
 }
 
 .bible-plan-celebration-desc {
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--text-secondary);
-  line-height: 1.6;
-  max-width: 580px;
-  margin: 0 auto 18px auto;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
 }
 
 .bible-plan-read-again-btn {
+  border-radius: 4px;
   box-shadow: none !important;
-  padding: 10px 24px;
-  font-size: 14px;
-  font-weight: 600;
 }
 
-/* Home Screen Bible Reading Widget */
+/* ==========================================================================
+   HOME SCREEN BIBLE WIDGET
+   Strictly Zero Background Tints, Crisp Corners, Zero Shadows
+   ========================================================================== */
+
 .home-bible-plan-widget {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
-.home-bible-widget-card {
+.home-bible-card {
   background: var(--bg-card);
-  border: 1.5px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: 16px 18px;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 14px 16px;
   box-shadow: none !important;
 }
 
-.home-bible-widget-header {
+.home-bible-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.home-bible-widget-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.home-bible-tag {
-  font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--primary);
-  background: rgba(2, 62, 138, 0.08);
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-
-.home-bible-plan-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.home-bible-day-pill {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--navy-900);
-}
-
-.home-bible-reading-content {
-  margin-bottom: 12px;
-}
-
-.home-bible-passage-row {
   margin-bottom: 8px;
 }
 
-.home-bible-main-text {
-  font-size: 17px;
+.home-bible-title {
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--text-primary);
-  display: block;
+  margin: 0;
 }
 
-.home-bible-mini-label {
-  display: block;
-  font-size: 11px;
+.home-bible-plan-label {
+  font-size: 11.5px;
   color: var(--text-muted);
-  margin-bottom: 2px;
 }
 
-.home-bible-dual-row {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
+.home-bible-reading-row {
+  margin-bottom: 6px;
 }
 
-.home-bible-dual-item {
-  flex: 1;
-  min-width: 140px;
-}
-
-.home-bible-mini-text {
+.home-bible-passage {
   font-size: 15px;
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.home-bible-sunday-spotlight {
-  background: rgba(217, 119, 6, 0.06);
-  border-left: 3px solid #D97706;
-  padding: 6px 10px;
-  border-radius: 0 4px 4px 0;
-  margin-bottom: 8px;
-  font-size: 12.5px;
-}
-
-.home-bible-sunday-tag {
-  font-weight: 700;
-  color: #B45309;
-  margin-right: 6px;
-}
-
-.home-bible-sunday-passage {
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.home-bible-wisdom-snippet {
+.home-bible-sunday-row {
   font-size: 12px;
   color: var(--text-secondary);
-  line-height: 1.45;
-  font-style: italic;
+  margin-bottom: 6px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-subtle);
 }
 
-.home-bible-wisdom-label {
-  font-style: normal;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-right: 4px;
+.home-bible-prayer-row {
+  font-size: 12.5px;
+  font-style: italic;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin-bottom: 12px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .home-bible-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-subtle);
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.home-bible-mark-btn,
-.home-bible-open-btn {
+.home-bible-actions .btn {
+  border-radius: 4px;
   box-shadow: none !important;
 }
 
-/* Dark Theme Overrides for Bible Plan */
+/* Dark Theme Reset */
+body.dark-theme .home-bible-card,
 body.dark-theme .bible-plan-choice-card,
-body.dark-theme .bible-plan-intro-card,
-body.dark-theme .bible-plan-progress-card,
 body.dark-theme .bible-plan-active-day-card,
 body.dark-theme .bible-plan-upcoming-card,
-body.dark-theme .home-bible-widget-card,
 body.dark-theme .bible-plan-completed-celebration-card {
   box-shadow: none !important;
 }
 
-body.dark-theme .bible-plan-day-number-badge {
-  background: #0284C7;
-  color: #FFFFFF;
-}
-
-body.dark-theme .home-bible-day-pill {
-  color: #38BDF8;
-}
-
-body.dark-theme .home-bible-tag {
-  color: #38BDF8;
-  background: rgba(56, 189, 248, 0.12);
-}
-
-body.dark-theme .bible-plan-pill {
-  color: #38BDF8;
-  background: rgba(56, 189, 248, 0.12);
-  border-color: rgba(56, 189, 248, 0.3);
-}

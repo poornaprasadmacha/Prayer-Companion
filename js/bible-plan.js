@@ -1,17 +1,16 @@
 /**
  * Prayer Companion - 365-Day Bible Reading Plan Module
  * 
- * Features:
- * - Plan 1: Canonical / Chronological (OT then NT from provided PDF)
- * - Plan 2: Morning NT + Night OT (Balanced daily dual walk)
- * - Sunday Worship & Praise Scripture spotlight on every 7th day
- * - Day 1 to Day 365 numbering (no calendar guilt)
- * - Progressive folding: Completed days fold into a collapsible drawer; active day unfolds
- * - Beautiful Daily Prayer Wisdom Box connecting Scripture to prayer
- * - Home Screen Widget (STRICT: Only displayed if a plan is chosen)
- * - Read Again button (STRICT: Never displayed until all 365 days are completed)
- * - 100% Offline-capable & auto-syncing
- * - Strictly NO emojis, strictly NO box-shadows (minimal, executive design)
+ * Clean, Professional, Minimalist & Dignified:
+ * - 2 Plans: "OT followed by NT" and "Morning NT + Night OT"
+ * - Real-life Sunday check (Worship reading displayed on actual Sundays)
+ * - Numbered Day 1 to Day 365
+ * - Progressive folding: Completed days fold into collapsible drawer; next day unfolds
+ * - Quiet Daily Prayer Wisdom Box
+ * - Smooth instant plan switching (zero broken prompts)
+ * - Read Again strictly locked until all 365 days are completed
+ * - Strictly NO tags/pills, NO emojis, NO background color tints, NO rounded corners
+ * - 100% Offline-first & synced
  */
 
 const BiblePlan = {
@@ -50,11 +49,9 @@ const BiblePlan = {
   async saveState(state) {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
-      // Save to AppDB settings store if available
       if (typeof AppDB !== 'undefined' && AppDB.put) {
         AppDB.put('settings', { key: 'bible_plan_state', value: state }).catch(() => {});
       }
-      // Broadcast change event
       window.dispatchEvent(new CustomEvent('bible-plan-changed', { detail: state }));
     } catch (e) {
       console.warn('Error saving Bible Plan state:', e);
@@ -64,22 +61,36 @@ const BiblePlan = {
   getActivePlan() {
     const state = this.getState();
     if (!state.activePlanId || typeof BiblePlanData === 'undefined') return null;
-    return BiblePlanData.plans.find(p => p.id === state.activePlanId) || null;
+    return BiblePlanData.plans.find(p => p.id === state.activePlanId) || BiblePlanData.plans[0];
   },
 
   getCurrentDayNumber() {
     const state = this.getState();
     if (state.completedDays.length === 0) return 1;
-    // Find lowest uncompleted day from 1 to 365
     for (let d = 1; d <= 365; d++) {
       if (!state.completedDays.includes(d)) return d;
     }
-    return 365; // All 365 completed
+    return 365;
   },
 
   isAllCompleted() {
     const state = this.getState();
     return state.completedDays.length >= 365;
+  },
+
+  isTodaySunday() {
+    return new Date().getDay() === 0;
+  },
+
+  getSundayWorshipReading() {
+    if (!this.isTodaySunday()) return null;
+    if (typeof BiblePlanData === 'undefined' || !BiblePlanData.sundayWorship || BiblePlanData.sundayWorship.length === 0) return null;
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+    const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const weekIdx = Math.floor(dayOfYear / 7) % BiblePlanData.sundayWorship.length;
+    return BiblePlanData.sundayWorship[weekIdx];
   },
 
   async selectPlan(planId) {
@@ -91,24 +102,10 @@ const BiblePlan = {
     await this.saveState(state);
     if (typeof UI !== 'undefined' && UI.toast) {
       const plan = BiblePlanData.plans.find(p => p.id === planId);
-      UI.toast(`Selected: ${plan ? plan.name : 'Bible Reading Plan'}`, 'success');
+      UI.toast(`Switched to: ${plan ? (plan.shortName || plan.name) : 'Bible Plan'}`, 'info');
     }
     this.render();
     this.renderHomeWidget();
-  },
-
-  async switchPlanPrompt() {
-    const state = this.getState();
-    const currentPlan = this.getActivePlan();
-    const otherPlanId = (state.activePlanId === 'plan_canonical') ? 'plan_morning_night' : 'plan_canonical';
-    const otherPlan = BiblePlanData.plans.find(p => p.id === otherPlanId);
-
-    const proceed = confirm(
-      `Switch to "${otherPlan.name}"?\n\nYour completed days (${state.completedDays.length}/365) will be preserved for the new plan schedule.`
-    );
-    if (proceed) {
-      await this.selectPlan(otherPlanId);
-    }
   },
 
   async toggleDay(dayNum) {
@@ -116,10 +113,8 @@ const BiblePlan = {
     const idx = state.completedDays.indexOf(dayNum);
 
     if (idx >= 0) {
-      // Remove day
       state.completedDays.splice(idx, 1);
     } else {
-      // Add day
       state.completedDays.push(dayNum);
       state.completedDays.sort((a, b) => a - b);
       state.lastCompletedAt = new Date().toISOString();
@@ -130,7 +125,7 @@ const BiblePlan = {
     if (typeof UI !== 'undefined' && UI.toast) {
       if (idx < 0) {
         if (state.completedDays.length === 365) {
-          UI.toast('Congratulations! You have completed the entire Bible!', 'success');
+          UI.toast('All 365 days completed! Glory to God.', 'success');
         } else {
           UI.toast(`Day ${dayNum} marked as completed`, 'success');
         }
@@ -158,29 +153,23 @@ const BiblePlan = {
       return;
     }
 
-    const confirmed = confirm(
-      'Congratulations on completing the entire Bible in 365 days!\n\nWould you like to reset your progress and begin your next round of Bible reading?'
-    );
+    state.historyRound = (state.historyRound || 1) + 1;
+    state.completedDays = [];
+    state.startedAt = new Date().toISOString();
+    state.lastCompletedAt = null;
+    state.folderExpanded = false;
+    await this.saveState(state);
 
-    if (confirmed) {
-      state.historyRound = (state.historyRound || 1) + 1;
-      state.completedDays = [];
-      state.startedAt = new Date().toISOString();
-      state.lastCompletedAt = null;
-      state.folderExpanded = false;
-      await this.saveState(state);
-
-      if (typeof UI !== 'undefined' && UI.toast) {
-        UI.toast(`Round ${state.historyRound} started! Keep reading the Word of God.`, 'success');
-      }
-
-      this.render();
-      this.renderHomeWidget();
+    if (typeof UI !== 'undefined' && UI.toast) {
+      UI.toast(`Round ${state.historyRound} started.`, 'success');
     }
+
+    this.render();
+    this.renderHomeWidget();
   },
 
   // =========================================================================
-  // VIEW RENDERER (Full view in #view-bible-plan)
+  // MAIN VIEW RENDERER
   // =========================================================================
 
   render() {
@@ -190,8 +179,8 @@ const BiblePlan = {
     const state = this.getState();
     const activePlan = this.getActivePlan();
 
-    // 1. If NO plan is chosen yet: Render Plan Selection Screen
-    if (!activePlan) {
+    // 1. If NO plan is chosen yet: Render Clean Plan Selection Screen
+    if (!state.activePlanId || !activePlan) {
       container.innerHTML = this.renderPlanSelectionHtml();
       return;
     }
@@ -205,72 +194,37 @@ const BiblePlan = {
 
     return `
       <div class="bible-plan-container">
-        
-        <!-- Header -->
+        <!-- Top Bar -->
         <div class="bible-plan-top-bar">
-          <button class="bible-plan-back-btn" onclick="App.switchTab('dashboard')" aria-label="Back to Dashboard">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+          <button class="bible-plan-back-btn" onclick="App.switchTab('dashboard')" aria-label="Back to Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
               <polyline points="15 18 9 12 15 6"/>
             </svg>
             <span>Home</span>
           </button>
-          <div class="bible-plan-header-title">365-Day Bible Reading</div>
+          <div class="bible-plan-header-title">Bible Reading Plan</div>
+          <div style="width: 60px;"></div>
         </div>
 
-        <!-- Hero Intro Card -->
-        <div class="bible-plan-intro-card">
-          <div class="bible-plan-intro-badge">Personal Devotional Journey</div>
-          <h2 class="bible-plan-intro-title">Read the Complete Bible in One Year</h2>
-          <p class="bible-plan-intro-desc">
-            Choose a reading schedule designed for your spiritual rhythm. No calendar dates or guilt — simply read Day by Day at your own pace, with dedicated Sunday worship scriptures and daily prayer wisdom.
-          </p>
-        </div>
+        <!-- Minimal Subtitle -->
+        <p class="bible-plan-sub-lead">Select your reading plan to begin.</p>
 
-        <!-- Plan Selection Options Grid -->
+        <!-- Two Clean Choice Cards -->
         <div class="bible-plan-cards-grid">
           ${plans.map(p => `
             <div class="bible-plan-choice-card">
-              <div class="bible-plan-choice-header">
-                <span class="bible-plan-pill">${p.badge}</span>
-                <span class="bible-plan-pill-sub">${p.totalDays} Days</span>
-              </div>
-              <h3 class="bible-plan-choice-name">${p.name}</h3>
-              <p class="bible-plan-choice-desc">${p.description}</p>
-              
-              <div class="bible-plan-features-list">
-                <div class="bible-plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px; color: var(--primary);">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                  <span>Numbered Day 1 to Day 365 (progress without calendar pressure)</span>
-                </div>
-                <div class="bible-plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px; color: var(--primary);">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                  <span>Dedicated Sunday Worship & Praise scripture on every 7th day</span>
-                </div>
-                <div class="bible-plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px; color: var(--primary);">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                  <span>Daily prayer wisdom box connecting Scripture to prayer</span>
-                </div>
-                <div class="bible-plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px; color: var(--primary);">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                  <span>Works 100% offline with automatic cloud backup</span>
-                </div>
-              </div>
-
+              <h3 class="bible-plan-choice-name">${p.shortName || p.name}</h3>
+              <p class="bible-plan-choice-desc">
+                ${p.id === 'plan_canonical' 
+                  ? 'Genesis to Revelation with Psalms and Proverbs.' 
+                  : 'Morning New Testament, Evening Old Testament.'}
+              </p>
               <button class="btn btn-primary bible-plan-select-btn" onclick="BiblePlan.selectPlan('${p.id}')">
-                Select This Reading Plan
+                Select Plan
               </button>
             </div>
           `).join('')}
         </div>
-
       </div>
     `;
   },
@@ -279,79 +233,67 @@ const BiblePlan = {
     const currentDayNum = this.getCurrentDayNumber();
     const currentDayData = plan.days.find(d => d.day === currentDayNum) || plan.days[0];
     const completedCount = state.completedDays.length;
-    const percent = Math.round((completedCount / 365) * 100);
     const isCompletedAll = (completedCount >= 365);
     const completedDaysSet = new Set(state.completedDays);
+    const sundayWorship = this.getSundayWorshipReading();
 
-    // Completed days for folded drawer
     const completedDaysList = plan.days.filter(d => completedDaysSet.has(d.day));
-
-    // Upcoming days preview (next 4 uncompleted days after currentDayNum)
     const upcomingDaysList = plan.days
       .filter(d => d.day > currentDayNum && !completedDaysSet.has(d.day))
-      .slice(0, 4);
+      .slice(0, 3);
 
     return `
       <div class="bible-plan-container">
         
-        <!-- Header -->
+        <!-- Top Bar -->
         <div class="bible-plan-top-bar">
-          <button class="bible-plan-back-btn" onclick="App.switchTab('dashboard')" aria-label="Back to Dashboard">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+          <button class="bible-plan-back-btn" onclick="App.switchTab('dashboard')" aria-label="Back to Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
               <polyline points="15 18 9 12 15 6"/>
             </svg>
             <span>Home</span>
           </button>
-          <div class="bible-plan-header-title">365-Day Bible Reading</div>
-          <button class="bible-plan-switch-btn" onclick="BiblePlan.switchPlanPrompt()" title="Switch Reading Plan">
-            <span>Change Plan</span>
+          <div class="bible-plan-header-title">Bible Reading</div>
+          <div style="width: 60px;"></div>
+        </div>
+
+        <!-- Plan Switcher Tabs (Instant 1-Click Switching) -->
+        <div class="bible-plan-tab-switch">
+          <button class="bible-plan-tab-item ${state.activePlanId === 'plan_canonical' ? 'active' : ''}" onclick="BiblePlan.selectPlan('plan_canonical')">
+            OT then NT
+          </button>
+          <button class="bible-plan-tab-item ${state.activePlanId === 'plan_morning_night' ? 'active' : ''}" onclick="BiblePlan.selectPlan('plan_morning_night')">
+            Morning NT + Night OT
           </button>
         </div>
 
-        <!-- Plan Progress Banner -->
-        <div class="bible-plan-progress-card">
-          <div class="bible-plan-progress-header">
-            <div>
-              <span class="bible-plan-pill">${plan.badge}</span>
-              <h2 class="bible-plan-active-title">${plan.name}</h2>
-              ${state.historyRound > 1 ? `<span class="bible-plan-round-badge">Round ${state.historyRound}</span>` : ''}
-            </div>
-            <div class="bible-plan-progress-stat">
-              <span class="bible-plan-stat-num">${completedCount}</span>
-              <span class="bible-plan-stat-denom">/ 365</span>
-            </div>
+        <!-- Clean Progress Header -->
+        <div class="bible-plan-progress-row">
+          <div>
+            <span class="bible-plan-progress-main">Day ${currentDayNum} of 365</span>
+            ${state.historyRound > 1 ? `<span class="bible-plan-round-text">Round ${state.historyRound}</span>` : ''}
           </div>
+          <div class="bible-plan-progress-counter">
+            ${completedCount} of 365 completed
+          </div>
+        </div>
 
-          <!-- Progress Bar -->
-          <div class="bible-plan-bar-wrapper">
-            <div class="bible-plan-bar-fill" style="width: ${percent}%;"></div>
-          </div>
-          <div class="bible-plan-bar-labels">
-            <span>${percent}% completed</span>
-            <span>${365 - completedCount} days remaining</span>
-          </div>
+        <!-- Minimal 3px Progress Line -->
+        <div class="bible-plan-progress-line">
+          <div class="bible-plan-progress-fill" style="width: ${(completedCount / 365) * 100}%;"></div>
         </div>
 
         <!-- CELEBRATION & READ AGAIN (STRICTLY ONLY WHEN 365/365 ARE COMPLETED) -->
         ${isCompletedAll ? `
           <div class="bible-plan-completed-celebration-card">
-            <div class="bible-plan-celebration-header">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px; color: #16A34A; margin-bottom: 8px;">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="9 12 12 15 16 10"/>
-              </svg>
-              <h3 class="bible-plan-celebration-title">Complete Bible Reading Finished!</h3>
-            </div>
+            <h3 class="bible-plan-celebration-title">Complete Bible Reading Finished</h3>
             <p class="bible-plan-celebration-desc">
               "Thy word is a lamp unto my feet, and a light unto my path." — Psalm 119:105<br><br>
-              You have faithfully read through all 365 days of the Holy Bible. May the Scriptures continue to dwell richly within your heart, guiding every prayer and step of your life.
+              You have read through the entire Bible.
             </p>
-            <div class="bible-plan-celebration-actions">
-              <!-- STRICT REQUIREMENT: Only shown when whole Bible is completed -->
-              <button class="btn btn-primary bible-plan-read-again-btn" onclick="BiblePlan.readAgain()">
-                Read Again (Start New Round)
-              </button>
-            </div>
+            <button class="btn btn-primary bible-plan-read-again-btn" onclick="BiblePlan.readAgain()">
+              Read Again
+            </button>
           </div>
         ` : ''}
 
@@ -359,134 +301,81 @@ const BiblePlan = {
         ${!isCompletedAll ? `
           <div class="bible-plan-active-day-card">
             <div class="bible-plan-day-top-row">
-              <div class="bible-plan-day-badge-col">
-                <span class="bible-plan-day-number-badge">Day ${currentDayData.day}</span>
-                <span class="bible-plan-day-category">${currentDayData.category}</span>
-              </div>
-              <div class="bible-plan-day-action">
-                <button class="btn btn-primary bible-plan-mark-btn" onclick="BiblePlan.toggleDay(${currentDayData.day})">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; margin-right: 6px;">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                  <span>Mark Day ${currentDayData.day} Completed</span>
-                </button>
-              </div>
+              <span class="bible-plan-day-title">Day ${currentDayData.day}</span>
+              <button class="btn btn-primary btn-sm bible-plan-mark-btn" onclick="BiblePlan.toggleDay(${currentDayData.day})">
+                Mark as Read
+              </button>
             </div>
 
-            <!-- Scripture References Box -->
+            <!-- Scripture Portion -->
             <div class="bible-plan-reading-box">
-              <span class="bible-plan-reading-label">Today's Scripture Reading</span>
-              
               ${currentDayData.morning ? `
-                <div class="bible-plan-dual-reading-row">
-                  <div class="bible-plan-sub-reading-card">
-                    <span class="bible-plan-sub-tag">Morning • New Testament</span>
-                    <strong class="bible-plan-sub-passage">${currentDayData.morning}</strong>
+                <div class="bible-plan-dual-box">
+                  <div class="bible-plan-dual-col">
+                    <span class="bible-plan-reading-lead">Morning (NT)</span>
+                    <strong class="bible-plan-passage-text">${currentDayData.morning}</strong>
                   </div>
-                  <div class="bible-plan-sub-reading-card">
-                    <span class="bible-plan-sub-tag">Night • Old Testament</span>
-                    <strong class="bible-plan-sub-passage">${currentDayData.night}</strong>
+                  <div class="bible-plan-dual-col">
+                    <span class="bible-plan-reading-lead">Night (OT)</span>
+                    <strong class="bible-plan-passage-text">${currentDayData.night}</strong>
                   </div>
                 </div>
               ` : `
-                <div class="bible-plan-canonical-reading-row">
-                  <strong class="bible-plan-main-passage">${currentDayData.reading}</strong>
-                </div>
+                <strong class="bible-plan-passage-text">${currentDayData.reading}</strong>
               `}
             </div>
 
-            <!-- SUNDAY WORSHIP & PRAISE SPOTLIGHT (IF SUNDAY) -->
-            ${currentDayData.isSunday && currentDayData.worshipReading ? `
-              <div class="bible-plan-worship-spotlight-card">
-                <div class="bible-plan-worship-header">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--primary);">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                  </svg>
-                  <span class="bible-plan-worship-label">Lord's Day Worship & Praise Reading</span>
-                </div>
-                <div class="bible-plan-worship-content">
-                  <strong class="bible-plan-worship-passage">${currentDayData.worshipReading}</strong>
-                  <div class="bible-plan-worship-theme">Theme: ${currentDayData.worshipTheme}</div>
-                  <p class="bible-plan-worship-verse">"${currentDayData.worshipVerse}"</p>
-                </div>
+            <!-- SUNDAY WORSHIP (ONLY DISPLAYED ON ACTUAL SUNDAYS!) -->
+            ${sundayWorship ? `
+              <div class="bible-plan-sunday-worship-card">
+                <span class="bible-plan-sunday-lead">Sunday Worship Reading</span>
+                <strong class="bible-plan-sunday-passage">${sundayWorship.passage}</strong>
+                <p class="bible-plan-sunday-verse">"${sundayWorship.verse}"</p>
               </div>
             ` : ''}
 
             <!-- DAILY PRAYER WISDOM BOX -->
-            <div class="bible-plan-prayer-wisdom-card">
-              <div class="bible-plan-wisdom-header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--navy-900);">
-                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-                </svg>
-                <span class="bible-plan-wisdom-title">Daily Prayer Wisdom</span>
-              </div>
-              <p class="bible-plan-wisdom-text">"${currentDayData.prayerWisdom.text}"</p>
-              <div class="bible-plan-wisdom-theme">— ${currentDayData.prayerWisdom.theme}</div>
+            <div class="bible-plan-prayer-box">
+              <p class="bible-plan-prayer-text">"${currentDayData.prayerWisdom.text}"</p>
             </div>
-
           </div>
         ` : ''}
 
-        <!-- COMPLETED DAYS FOLDED DRAWER (ACCORDION) -->
+        <!-- COMPLETED DAYS FOLDED DRAWER -->
         ${completedCount > 0 ? `
           <div class="bible-plan-folded-drawer">
             <button class="bible-plan-folder-toggle" onclick="BiblePlan.toggleFolder()">
-              <div class="bible-plan-folder-left">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                <span class="bible-plan-folder-title">Completed Days (${completedCount} of 365)</span>
-              </div>
-              <div class="bible-plan-folder-right">
-                <span class="bible-plan-folder-hint">${state.folderExpanded ? 'Fold back' : 'View folded'}</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bible-plan-folder-chevron ${state.folderExpanded ? 'rotated' : ''}" style="width: 16px; height: 16px;">
-                  <polyline points="6 9 12 15 18 9"/>
-                </svg>
-              </div>
+              <span>Completed (${completedCount})</span>
+              <span class="bible-plan-folder-hint">${state.folderExpanded ? 'Fold back' : 'View'}</span>
             </button>
 
             ${state.folderExpanded ? `
               <div class="bible-plan-folded-content">
-                <div class="bible-plan-history-table">
-                  ${completedDaysList.map(d => `
-                    <div class="bible-plan-history-row">
-                      <div class="bible-plan-history-info">
-                        <span class="bible-plan-history-day">Day ${d.day}</span>
-                        <span class="bible-plan-history-reading">${d.reading}</span>
-                        ${d.isSunday ? `<span class="bible-plan-history-sunday">Worship: ${d.worshipReading}</span>` : ''}
-                      </div>
-                      <button class="bible-plan-history-uncheck-btn" onclick="BiblePlan.toggleDay(${d.day})" title="Mark as unread">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; color: #16A34A;">
-                          <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        <span>Completed</span>
-                      </button>
+                ${completedDaysList.map(d => `
+                  <div class="bible-plan-history-row">
+                    <div>
+                      <strong>Day ${d.day}</strong>: ${d.reading}
                     </div>
-                  `).join('')}
-                </div>
+                    <button class="bible-plan-uncheck-btn" onclick="BiblePlan.toggleDay(${d.day})" title="Mark unread">
+                      Undo
+                    </button>
+                  </div>
+                `).join('')}
               </div>
             ` : ''}
           </div>
         ` : ''}
 
-        <!-- UPCOMING DAYS PREVIEW -->
+        <!-- UPCOMING PREVIEW -->
         ${upcomingDaysList.length > 0 ? `
           <div class="bible-plan-upcoming-card">
-            <div class="bible-plan-upcoming-header">
-              <span class="bible-plan-upcoming-title">Upcoming Scripture Portions</span>
-              <span class="bible-plan-upcoming-sub">Next readings ahead</span>
-            </div>
-            <div class="bible-plan-upcoming-list">
-              ${upcomingDaysList.map(d => `
-                <div class="bible-plan-upcoming-row">
-                  <div class="bible-plan-upcoming-left">
-                    <span class="bible-plan-upcoming-day">Day ${d.day}</span>
-                    <span class="bible-plan-upcoming-passage">${d.reading}</span>
-                  </div>
-                  <span class="bible-plan-upcoming-cat">${d.category}</span>
-                </div>
-              `).join('')}
-            </div>
+            <div class="bible-plan-upcoming-title">Upcoming</div>
+            ${upcomingDaysList.map(d => `
+              <div class="bible-plan-upcoming-row">
+                <span>Day ${d.day}</span>
+                <strong>${d.reading}</strong>
+              </div>
+            `).join('')}
           </div>
         ` : ''}
 
@@ -495,8 +384,8 @@ const BiblePlan = {
   },
 
   // =========================================================================
-  // HOME SCREEN / DASHBOARD INTEGRATION
-  // STRICT RULE: If the user has NOT chosen a plan, DO NOT display it!
+  // HOME SCREEN WIDGET
+  // STRICT: Only visible if a plan is active. No background colors.
   // =========================================================================
 
   renderHomeWidget() {
@@ -506,7 +395,7 @@ const BiblePlan = {
     const state = this.getState();
     const activePlan = this.getActivePlan();
 
-    // STRICT CHECK: If user has not chosen a plan, do NOT display on Home screen
+    // STRICT CHECK: If user has not chosen a plan, hide completely
     if (!activePlan || !state.activePlanId) {
       cardEl.style.display = 'none';
       cardEl.innerHTML = '';
@@ -516,26 +405,21 @@ const BiblePlan = {
     const currentDayNum = this.getCurrentDayNumber();
     const currentDayData = activePlan.days.find(d => d.day === currentDayNum) || activePlan.days[0];
     const isCompletedAll = (state.completedDays.length >= 365);
-    const percent = Math.round((state.completedDays.length / 365) * 100);
+    const sundayWorship = this.getSundayWorshipReading();
 
     cardEl.style.display = 'block';
 
     if (isCompletedAll) {
       cardEl.innerHTML = `
-        <div class="home-bible-widget-card">
-          <div class="home-bible-widget-header">
-            <div class="home-bible-widget-brand">
-              <span class="home-bible-tag">Bible Reading</span>
-              <strong class="home-bible-plan-name">${activePlan.name}</strong>
-            </div>
-            <span class="home-bible-day-pill">365 / 365 Completed</span>
+        <div class="home-bible-card">
+          <div class="home-bible-header">
+            <span class="home-bible-title">Bible Reading Completed</span>
+            <span class="home-bible-plan-label">365 / 365</span>
           </div>
-          <p class="home-bible-desc" style="margin: 8px 0;">
-            Congratulations! You have completed all 365 days of the Bible. Open your reading plan to view your full journey.
-          </p>
+          <p class="home-bible-desc">You have completed all 365 days of the Bible.</p>
           <div class="home-bible-actions">
             <button class="btn btn-secondary btn-sm" onclick="App.switchTab('bible-plan')">
-              Open Reading Plan &rarr;
+              Open Plan &rarr;
             </button>
           </div>
         </div>
@@ -543,58 +427,36 @@ const BiblePlan = {
       return;
     }
 
+    const readingText = currentDayData.morning 
+      ? `Morning: ${currentDayData.morning} &bull; Night: ${currentDayData.night}` 
+      : currentDayData.reading;
+
     cardEl.innerHTML = `
-      <div class="home-bible-widget-card">
-        <div class="home-bible-widget-header">
-          <div class="home-bible-widget-brand">
-            <span class="home-bible-tag">Daily Bible Reading</span>
-            <strong class="home-bible-plan-name">${activePlan.shortName || activePlan.name}</strong>
-          </div>
-          <span class="home-bible-day-pill">Day ${currentDayData.day} of 365</span>
+      <div class="home-bible-card">
+        <div class="home-bible-header">
+          <span class="home-bible-title">Bible Reading &bull; Day ${currentDayData.day}</span>
+          <span class="home-bible-plan-label">${activePlan.shortName || activePlan.name}</span>
         </div>
 
-        <div class="home-bible-reading-content">
-          <div class="home-bible-passage-row">
-            ${currentDayData.morning ? `
-              <div class="home-bible-dual-row">
-                <div class="home-bible-dual-item">
-                  <span class="home-bible-mini-label">Morning</span>
-                  <strong class="home-bible-mini-text">${currentDayData.morning}</strong>
-                </div>
-                <div class="home-bible-dual-item">
-                  <span class="home-bible-mini-label">Night</span>
-                  <strong class="home-bible-mini-text">${currentDayData.night}</strong>
-                </div>
-              </div>
-            ` : `
-              <div class="home-bible-canonical-item">
-                <span class="home-bible-mini-label">${currentDayData.category}</span>
-                <strong class="home-bible-main-text">${currentDayData.reading}</strong>
-              </div>
-            `}
-          </div>
+        <div class="home-bible-reading-row">
+          <strong class="home-bible-passage">${readingText}</strong>
+        </div>
 
-          ${currentDayData.isSunday && currentDayData.worshipReading ? `
-            <div class="home-bible-sunday-spotlight">
-              <span class="home-bible-sunday-tag">Sunday Worship:</span>
-              <span class="home-bible-sunday-passage">${currentDayData.worshipReading}</span>
-            </div>
-          ` : ''}
-
-          <div class="home-bible-wisdom-snippet">
-            <span class="home-bible-wisdom-label">Prayer Wisdom:</span>
-            <span class="home-bible-wisdom-quote">"${currentDayData.prayerWisdom.text.substring(0, 110)}..."</span>
+        ${sundayWorship ? `
+          <div class="home-bible-sunday-row">
+            <span>Sunday Worship: <strong>${sundayWorship.passage}</strong></span>
           </div>
+        ` : ''}
+
+        <div class="home-bible-prayer-row">
+          "${currentDayData.prayerWisdom.text}"
         </div>
 
         <div class="home-bible-actions">
-          <button class="btn btn-primary btn-sm home-bible-mark-btn" onclick="BiblePlan.toggleDay(${currentDayData.day})">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 5px;">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-            <span>Mark Day ${currentDayData.day} Read</span>
+          <button class="btn btn-primary btn-sm" onclick="BiblePlan.toggleDay(${currentDayData.day})">
+            Mark as Read
           </button>
-          <button class="btn btn-secondary btn-sm home-bible-open-btn" onclick="App.switchTab('bible-plan')">
+          <button class="btn btn-secondary btn-sm" onclick="App.switchTab('bible-plan')">
             Open Plan &rarr;
           </button>
         </div>
@@ -603,7 +465,6 @@ const BiblePlan = {
   },
 
   init() {
-    // Listen for storage changes
     window.addEventListener('storage', (e) => {
       if (e.key === this.STORAGE_KEY) {
         this.render();
@@ -611,7 +472,6 @@ const BiblePlan = {
       }
     });
 
-    // Initial render of home widget
     this.renderHomeWidget();
   }
 };

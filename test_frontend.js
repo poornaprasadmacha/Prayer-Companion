@@ -301,32 +301,26 @@ assert.strictEqual(plan2.days.length, 365, 'Plan 2 must have exactly 365 days');
 assert.ok(plan2.days[0].morning, 'Plan 2 must have morning reading');
 assert.ok(plan2.days[0].night, 'Plan 2 must have night reading');
 
-// Check Sunday Worship on every 7th day
+// Check Sunday Worship Readings collection
 assert.strictEqual(BiblePlanData.sundayWorship.length, 52, '52 Sunday worship readings must exist');
-for (let d = 7; d <= 365; d += 7) {
-  assert.strictEqual(plan1.days[d - 1].isSunday, true, `Day ${d} must be flagged as Sunday in Plan 1`);
-  assert.ok(plan1.days[d - 1].worshipReading, `Day ${d} must include worship reading in Plan 1`);
-  assert.strictEqual(plan2.days[d - 1].isSunday, true, `Day ${d} must be flagged as Sunday in Plan 2`);
-  assert.ok(plan2.days[d - 1].worshipReading, `Day ${d} must include worship reading in Plan 2`);
-}
 
 // Check Daily Prayer Wisdom on all 365 days
 for (let i = 0; i < 365; i++) {
   const w1 = plan1.days[i].prayerWisdom;
-  assert.ok(w1 && w1.theme && w1.text, `Day ${i + 1} must include prayer wisdom theme and text in Plan 1`);
+  assert.ok(w1 && w1.text, `Day ${i + 1} must include prayer wisdom text in Plan 1`);
   const w2 = plan2.days[i].prayerWisdom;
-  assert.ok(w2 && w2.theme && w2.text, `Day ${i + 1} must include prayer wisdom theme and text in Plan 2`);
+  assert.ok(w2 && w2.text, `Day ${i + 1} must include prayer wisdom text in Plan 2`);
 }
 
-console.log('✓ Verified Plan 1 (Canonical/Thematic): 365 days with Genesis to Revelation sequence');
-console.log('✓ Verified Plan 2 (Morning NT + Night OT): 365 days with dual daily portions');
-console.log('✓ Verified 52 Sunday worship and praise readings on every 7th day');
+console.log('✓ Verified Plan 1 (OT followed by NT): 365 days');
+console.log('✓ Verified Plan 2 (Morning NT + Night OT): 365 days');
+console.log('✓ Verified 52 Sunday worship and praise readings');
 console.log('✓ Verified 365 daily prayer wisdom reflections');
 
 // ============================================================================
 // VERIFY BIBLE PLAN CONTROLLER LOGIC (OFFLINE STORAGE, UNCHECK, RESET GUARDS)
 // ============================================================================
-console.log('\nVerifying BiblePlan controller logic and strict completion rules...');
+console.log('\nVerifying BiblePlan controller logic, plan switcher, and Sunday check...');
 
 // Mock browser localStorage and DOM
 const mockStorage = {};
@@ -375,6 +369,16 @@ assert.strictEqual(mockElements['home-bible-reading-card'].style.display, 'block
 assert.ok(mockElements['home-bible-reading-card'].innerHTML.includes('Day 1'), 'Home widget must display Day 1');
 console.log('✓ Verified: Home screen widget displays Day 1 when plan is selected');
 
+// 2.5 Instant Plan Switcher (switch to Plan 2 directly without alerts)
+BiblePlan.selectPlan('plan_morning_night');
+assert.strictEqual(BiblePlan.getState().activePlanId, 'plan_morning_night', 'Active plan must switch instantly to plan_morning_night');
+BiblePlan.renderHomeWidget();
+assert.ok(mockElements['home-bible-reading-card'].innerHTML.includes('Morning:'), 'Home widget must display dual reading after switching');
+console.log('✓ Verified: Change Plan works seamlessly with instant switching');
+
+// Switch back to Plan 1
+BiblePlan.selectPlan('plan_canonical');
+
 // 3. Mark Day 1 complete -> Next active day unfolds to Day 2
 BiblePlan.toggleDay(1);
 assert.deepStrictEqual(BiblePlan.getState().completedDays, [1], 'Day 1 must be marked complete');
@@ -383,6 +387,18 @@ assert.strictEqual(BiblePlan.getCurrentDayNumber(), 2, 'Current uncompleted day 
 BiblePlan.renderHomeWidget();
 assert.ok(mockElements['home-bible-reading-card'].innerHTML.includes('Day 2'), 'Home widget must now display Day 2');
 console.log('✓ Verified: Day 1 folds back and Day 2 unfolds as active reading');
+
+// 3.5 Real-life Sunday check verification
+assert.strictEqual(typeof BiblePlan.isTodaySunday(), 'boolean', 'isTodaySunday() returns boolean');
+const isRealSunday = (new Date().getDay() === 0);
+assert.strictEqual(BiblePlan.isTodaySunday(), isRealSunday, 'isTodaySunday must match actual current weekday (Sunday = 0)');
+if (!isRealSunday) {
+  assert.strictEqual(BiblePlan.getSundayWorshipReading(), null, 'Sunday worship reading must be null when today is NOT Sunday');
+  console.log('✓ Verified: Sunday worship reading is NOT included on non-Sundays');
+} else {
+  assert.ok(BiblePlan.getSundayWorshipReading(), 'Sunday worship reading is included on actual Sunday');
+  console.log('✓ Verified: Sunday worship reading is included on actual Sunday');
+}
 
 // 4. Strict Guard: Read Again MUST NOT be allowed when < 365 days
 BiblePlan.readAgain();
@@ -398,8 +414,8 @@ assert.strictEqual(BiblePlan.isAllCompleted(), true, 'isAllCompleted() must retu
 
 BiblePlan.render();
 const planHtml = mockElements['view-bible-plan'].innerHTML;
-assert.ok(planHtml.includes('Complete Bible Reading Finished!'), 'Celebration message must be rendered on completion');
-assert.ok(planHtml.includes('Read Again (Start New Round)'), 'Read Again button must be rendered on completion');
+assert.ok(planHtml.includes('Complete Bible Reading Finished'), 'Celebration message must be rendered on completion');
+assert.ok(planHtml.includes('Read Again'), 'Read Again button must be rendered on completion');
 
 // Test Read Again resets safely and increments round
 BiblePlan.readAgain();
@@ -408,10 +424,11 @@ assert.strictEqual(stateAfterReset.completedDays.length, 0, 'Completed days must
 assert.strictEqual(stateAfterReset.historyRound, 2, 'History round must increment to 2');
 console.log('✓ Verified: "Read Again" resets cleanly to Round 2 once all 365 days are completed');
 
-// Verify zero emojis in generated markup
+// Verify zero emojis and zero tags in generated markup
 const emojiRegex = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u;
 assert.ok(!emojiRegex.test(planHtml), 'No emojis should be present in Bible Plan view');
-console.log('✓ Verified: Strictly zero emojis in Bible Plan interface');
+assert.ok(!planHtml.includes('Daily Bible Reading'), 'No "Daily Bible Reading" tag should be present');
+console.log('✓ Verified: Strictly zero emojis and zero unnecessary tags in Bible Plan interface');
 
 console.log('✓ Frontend and Bible Plan verification passed successfully.\n');
 
