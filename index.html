@@ -1733,7 +1733,7 @@
           <!-- Right Action Controls -->
           <div class="bible-reader-top-actions">
             <!-- Offline Status / Download Pill -->
-            <button id="bible-reader-offline-btn" class="bible-offline-badge-btn" onclick="BibleReader.openOfflineModal()" title="Holy Bible Offline Status & Download" aria-label="Bible offline status">
+            <button id="bible-reader-offline-btn" class="bible-offline-badge-btn" onclick="BibleReader.handleOfflineBadgeClick()" title="Holy Bible Offline Status & Download" aria-label="Bible offline status">
               <span id="bible-reader-offline-icon" class="bible-offline-icon">✓</span>
               <span id="bible-reader-offline-text" class="bible-offline-text">Offline Ready</span>
             </button>
@@ -1815,7 +1815,7 @@
               <span class="bible-picker-offline-dot"></span>
               <span id="bible-picker-offline-label">Offline: Checking...</span>
             </div>
-            <button id="bible-picker-offline-dl-btn" class="bible-picker-offline-dl-btn" onclick="BibleReader.startFullOfflineDownload()">
+            <button id="bible-picker-offline-dl-btn" class="bible-picker-offline-dl-btn" onclick="BibleReader.handleOfflineBadgeClick()">
               Download All (Offline)
             </button>
           </div>

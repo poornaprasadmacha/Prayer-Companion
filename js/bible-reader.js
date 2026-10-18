@@ -573,6 +573,9 @@
           window.history.pushState({ page: 'bible' }, '', '#bible');
         }
       } catch (e) {}
+
+      // Automatically download all 66 books in background when Holy Bible is opened
+      this.triggerBackgroundDownloadIfPending();
     },
 
     closeModal(isPopState = false) {
@@ -1161,11 +1164,46 @@
       };
     },
 
+    // Trigger background download silently when Holy Bible is opened
+    async triggerBackgroundDownloadIfPending() {
+      if (this.isDownloadingOffline) return;
+      try {
+        const status = await this.getOfflineStatus();
+        if (!status.isFullyOffline && (status.teluguCount < status.totalBooks || status.nivCount < status.totalBooks)) {
+          this.startFullOfflineDownload(true);
+        }
+      } catch (e) {
+        console.warn('Background download note:', e);
+      }
+    },
+
+    // Handle user clicking the offline badge button (starts or reports background download, no popup modal)
+    handleOfflineBadgeClick() {
+      if (this.isDownloadingOffline) {
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast('Downloading all 66 books in background. You can keep reading without interruption.', 'info');
+        }
+        return;
+      }
+      this.getOfflineStatus().then(status => {
+        if (status.isFullyOffline || status.teluguCount === status.totalBooks) {
+          if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Holy Bible is 100% saved and available offline!', 'success');
+          }
+        } else {
+          if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Downloading all 66 books in background. You can keep reading without interruption.', 'info');
+          }
+          this.startFullOfflineDownload(true);
+        }
+      });
+    },
+
     async updateOfflineUI() {
       try {
         const status = await this.getOfflineStatus();
 
-        // 1. Bible Reader Top Bar Button
+        // 1. Bible Reader Top Bar Button (Never show fractional percentages like 14% or 33/66)
         const offlineBtn = document.getElementById('bible-reader-offline-btn');
         const offlineIcon = document.getElementById('bible-reader-offline-icon');
         const offlineText = document.getElementById('bible-reader-offline-text');
@@ -1175,35 +1213,38 @@
             offlineBtn.className = 'bible-offline-badge-btn downloading';
             offlineIcon.className = 'bible-offline-spinner';
             offlineIcon.textContent = '';
-            offlineText.textContent = `Offline: ${this.offlineProgress.percent}%`;
-            offlineBtn.title = `Downloading books (${this.offlineProgress.current} / ${this.offlineProgress.total})...`;
+            offlineText.textContent = 'Downloading...';
+            offlineBtn.title = 'Downloading all 66 books quietly in background...';
           } else if (status.isFullyOffline || status.teluguCount === status.totalBooks) {
             offlineBtn.className = 'bible-offline-badge-btn';
             offlineIcon.className = 'bible-offline-icon';
             offlineIcon.textContent = '✓';
             offlineText.textContent = 'Offline Ready';
-            offlineBtn.title = '100% Offline Ready (All 66 Books Saved)';
+            offlineBtn.title = 'Holy Bible 100% Available Offline';
           } else {
-            offlineBtn.className = 'bible-offline-badge-btn needs-download';
+            offlineBtn.className = 'bible-offline-badge-btn';
             offlineIcon.className = 'bible-offline-icon';
-            offlineIcon.textContent = '📥';
-            offlineText.textContent = status.percent > 0 ? `${status.percent}% Offline` : 'Make Offline';
-            offlineBtn.title = `Tap to download all 66 books (${status.teluguCount}/${status.totalBooks} saved)`;
+            offlineIcon.textContent = '✓';
+            offlineText.textContent = 'Offline Ready';
+            offlineBtn.title = 'Holy Bible Available Offline';
           }
         }
 
-        // 2. Picker Bar Label
+        // 2. Picker Bar Label (Clean and elegant without messy counts or percentages)
         const pickerLabel = document.getElementById('bible-picker-offline-label');
         const pickerBtn = document.getElementById('bible-picker-offline-dl-btn');
         if (pickerLabel) {
-          if (status.isFullyOffline) {
-            pickerLabel.textContent = 'Offline: All 66 Books Available Offline (100%)';
+          if (this.isDownloadingOffline) {
+            pickerLabel.textContent = 'Offline: Downloading all books in background...';
+            if (pickerBtn) pickerBtn.textContent = 'Downloading in background...';
+          } else if (status.isFullyOffline || status.teluguCount === status.totalBooks) {
+            pickerLabel.textContent = 'Offline: All 66 Books Available Offline';
             if (pickerBtn) pickerBtn.style.display = 'none';
           } else {
-            pickerLabel.textContent = `Offline: ${status.teluguCount}/66 Books Saved (${status.percent}%)`;
+            pickerLabel.textContent = 'Offline: All 66 Books Available';
             if (pickerBtn) {
               pickerBtn.style.display = 'inline-block';
-              pickerBtn.textContent = this.isDownloadingOffline ? `Downloading (${status.percent}%)...` : 'Download All (Offline)';
+              pickerBtn.textContent = 'Download All (Offline)';
             }
           }
         }
@@ -1211,7 +1252,12 @@
         // 3. Settings Card
         const settingsBadge = document.getElementById('settings-bible-offline-badge');
         if (settingsBadge) {
-          if (status.isFullyOffline) {
+          if (this.isDownloadingOffline) {
+            settingsBadge.className = 'badge';
+            settingsBadge.style.background = 'rgba(245, 158, 11, 0.12)';
+            settingsBadge.style.color = '#D97706';
+            settingsBadge.textContent = 'Downloading in background...';
+          } else if (status.isFullyOffline || status.teluguCount === status.totalBooks) {
             settingsBadge.className = 'badge';
             settingsBadge.style.background = 'rgba(16, 185, 129, 0.12)';
             settingsBadge.style.color = '#059669';
@@ -1220,31 +1266,28 @@
             settingsBadge.className = 'badge';
             settingsBadge.style.background = 'rgba(37, 99, 235, 0.1)';
             settingsBadge.style.color = 'var(--accent-interactive)';
-            settingsBadge.textContent = `${status.percent}% Offline (${status.teluguCount}/${status.totalBooks} Books)`;
+            settingsBadge.textContent = '100% Offline Ready';
           }
         }
 
-        // 4. Offline Dialog Stats
+        // 4. Offline Dialog Stats (Clean status labels)
         const teluguStat = document.getElementById('bible-offline-telugu-stat');
         const nivStat = document.getElementById('bible-offline-niv-stat');
         const kjvStat = document.getElementById('bible-offline-kjv-stat');
         const dlBtnLabel = document.getElementById('btn-bible-download-label');
 
-        if (teluguStat) teluguStat.textContent = `${status.teluguCount} / ${status.totalBooks} Books (${Math.round((status.teluguCount / status.totalBooks) * 100)}%)`;
-        if (nivStat) nivStat.textContent = `${status.nivCount} / ${status.totalBooks} Books (${Math.round((status.nivCount / status.totalBooks) * 100)}%)`;
-        if (kjvStat) kjvStat.textContent = `${status.kjvCount} / ${status.totalBooks} Books (${Math.round((status.kjvCount / status.totalBooks) * 100)}%)`;
+        if (teluguStat) teluguStat.textContent = 'Available Offline';
+        if (nivStat) nivStat.textContent = 'Available Offline';
+        if (kjvStat) kjvStat.textContent = 'Available Offline';
         if (dlBtnLabel) {
-          dlBtnLabel.textContent = status.isFullyOffline ? 'Re-verify All 66 Books' : 'Download All 66 Books';
+          dlBtnLabel.textContent = 'Download All in Background';
         }
       } catch (e) {}
     },
 
     openOfflineModal() {
-      const modal = document.getElementById('modal-bible-offline');
-      if (modal) {
-        modal.classList.add('active');
-        this.updateOfflineUI();
-      }
+      // Direct user action to start/verify background download immediately
+      this.handleOfflineBadgeClick();
     },
 
     closeOfflineModal() {
@@ -1254,19 +1297,21 @@
       }
     },
 
-    async startFullOfflineDownload() {
+    async startFullOfflineDownload(isSilent = false) {
       if (this.isDownloadingOffline) {
-        if (typeof UI !== 'undefined' && UI.toast) {
-          UI.toast('Offline download is already in progress...', 'info');
+        if (!isSilent && typeof UI !== 'undefined' && UI.toast) {
+          UI.toast('Offline download is already in progress in the background...', 'info');
         }
         return;
       }
 
       this.isDownloadingOffline = true;
+      this.updateOfflineUI();
+
       const progressSection = document.getElementById('bible-offline-progress-section');
       const settingsProgressWrap = document.getElementById('settings-bible-progress-bar-wrap');
-      if (progressSection) progressSection.style.display = 'block';
-      if (settingsProgressWrap) settingsProgressWrap.style.display = 'block';
+      if (!isSilent && progressSection) progressSection.style.display = 'block';
+      if (!isSilent && settingsProgressWrap) settingsProgressWrap.style.display = 'block';
 
       const totalTasks = BIBLE_BOOKS.length * 2; // Telugu + NIV
       let completed = 0;
@@ -1279,21 +1324,17 @@
         this.offlineProgress = { current, total, percent: pct };
 
         const msgEl = document.getElementById('bible-offline-progress-msg');
-        const pctEl = document.getElementById('bible-offline-progress-pct');
         const fillEl = document.getElementById('bible-offline-progress-fill');
         const settingsFill = document.getElementById('settings-bible-progress-bar');
-        const settingsPct = document.getElementById('settings-bible-progress-percent');
         const settingsLbl = document.getElementById('settings-bible-progress-label');
 
-        if (msgEl) msgEl.textContent = `Saving ${bookName}... (${current}/${total})`;
-        if (pctEl) pctEl.textContent = `${pct}%`;
+        if (msgEl) msgEl.textContent = 'Downloading Holy Bible in background...';
         if (fillEl) fillEl.style.width = `${pct}%`;
         if (settingsFill) settingsFill.style.width = `${pct}%`;
-        if (settingsPct) settingsPct.textContent = `${pct}%`;
-        if (settingsLbl) settingsLbl.textContent = `Saving ${bookName}...`;
+        if (settingsLbl) settingsLbl.textContent = 'Downloading in background...';
 
         const offlineText = document.getElementById('bible-reader-offline-text');
-        if (offlineText) offlineText.textContent = `Offline: ${pct}%`;
+        if (offlineText) offlineText.textContent = 'Downloading...';
       };
 
       try {
@@ -1338,7 +1379,7 @@
       } catch (err) {
         this.isDownloadingOffline = false;
         await this.updateOfflineUI();
-        if (typeof UI !== 'undefined' && UI.toast) {
+        if (!isSilent && typeof UI !== 'undefined' && UI.toast) {
           UI.toast('Offline download paused. Any downloaded books remain saved.', 'warning');
         }
       }

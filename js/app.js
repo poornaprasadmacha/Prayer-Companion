@@ -95,6 +95,10 @@ const App = {
     if (typeof VerseNotifications !== 'undefined' && VerseNotifications.startScheduler) {
       VerseNotifications.startScheduler();
     }
+
+    // 10. Background Preload of Community Prayers
+    // Loads community prayer requests silently in background even if user has not navigated to community tab
+    this.preloadCommunityPrayersInBackground();
   },
 
   // ==========================================================================
@@ -1693,6 +1697,31 @@ const App = {
   // COMMUNITY PRAYER COMPANIONS VIEW
   // ==========================================================================
 
+  async preloadCommunityPrayersInBackground() {
+    try {
+      // 1. Instantly hydrate in-memory cache from IndexedDB / localStorage
+      if (typeof Community !== 'undefined' && Community.getCachedRequests) {
+        await Community.getCachedRequests();
+      }
+      // 2. Silently fetch fresh community prayer requests in background
+      if (typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn()) {
+        if (typeof Community !== 'undefined' && Community.getRequests) {
+          Community.getRequests({ filterType: 'recent', category: 'all', page: 1, limit: 15 }).then(data => {
+            const container = document.getElementById('community-requests-container');
+            const emptyState = document.getElementById('community-empty-state');
+            if (this.currentTab === 'community' && container) {
+              this.renderCommunityCards(container, emptyState, data);
+            }
+          }).catch(err => {
+            console.warn('Silent background community preload note:', err);
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('Preload community prayers error:', e);
+    }
+  },
+
   async renderCommunityView() {
     const container = document.getElementById('community-requests-container');
     const emptyState = document.getElementById('community-empty-state');
@@ -2716,6 +2745,7 @@ const App = {
           UI.toast('Signed in successfully! Welcome to Prayerly.', 'success');
           this.renderHeader();
           await SyncEngine.initialCloudPull();
+          this.preloadCommunityPrayersInBackground();
           await this.renderCurrentView();
           this.checkOnboardingState();
         } catch (err) {

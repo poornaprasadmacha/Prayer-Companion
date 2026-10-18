@@ -661,6 +661,21 @@ assert.strictEqual(typeof BibleReader.autoCachePlanBooks, 'function', 'BibleRead
   assert.strictEqual(typeof status.nivCount, 'number', 'nivCount must be number');
   assert.strictEqual(typeof status.percent, 'number', 'percent must be number');
   console.log('✓ Verified: BibleReader offline engine calculates 66-book offline availability metrics');
+
+  // 5. Verify Zero Percentage Clutter & Pure Background Download
+  assert.strictEqual(typeof BibleReader.triggerBackgroundDownloadIfPending, 'function', 'BibleReader.triggerBackgroundDownloadIfPending must be a function');
+  assert.strictEqual(typeof BibleReader.handleOfflineBadgeClick, 'function', 'BibleReader.handleOfflineBadgeClick must be a function');
+  const bibleReaderCode = fs.readFileSync('js/bible-reader.js', 'utf8');
+  assert.ok(!bibleReaderCode.includes('${status.percent}% Offline'), 'js/bible-reader.js must NOT output fractional offline percentage text');
+  assert.ok(!bibleReaderCode.includes('${status.teluguCount}/66 Books Saved'), 'js/bible-reader.js must NOT output fractional book counts in picker');
+  assert.ok(bibleReaderCode.includes('this.triggerBackgroundDownloadIfPending()'), 'showModal must call triggerBackgroundDownloadIfPending');
+  console.log('✓ Verified: Fractional percentages and book counts are strictly removed from offline UI');
+
+  // 6. Verify Community Prayers Background Preload
+  const appCode = fs.readFileSync('js/app.js', 'utf8');
+  assert.strictEqual(typeof App.preloadCommunityPrayersInBackground, 'function', 'App.preloadCommunityPrayersInBackground must be a function');
+  assert.ok(appCode.includes('this.preloadCommunityPrayersInBackground()'), 'App.init must call preloadCommunityPrayersInBackground');
+  console.log('✓ Verified: Community prayers are preloaded automatically in background on app start');
 })();
 
 // ============================================================================
