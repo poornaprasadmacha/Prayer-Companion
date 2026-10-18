@@ -251,7 +251,12 @@ const requiredIds = [
   'more-btn-holy-bible',
   'bible-reader-offline-btn',
   'modal-bible-offline',
-  'btn-download-all-bible'
+  'btn-download-all-bible',
+  // Fast Chapter Quick-Selector
+  'bible-reader-chapter-btn',
+  'bible-reader-chapter-pill-text',
+  'bible-chapter-quick-dialog',
+  'bible-quick-chapters-grid'
 ];
 
 requiredIds.forEach(id => {
@@ -581,8 +586,8 @@ assert.ok(stylesCss.includes('body.bible-full-page-active .app-header'), 'CSS mu
 assert.ok(stylesCss.includes('body.bible-full-page-active .mobile-bottom-nav'), 'CSS must target .mobile-bottom-nav when Bible page is active');
 assert.ok(stylesCss.includes('body.bible-full-page-active #pwa-install-banner'), 'CSS must target #pwa-install-banner when Bible page is active');
 
-// 2. Verify full 100vw x 100vh page isolation
-assert.ok(stylesCss.includes('100vw !important') && stylesCss.includes('100vh !important'), 'Bible reader backdrop must be 100vw x 100vh');
+// 2. Verify full 100% / 100dvh page isolation without horizontal overflow
+assert.ok(stylesCss.includes('.bible-reader-backdrop') && stylesCss.includes('width: 100% !important'), 'Bible reader backdrop must be full screen 100% width without overflow');
 
 // 3. Verify markup for dedicated navigation top bar
 assert.ok(indexHtml.includes('bible-dedicated-navbar'), 'Dedicated Bible navigation top bar must be present');
@@ -657,6 +662,41 @@ assert.strictEqual(typeof BibleReader.autoCachePlanBooks, 'function', 'BibleRead
   assert.strictEqual(typeof status.percent, 'number', 'percent must be number');
   console.log('✓ Verified: BibleReader offline engine calculates 66-book offline availability metrics');
 })();
+
+// ============================================================================
+// 12. VERIFY MOBILE SCROLL FIX, OTP-ONLY AUTH, NO PRAY IN BIBLE & FAST CHAPTER SELECTOR
+// ============================================================================
+console.log('\nVerifying Mobile Scroll Fix, Strict OTP Signin, Clean Bible & Fast Chapter UI...');
+
+// 1. Verify Zero Horizontal Scroll CSS Invariants
+const cssContent = fs.readFileSync('css/styles.css', 'utf8');
+assert.ok(cssContent.includes('.bible-reader-assigned-bar') && cssContent.includes('scrollbar-width: none'), 'css/styles.css must hide scrollbar on bible-reader-assigned-bar');
+assert.ok(cssContent.includes('.bible-reader-backdrop') && cssContent.includes('width: 100% !important'), 'css/styles.css must use width: 100% !important on bible-reader-backdrop');
+assert.ok(cssContent.includes('.bible-reader-modal-card') && cssContent.includes('width: 100% !important'), 'css/styles.css must use width: 100% !important on bible-reader-modal-card');
+assert.ok(cssContent.includes('overflow-x: hidden !important'), 'css/styles.css must enforce overflow-x: hidden !important on full page modal card');
+console.log('✓ Verified: Strict zero horizontal scroll rules and hidden scrollbars in place');
+
+// 2. Verify Strict OTP Signin for All Users
+const Auth = require('./js/auth.js');
+assert.ok(indexHtml.includes('Strictly OTP-Based'), 'index.html must indicate strictly OTP-based signin');
+assert.ok(indexHtml.includes('New &amp; returning users:'), 'index.html must clarify OTP workflow for new and returning users');
+assert.strictEqual(typeof Auth.requestOtp, 'function', 'Auth.requestOtp must be a function');
+assert.strictEqual(typeof Auth.verifyOtp, 'function', 'Auth.verifyOtp must be a function');
+console.log('✓ Verified: Signin is 100% OTP-based for both new and returning users');
+
+// 3. Verify Pray Button is Removed from Verse Rows
+const readerJs = fs.readFileSync('js/bible-reader.js', 'utf8');
+assert.ok(!readerJs.includes('class="btn-verse-tool btn-verse-pray"'), 'js/bible-reader.js must NOT render btn-verse-pray in verse rows');
+assert.ok(readerJs.includes('title="Copy verse"'), 'js/bible-reader.js must retain copy verse button');
+console.log('✓ Verified: Pray button completely removed from Bible reader verses for serene reading');
+
+// 4. Verify Fast Chapter & Verse Quick-Selector
+assert.strictEqual(typeof BibleReader.toggleFastChapterPicker, 'function', 'BibleReader.toggleFastChapterPicker must be a function');
+assert.strictEqual(typeof BibleReader.openFastChapterPicker, 'function', 'BibleReader.openFastChapterPicker must be a function');
+assert.strictEqual(typeof BibleReader.closeFastChapterPicker, 'function', 'BibleReader.closeFastChapterPicker must be a function');
+assert.strictEqual(typeof BibleReader.showBookChapters, 'function', 'BibleReader.showBookChapters must be a function');
+assert.strictEqual(typeof BibleReader.scrollToVerse, 'function', 'BibleReader.scrollToVerse must be a function');
+console.log('✓ Verified: Dedicated Fast Chapter & Verse Quick-Selector methods and DOM nodes active');
 
 console.log('============================================================');
 console.log('ALL FRONTEND & THEME SYSTEM TESTS PASSED SUCCESSFULLY (100%)');

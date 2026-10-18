@@ -1243,7 +1243,12 @@
     <div class="modal-card">
       <div class="modal-drag-handle"></div>
       <div class="modal-header">
-        <h3 class="modal-title">Sign In</h3>
+        <div>
+          <h3 class="modal-title">Sign In / Register</h3>
+          <p class="modal-subtitle" style="font-size: 12px; color: var(--accent-interactive); font-weight: 600; margin-top: 2px;">
+            Strictly OTP-Based &bull; No Password Required
+          </p>
+        </div>
         <button class="icon-btn modal-close-btn" onclick="App.closeAllModals()" aria-label="Close">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -1255,22 +1260,26 @@
 
         <!-- STEP 1: NAME AND EMAIL -->
         <div id="auth-step-email">
+          <div style="background: var(--accent-soft); border: 1px solid var(--accent-light); border-radius: 8px; padding: 10px 12px; margin-bottom: 16px; font-size: 12.5px; color: var(--navy-900); line-height: 1.45;">
+            <strong>New &amp; returning users:</strong> Enter your email below to receive a secure 4-digit code. New accounts are automatically registered upon verification.
+          </div>
           <div class="form-group" style="margin-bottom: 14px;">
-            <label class="form-label" for="auth-name-input">Your Name</label>
-            <input type="text" id="auth-name-input" class="form-input" placeholder="Your name" maxlength="40" autocomplete="name">
+            <label class="form-label" for="auth-name-input">Your Name (Optional for first-time signups)</label>
+            <input type="text" id="auth-name-input" class="form-input" placeholder="e.g. John or Sarah" maxlength="40" autocomplete="name">
           </div>
           <div class="form-group" style="margin-bottom: 18px;">
             <label class="form-label" for="auth-email-input">Email Address *</label>
             <input type="email" id="auth-email-input" class="form-input" placeholder="name@example.com" required autocomplete="email">
+            <span style="font-size: 11.5px; color: var(--text-muted); display: block; margin-top: 4px;">A 4-digit OTP code will be sent instantly to this email.</span>
           </div>
           <button id="btn-send-otp" class="btn btn-primary" style="width: 100%; height: 46px; font-size: 15px; font-weight: 600;">
-            Send OTP
+            Send Verification Code (OTP)
           </button>
 
-          <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;" />
+          <hr style="border: none; border-top: 1px solid var(--border-color); margin: 18px 0 14px 0;" />
           <div style="text-align: center;">
-            <button id="btn-continue-local" class="btn btn-secondary btn-sm" style="width: 100%;">
-              Continue in Local Mode
+            <button id="btn-continue-local" class="btn-link" type="button" style="background: none; border: none; color: var(--text-muted); font-size: 12.5px; cursor: pointer; text-decoration: underline;">
+              Continue as Guest (Offline Local Mode)
             </button>
           </div>
         </div>
@@ -1702,15 +1711,23 @@
               <span class="bible-back-text">Back</span>
             </button>
             <div class="bible-nav-divider" aria-hidden="true"></div>
-            <!-- Book & Chapter Trigger Dropdown -->
-            <button id="bible-reader-book-picker-btn" class="bible-reader-title-btn" onclick="BibleReader.togglePicker()" title="Select Book and Chapter" aria-haspopup="dialog">
-              <span id="bible-reader-title-text" class="bible-reader-title-content">
-                <span class="reader-title-english">Genesis 1</span>
-                <span class="reader-title-separator">&bull;</span>
-                <span class="reader-title-telugu">ఆదికాండము</span>
-              </span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bible-reader-arrow-icon"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
+            <div class="bible-selectors-cluster">
+              <!-- Book Trigger Dropdown -->
+              <button id="bible-reader-book-picker-btn" class="bible-reader-title-btn" onclick="BibleReader.openPicker()" title="Select Bible Book" aria-haspopup="dialog">
+                <span id="bible-reader-title-text" class="bible-reader-title-content">
+                  <span class="reader-title-english">Genesis</span>
+                  <span class="reader-title-separator">&bull;</span>
+                  <span class="reader-title-telugu">ఆదికాండము</span>
+                </span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bible-reader-arrow-icon"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+
+              <!-- Dedicated Fast Chapter Selector Button -->
+              <button id="bible-reader-chapter-btn" class="bible-reader-pill-btn" onclick="BibleReader.toggleFastChapterPicker()" title="Fast Jump Chapter" aria-haspopup="dialog">
+                <span id="bible-reader-chapter-pill-text">Ch. 1</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bible-pill-arrow-icon"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </div>
           </div>
 
           <!-- Right Action Controls -->
@@ -1804,6 +1821,42 @@
           </div>
           <div id="bible-picker-content" class="bible-picker-content">
             <!-- Tabs, search and book cards rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Dedicated Fast Chapter & Verse Quick-Selector Modal Sheet -->
+      <div id="bible-chapter-quick-dialog" class="bible-chapter-quick-dialog" style="display: none;" role="dialog" aria-modal="true" aria-label="Fast Chapter Selector">
+        <div class="bible-quick-card">
+          <div class="bible-quick-header">
+            <div class="bible-quick-title-wrap">
+              <span id="bible-quick-book-name" class="bible-quick-book-title">Genesis</span>
+              <span id="bible-quick-book-meta" class="bible-quick-book-meta">Select chapter to jump</span>
+            </div>
+            <div class="bible-quick-header-actions">
+              <button class="bible-quick-nav-arrow" onclick="BibleReader.prevChapter()" title="Previous chapter" aria-label="Previous chapter">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="bible-quick-nav-arrow" onclick="BibleReader.nextChapter()" title="Next chapter" aria-label="Next chapter">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <button class="icon-btn" onclick="BibleReader.closeFastChapterPicker()" aria-label="Close chapter selector">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div id="bible-quick-chapters-grid" class="bible-quick-grid">
+            <!-- Numbers 1..N rendered dynamically -->
+          </div>
+
+          <!-- Quick Verse Jump Drawer -->
+          <div id="bible-quick-verses-section" class="bible-quick-verses-section" style="display: none;">
+            <div class="bible-quick-verses-header">
+              <span id="bible-quick-verses-label">Jump to Verse in Chapter:</span>
+              <button class="bible-quick-verses-close" onclick="BibleReader.toggleQuickVerses(false)">&times; Close</button>
+            </div>
+            <div id="bible-quick-verses-grid" class="bible-quick-verses-grid"></div>
           </div>
         </div>
       </div>

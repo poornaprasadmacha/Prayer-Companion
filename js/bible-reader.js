@@ -241,6 +241,7 @@
     assignedChapters: [1], // If opened from day's plan (e.g. [1, 2, 3])
     highlightVerse: null,
     readingContext: null, // e.g. { dayNum: 1, passage: 'Genesis 1-3' }
+    currentVerseCount: 0,
 
     // User Preferences (Stored in localStorage)
     viewMode: 'bilingual',        // 'bilingual' (Telugu + English), 'telugu', 'english'
@@ -584,6 +585,7 @@
         }
       }
       this.closePicker();
+      this.closeFastChapterPicker();
       this.closeOfflineModal();
       try {
         if (!isPopState && typeof window !== 'undefined' && window.location && window.location.hash === '#bible') {
@@ -762,11 +764,14 @@
       }
     },
 
-    openPicker() {
+    openPicker(initialTab = null) {
+      this.closeFastChapterPicker();
       const pickerEl = document.getElementById('bible-picker-dialog');
       if (!pickerEl) return;
       pickerEl.style.display = 'block';
-      this.renderPicker('OT');
+      const curBook = BOOK_BY_ID.get(this.currentBookId);
+      const testament = curBook ? curBook.testament : 'OT';
+      this.renderPicker(testament);
       this.updateOfflineUI();
     },
 
@@ -775,6 +780,87 @@
       if (pickerEl) pickerEl.style.display = 'none';
     },
 
+    // Fast Chapter Quick-Selector Popover / Modal
+    toggleFastChapterPicker() {
+      const dialogEl = document.getElementById('bible-chapter-quick-dialog');
+      if (!dialogEl) return;
+      if (dialogEl.style.display === 'none' || !dialogEl.style.display) {
+        this.openFastChapterPicker();
+      } else {
+        this.closeFastChapterPicker();
+      }
+    },
+
+    openFastChapterPicker() {
+      this.closePicker();
+      const dialogEl = document.getElementById('bible-chapter-quick-dialog');
+      if (!dialogEl) return;
+
+      const book = BOOK_BY_ID.get(this.currentBookId) || BIBLE_BOOKS[0];
+      const bookNameEl = document.getElementById('bible-quick-book-name');
+      const bookMetaEl = document.getElementById('bible-quick-book-meta');
+      const gridEl = document.getElementById('bible-quick-chapters-grid');
+
+      if (bookNameEl) {
+        bookNameEl.innerHTML = `${book.name} <span class="bible-quick-telugu" style="font-weight: 500; font-size: 13px; color: var(--text-secondary);">(${book.telugu})</span>`;
+      }
+      if (bookMetaEl) {
+        bookMetaEl.textContent = `Chapter ${this.currentChapter} of ${book.chapters} • Tap any chapter number to jump`;
+      }
+
+      if (gridEl) {
+        gridEl.innerHTML = Array.from({ length: book.chapters }, (_, i) => i + 1).map(ch => `
+          <button class="bible-quick-ch-btn ${ch === this.currentChapter ? 'active-ch' : ''}" onclick="BibleReader.selectChapter('${book.id}', ${ch})">
+            ${ch}
+          </button>
+        `).join('');
+      }
+
+      // Populate verse drawer if verses are loaded
+      const versesSection = document.getElementById('bible-quick-verses-section');
+      const versesGrid = document.getElementById('bible-quick-verses-grid');
+      const versesLabel = document.getElementById('bible-quick-verses-label');
+      if (versesSection && versesGrid && this.currentVerseCount > 1) {
+        versesSection.style.display = 'block';
+        if (versesLabel) {
+          versesLabel.textContent = `Jump to Verse in ${book.name} ${this.currentChapter} (1 to ${this.currentVerseCount}):`;
+        }
+        versesGrid.innerHTML = Array.from({ length: this.currentVerseCount }, (_, i) => i + 1).map(v => `
+          <button class="bible-quick-v-btn" onclick="BibleReader.scrollToVerse(${v})">
+            ${v}
+          </button>
+        `).join('');
+      } else if (versesSection) {
+        versesSection.style.display = 'none';
+      }
+
+      dialogEl.style.display = 'flex';
+    },
+
+    closeFastChapterPicker() {
+      const dialogEl = document.getElementById('bible-chapter-quick-dialog');
+      if (dialogEl) dialogEl.style.display = 'none';
+    },
+
+    scrollToVerse(verseNum) {
+      this.closeFastChapterPicker();
+      this.closePicker();
+      setTimeout(() => {
+        const rowEl = document.getElementById(`verse-row-${verseNum}`);
+        if (rowEl) {
+          rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          rowEl.classList.add('verse-row-highlighted');
+          setTimeout(() => rowEl.classList.remove('verse-row-highlighted'), 2400);
+        }
+      }, 120);
+    },
+
+    toggleQuickVerses(show = true) {
+      const el = document.getElementById('bible-quick-verses-section');
+      if (el) el.style.display = show ? 'block' : 'none';
+    },
+
+    // 2-Step Book & Chapter Dialog Renderer
     renderPicker(activeTestament = 'OT', filterQuery = '') {
       const container = document.getElementById('bible-picker-content');
       if (!container) return;
@@ -787,7 +873,18 @@
         return b.testament === activeTestament;
       });
 
+      const curBook = BOOK_BY_ID.get(this.currentBookId) || BIBLE_BOOKS[0];
+
       container.innerHTML = `
+        <div class="bible-picker-current-hint">
+          <div class="picker-hint-info">
+            <span class="picker-hint-label">Reading Now:</span>
+            <strong class="picker-hint-name">${curBook.name} ${this.currentChapter}</strong>
+          </div>
+          <button class="bible-picker-quick-btn" onclick="BibleReader.showBookChapters('${curBook.id}', '${activeTestament}')">
+            Jump Chapter &rarr;
+          </button>
+        </div>
         <div class="bible-picker-tabs">
           <button class="bible-picker-tab ${!q && activeTestament === 'OT' ? 'active' : ''}" onclick="BibleReader.renderPicker('OT')">
             Old Testament (39)
@@ -801,36 +898,55 @@
         </div>
         <div class="bible-picker-grid">
           ${filtered.map(b => `
-            <div class="bible-picker-book-card ${b.id === this.currentBookId ? 'current-book' : ''}">
-              <div class="bible-picker-book-header" onclick="BibleReader.toggleBookChapters('${b.id}')">
-                <div class="bible-picker-book-names">
-                  <span class="bible-picker-telugu">${b.telugu}</span>
-                  <span class="bible-picker-english">${b.name} (${b.chapters})</span>
-                </div>
-                <span class="bible-picker-arrow">&darr;</span>
+            <div class="bible-picker-book-card ${b.id === this.currentBookId ? 'current-book' : ''}" onclick="BibleReader.showBookChapters('${b.id}', '${activeTestament}')">
+              <div class="bible-picker-book-names">
+                <span class="bible-picker-english">${b.name}</span>
+                <span class="bible-picker-telugu">${b.telugu}</span>
               </div>
-              <div id="chapters-grid-${b.id}" class="bible-picker-chapters-grid" style="${b.id === this.currentBookId ? 'display: flex;' : 'display: none;'}">
-                ${Array.from({ length: b.chapters }, (_, i) => i + 1).map(ch => `
-                  <button class="bible-picker-ch-btn ${b.id === this.currentBookId && ch === this.currentChapter ? 'active-ch' : ''}" onclick="BibleReader.selectChapter('${b.id}', ${ch})">
-                    ${ch}
-                  </button>
-                `).join('')}
-              </div>
+              <span class="bible-picker-arrow">${b.chapters} Ch &rarr;</span>
             </div>
           `).join('')}
         </div>
       `;
     },
 
+    showBookChapters(bookId, activeTestament = 'OT') {
+      const container = document.getElementById('bible-picker-content');
+      if (!container) return;
+      const book = BOOK_BY_ID.get(bookId) || BIBLE_BOOKS[0];
+      const t = activeTestament || book.testament || 'OT';
+
+      container.innerHTML = `
+        <div class="bible-picker-nav-row">
+          <button class="bible-picker-back-btn" onclick="BibleReader.renderPicker('${t}')">
+            &larr; All Books
+          </button>
+          <div class="bible-picker-active-book-title">
+            <span class="picker-book-name">${book.name}</span>
+            <span class="picker-book-telugu">(${book.telugu})</span>
+          </div>
+        </div>
+        <div class="bible-picker-chapters-header">
+          <span>Select Chapter (1 to ${book.chapters})</span>
+          <span class="picker-total-badge">${book.chapters} Chapters</span>
+        </div>
+        <div class="bible-picker-chapters-grid-large">
+          ${Array.from({ length: book.chapters }, (_, i) => i + 1).map(ch => `
+            <button class="bible-picker-ch-btn-large ${book.id === this.currentBookId && ch === this.currentChapter ? 'active-ch' : ''}" onclick="BibleReader.selectChapter('${book.id}', ${ch})">
+              ${ch}
+            </button>
+          `).join('')}
+        </div>
+      `;
+    },
+
     toggleBookChapters(bookId) {
-      const el = document.getElementById(`chapters-grid-${bookId}`);
-      if (el) {
-        el.style.display = (el.style.display === 'none') ? 'flex' : 'none';
-      }
+      this.showBookChapters(bookId);
     },
 
     selectChapter(bookId, ch) {
       this.closePicker();
+      this.closeFastChapterPicker();
       this.openChapter(bookId, ch, { clearContext: false });
     },
 
@@ -845,15 +961,19 @@
       const assignedBarEl = document.getElementById('bible-reader-assigned-bar');
       const completeBtnWrap = document.getElementById('bible-reader-complete-wrap');
 
-      // Update header title
+      // Update header title and quick chapter pill
       if (titleEl) {
         titleEl.innerHTML = `
-          <span class="reader-title-english">${book.name} ${this.currentChapter}</span>
+          <span class="reader-title-english">${book.name}</span>
           ${(this.viewMode === 'telugu' || this.viewMode === 'bilingual') ? `
             <span class="reader-title-separator">&bull;</span>
             <span class="reader-title-telugu">${book.telugu}</span>
           ` : ''}
         `;
+      }
+      const chPillText = document.getElementById('bible-reader-chapter-pill-text');
+      if (chPillText) {
+        chPillText.textContent = `Ch. ${this.currentChapter}`;
       }
 
       // Update active control pill classes
@@ -934,6 +1054,7 @@
 
       try {
         const paired = await this.loadPairedChapter(book.id, this.currentChapter);
+        this.currentVerseCount = (paired && paired.verses) ? paired.verses.length : 0;
 
         if (!contentEl) return;
 
@@ -974,10 +1095,6 @@
                 <div class="verse-actions-cell">
                   <button class="btn-verse-tool" title="Copy verse" onclick="BibleReader.copyVerse(${v.verse}, '${this.escapeJs(v.telugu)}', '${this.escapeJs(v.english)}')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                  </button>
-                  <button class="btn-verse-tool btn-verse-pray" title="Pray this verse" onclick="BibleReader.prayVerse(${v.verse}, '${this.escapeJs(v.telugu)}', '${this.escapeJs(v.english)}')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 13px; height: 13px;"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
-                    <span>Pray</span>
                   </button>
                 </div>
               </div>
