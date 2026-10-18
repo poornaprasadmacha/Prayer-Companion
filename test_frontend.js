@@ -249,14 +249,8 @@ const requiredIds = [
   'bible-reader-close-btn',
   'bible-picker-dialog',
   'more-btn-holy-bible',
-  'bible-reader-offline-btn',
   'modal-bible-offline',
-  'btn-download-all-bible',
-  // Fast Chapter Quick-Selector
-  'bible-reader-chapter-btn',
-  'bible-reader-chapter-pill-text',
-  'bible-chapter-quick-dialog',
-  'bible-quick-chapters-grid'
+  'btn-download-all-bible'
 ];
 
 requiredIds.forEach(id => {
@@ -637,10 +631,10 @@ const swContent = fs.readFileSync('service-worker.js', 'utf8');
 assert.ok(swContent.includes('prayerly-bible-cdn-v1'), 'service-worker.js must contain prayerly-bible-cdn-v1 cache store');
 assert.ok(swContent.includes('cdn.jsdelivr.net') && swContent.includes('raw.githubusercontent.com'), 'service-worker.js must intercept Bible CDN and GitHub raw URLs');
 
-// 2. Verify Offline UI elements in index.html
-assert.ok(indexHtml.includes('id="bible-reader-offline-btn"'), 'index.html must have bible-reader-offline-btn');
-assert.ok(indexHtml.includes('id="bible-picker-offline-bar"'), 'index.html must have bible-picker-offline-bar');
-assert.ok(indexHtml.includes('id="modal-bible-offline"'), 'index.html must have modal-bible-offline');
+// 2. Verify Clean Offline Invariants in index.html (No green tick pill, No offline tag in picker dialog)
+assert.ok(!indexHtml.includes('id="bible-reader-offline-btn"'), 'index.html must NOT display green tick offline badge pill in reader header');
+assert.ok(!indexHtml.includes('id="bible-picker-offline-bar"'), 'index.html must NOT display offline tag line in picker dialog');
+assert.ok(indexHtml.includes('id="modal-bible-offline"'), 'index.html must retain modal-bible-offline');
 assert.ok(indexHtml.includes('id="settings-bible-offline-card"'), 'index.html must have settings-bible-offline-card');
 assert.ok(indexHtml.includes('id="btn-download-all-bible"'), 'index.html must have btn-download-all-bible');
 
@@ -664,12 +658,11 @@ assert.strictEqual(typeof BibleReader.autoCachePlanBooks, 'function', 'BibleRead
 
   // 5. Verify Zero Percentage Clutter & Pure Background Download
   assert.strictEqual(typeof BibleReader.triggerBackgroundDownloadIfPending, 'function', 'BibleReader.triggerBackgroundDownloadIfPending must be a function');
-  assert.strictEqual(typeof BibleReader.handleOfflineBadgeClick, 'function', 'BibleReader.handleOfflineBadgeClick must be a function');
   const bibleReaderCode = fs.readFileSync('js/bible-reader.js', 'utf8');
   assert.ok(!bibleReaderCode.includes('${status.percent}% Offline'), 'js/bible-reader.js must NOT output fractional offline percentage text');
   assert.ok(!bibleReaderCode.includes('${status.teluguCount}/66 Books Saved'), 'js/bible-reader.js must NOT output fractional book counts in picker');
   assert.ok(bibleReaderCode.includes('this.triggerBackgroundDownloadIfPending()'), 'showModal must call triggerBackgroundDownloadIfPending');
-  console.log('✓ Verified: Fractional percentages and book counts are strictly removed from offline UI');
+  console.log('✓ Verified: Fractional percentages, book counts, green tick, and offline tag line are strictly removed from Holy Bible');
 
   // 6. Verify Community Prayers Background Preload
   const appCode = fs.readFileSync('js/app.js', 'utf8');
@@ -679,9 +672,9 @@ assert.strictEqual(typeof BibleReader.autoCachePlanBooks, 'function', 'BibleRead
 })();
 
 // ============================================================================
-// 12. VERIFY MOBILE SCROLL FIX, OTP-ONLY AUTH, NO PRAY IN BIBLE & FAST CHAPTER SELECTOR
+// 12. VERIFY MOBILE SCROLL FIX, OTP-ONLY AUTH, CLEAN BIBLE & RESTORED DESIGN
 // ============================================================================
-console.log('\nVerifying Mobile Scroll Fix, Strict OTP Signin, Clean Bible & Fast Chapter UI...');
+console.log('\nVerifying Mobile Scroll Fix, Strict OTP Signin, Clean Bible & Restored Design...');
 
 // 1. Verify Zero Horizontal Scroll CSS Invariants
 const cssContent = fs.readFileSync('css/styles.css', 'utf8');
@@ -705,13 +698,13 @@ assert.ok(!readerJs.includes('class="btn-verse-tool btn-verse-pray"'), 'js/bible
 assert.ok(readerJs.includes('title="Copy verse"'), 'js/bible-reader.js must retain copy verse button');
 console.log('✓ Verified: Pray button completely removed from Bible reader verses for serene reading');
 
-// 4. Verify Fast Chapter & Verse Quick-Selector
-assert.strictEqual(typeof BibleReader.toggleFastChapterPicker, 'function', 'BibleReader.toggleFastChapterPicker must be a function');
-assert.strictEqual(typeof BibleReader.openFastChapterPicker, 'function', 'BibleReader.openFastChapterPicker must be a function');
-assert.strictEqual(typeof BibleReader.closeFastChapterPicker, 'function', 'BibleReader.closeFastChapterPicker must be a function');
-assert.strictEqual(typeof BibleReader.showBookChapters, 'function', 'BibleReader.showBookChapters must be a function');
-assert.strictEqual(typeof BibleReader.scrollToVerse, 'function', 'BibleReader.scrollToVerse must be a function');
-console.log('✓ Verified: Dedicated Fast Chapter & Verse Quick-Selector methods and DOM nodes active');
+// 4. Verify Verses Location Removed & Clean Accordion Picker Restored
+assert.ok(!indexHtml.includes('id="bible-chapter-quick-dialog"'), 'Verses location and quick chapter dialog must be removed from DOM');
+assert.ok(!indexHtml.includes('id="bible-quick-verses-section"'), 'Quick verses section must be removed from DOM');
+assert.ok(indexHtml.includes('id="bible-reader-book-picker-btn"'), 'index.html must have unified book & chapter picker button');
+assert.strictEqual(typeof BibleReader.togglePicker, 'function', 'BibleReader.togglePicker must be a function');
+assert.strictEqual(typeof BibleReader.toggleBookChapters, 'function', 'BibleReader.toggleBookChapters must be a function');
+console.log('✓ Verified: Verses location removed, green tick removed, offline line removed, clean previous design restored');
 
 console.log('============================================================');
 console.log('ALL FRONTEND & THEME SYSTEM TESTS PASSED SUCCESSFULLY (100%)');

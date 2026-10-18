@@ -1711,33 +1711,19 @@
               <span class="bible-back-text">Back</span>
             </button>
             <div class="bible-nav-divider" aria-hidden="true"></div>
-            <div class="bible-selectors-cluster">
-              <!-- Book Trigger Dropdown -->
-              <button id="bible-reader-book-picker-btn" class="bible-reader-title-btn" onclick="BibleReader.openPicker()" title="Select Bible Book" aria-haspopup="dialog">
-                <span id="bible-reader-title-text" class="bible-reader-title-content">
-                  <span class="reader-title-english">Genesis</span>
-                  <span class="reader-title-separator">&bull;</span>
-                  <span class="reader-title-telugu">ఆదికాండము</span>
-                </span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bible-reader-arrow-icon"><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
-
-              <!-- Dedicated Fast Chapter Selector Button -->
-              <button id="bible-reader-chapter-btn" class="bible-reader-pill-btn" onclick="BibleReader.toggleFastChapterPicker()" title="Fast Jump Chapter" aria-haspopup="dialog">
-                <span id="bible-reader-chapter-pill-text">Ch. 1</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bible-pill-arrow-icon"><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
-            </div>
+            <!-- Book & Chapter Trigger Dropdown -->
+            <button id="bible-reader-book-picker-btn" class="bible-reader-title-btn" onclick="BibleReader.togglePicker()" title="Select Book and Chapter" aria-haspopup="dialog">
+              <span id="bible-reader-title-text" class="bible-reader-title-content">
+                <span class="reader-title-english">Genesis 1</span>
+                <span class="reader-title-separator">&bull;</span>
+                <span class="reader-title-telugu">ఆదికాండము</span>
+              </span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bible-reader-arrow-icon"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
           </div>
 
           <!-- Right Action Controls -->
           <div class="bible-reader-top-actions">
-            <!-- Offline Status / Download Pill -->
-            <button id="bible-reader-offline-btn" class="bible-offline-badge-btn" onclick="BibleReader.handleOfflineBadgeClick()" title="Holy Bible Offline Status & Download" aria-label="Bible offline status">
-              <span id="bible-reader-offline-icon" class="bible-offline-icon">✓</span>
-              <span id="bible-reader-offline-text" class="bible-offline-text">Offline Ready</span>
-            </button>
-
             <!-- Font Size Adjusters -->
             <div class="bible-reader-font-controls" role="group" aria-label="Font size">
               <button class="bible-reader-tool-btn" onclick="BibleReader.adjustFontSize(-1)" title="Smaller text" aria-label="Decrease font size">A−</button>
@@ -1805,18 +1791,9 @@
       <div id="bible-picker-dialog" class="bible-picker-dialog" style="display: none;" role="dialog" aria-modal="true" aria-label="Book and Chapter Picker">
         <div class="bible-picker-dialog-card">
           <div class="bible-picker-dialog-header">
-            <span class="bible-picker-dialog-title">Select Book</span>
+            <span class="bible-picker-dialog-title">Select Book and Chapter</span>
             <button class="icon-btn" onclick="BibleReader.closePicker()" aria-label="Close picker">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>
-          <div id="bible-picker-offline-bar" class="bible-picker-offline-bar">
-            <div class="bible-picker-offline-status">
-              <span class="bible-picker-offline-dot"></span>
-              <span id="bible-picker-offline-label">Offline: Checking...</span>
-            </div>
-            <button id="bible-picker-offline-dl-btn" class="bible-picker-offline-dl-btn" onclick="BibleReader.handleOfflineBadgeClick()">
-              Download All (Offline)
             </button>
           </div>
           <div id="bible-picker-content" class="bible-picker-content">
@@ -1825,41 +1802,6 @@
         </div>
       </div>
 
-      <!-- Dedicated Fast Chapter & Verse Quick-Selector Modal Sheet -->
-      <div id="bible-chapter-quick-dialog" class="bible-chapter-quick-dialog" style="display: none;" role="dialog" aria-modal="true" aria-label="Fast Chapter Selector">
-        <div class="bible-quick-card">
-          <div class="bible-quick-header">
-            <div class="bible-quick-title-wrap">
-              <span id="bible-quick-book-name" class="bible-quick-book-title">Genesis</span>
-              <span id="bible-quick-book-meta" class="bible-quick-book-meta">Select chapter to jump</span>
-            </div>
-            <div class="bible-quick-header-actions">
-              <button class="bible-quick-nav-arrow" onclick="BibleReader.prevChapter()" title="Previous chapter" aria-label="Previous chapter">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><polyline points="15 18 9 12 15 6"/></svg>
-              </button>
-              <button class="bible-quick-nav-arrow" onclick="BibleReader.nextChapter()" title="Next chapter" aria-label="Next chapter">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
-              <button class="icon-btn" onclick="BibleReader.closeFastChapterPicker()" aria-label="Close chapter selector">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </div>
-          </div>
-
-          <div id="bible-quick-chapters-grid" class="bible-quick-grid">
-            <!-- Numbers 1..N rendered dynamically -->
-          </div>
-
-          <!-- Quick Verse Jump Drawer -->
-          <div id="bible-quick-verses-section" class="bible-quick-verses-section" style="display: none;">
-            <div class="bible-quick-verses-header">
-              <span id="bible-quick-verses-label">Jump to Verse in Chapter:</span>
-              <button class="bible-quick-verses-close" onclick="BibleReader.toggleQuickVerses(false)">&times; Close</button>
-            </div>
-            <div id="bible-quick-verses-grid" class="bible-quick-verses-grid"></div>
-          </div>
-        </div>
-      </div>
 
     </div>
   </div>
