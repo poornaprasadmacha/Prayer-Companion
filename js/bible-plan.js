@@ -314,14 +314,25 @@ const BiblePlan = {
                   <div class="bible-plan-dual-col">
                     <span class="bible-plan-reading-lead">Morning (NT)</span>
                     <strong class="bible-plan-passage-text">${currentDayData.morning}</strong>
+                    <button class="btn-read-passage-chip" onclick="BibleReader.openPassage('${currentDayData.morning}', ${currentDayData.day})" title="Read scripture">
+                      Read &bull; చదవండి
+                    </button>
                   </div>
                   <div class="bible-plan-dual-col">
                     <span class="bible-plan-reading-lead">Night (OT)</span>
                     <strong class="bible-plan-passage-text">${currentDayData.night}</strong>
+                    <button class="btn-read-passage-chip" onclick="BibleReader.openPassage('${currentDayData.night}', ${currentDayData.day})" title="Read scripture">
+                      Read &bull; చదవండి
+                    </button>
                   </div>
                 </div>
               ` : `
-                <strong class="bible-plan-passage-text">${currentDayData.reading}</strong>
+                <div class="bible-plan-single-reading-row">
+                  <strong class="bible-plan-passage-text">${currentDayData.reading}</strong>
+                  <button class="btn-read-passage-chip" onclick="BibleReader.openPassage('${currentDayData.reading}', ${currentDayData.day})" title="Read scripture">
+                    Read &bull; చదవండి
+                  </button>
+                </div>
               `}
             </div>
 
@@ -329,7 +340,12 @@ const BiblePlan = {
             ${sundayWorship ? `
               <div class="bible-plan-sunday-worship-card">
                 <span class="bible-plan-sunday-lead">Sunday Worship Reading</span>
-                <strong class="bible-plan-sunday-passage">${sundayWorship.passage}</strong>
+                <div class="bible-plan-sunday-header-row">
+                  <strong class="bible-plan-sunday-passage">${sundayWorship.passage}</strong>
+                  <button class="btn-read-passage-chip" onclick="BibleReader.openPassage('${sundayWorship.passage}')" title="Read worship scripture">
+                    Read &bull; చదవండి
+                  </button>
+                </div>
                 <p class="bible-plan-sunday-verse">"${sundayWorship.verse}"</p>
               </div>
             ` : ''}
@@ -455,6 +471,9 @@ const BiblePlan = {
         <div class="home-bible-actions">
           <button class="btn btn-primary btn-sm" onclick="BiblePlan.toggleDay(${currentDayData.day})">
             Mark as Read
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="BibleReader.openDayReading(${currentDayData.day})">
+            Read &bull; చదవండి
           </button>
           <button class="btn btn-secondary btn-sm" onclick="App.switchTab('bible-plan')">
             Open Plan &rarr;

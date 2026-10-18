@@ -413,6 +413,13 @@ const App = {
     this.switchTab(tab);
   },
 
+  openMoreBibleReader() {
+    this.closeAllModals();
+    if (typeof BibleReader !== 'undefined') {
+      BibleReader.openChapter('genesis', 1);
+    }
+  },
+
   openMoreManual() {
     this.closeAllModals();
     if (typeof Settings !== 'undefined' && Settings.openManualModal) {

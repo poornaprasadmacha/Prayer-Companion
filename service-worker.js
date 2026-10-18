@@ -27,6 +27,7 @@ const STATIC_ASSETS = [
   './js/notifications.js',
   './js/bible-plan-data.js',
   './js/bible-plan.js',
+  './js/bible-reader.js',
   './js/app.js',
   './assets/prayerly-logo.png',
   './assets/daily-devotional.jpg',

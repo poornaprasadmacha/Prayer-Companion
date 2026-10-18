@@ -53,6 +53,7 @@ const scripts = [
   'js/notifications.js',
   'js/bible-plan-data.js',
   'js/bible-plan.js',
+  'js/bible-reader.js',
   'js/app.js'
 ];
 
@@ -266,7 +267,15 @@ const requiredIds = [
   'printable-prayer-summary',
   // 365-Day Bible Reading Plan
   'view-bible-plan',
-  'home-bible-reading-card'
+  'home-bible-reading-card',
+  // Holy Bible Reader (Telugu & English)
+  'modal-bible-reader',
+  'bible-reader-content',
+  'bible-reader-btn-prev',
+  'bible-reader-btn-next',
+  'bible-reader-close-btn',
+  'bible-picker-dialog',
+  'more-btn-holy-bible'
 ];
 
 requiredIds.forEach(id => {
@@ -488,10 +497,69 @@ App.toggleTheme();
 assert.strictEqual(App.getTheme(), 'dark', 'Toggling from light should switch to dark');
 App.toggleTheme();
 assert.strictEqual(App.getTheme(), 'light', 'Toggling from dark should switch to light');
-console.log('✓ Verified: App theme controller seamlessly manages light, dark, and system modes');
+// 7. Verify Holy Bible Reader (Telugu & English Bilingual, NIV Default, KJV Switchable)
+console.log('\nVerifying Holy Bible Reader (Telugu + English NIV/KJV)...');
+const BibleReader = require('./js/bible-reader.js');
+
+assert.ok(Array.isArray(BibleReader.books), 'BibleReader.books must be an array');
+assert.strictEqual(BibleReader.books.length, 66, 'Holy Bible must have all 66 books');
+
+const otBooks = BibleReader.books.filter(b => b.testament === 'OT');
+const ntBooks = BibleReader.books.filter(b => b.testament === 'NT');
+assert.strictEqual(otBooks.length, 39, 'Old Testament must have exactly 39 books');
+assert.strictEqual(ntBooks.length, 27, 'New Testament must have exactly 27 books');
+
+// Verify translation mappings for all 66 books
+BibleReader.books.forEach(b => {
+  assert.ok(b.name && b.telugu, `Book ${b.name} must have Telugu name`);
+  assert.ok(b.chapters > 0, `Book ${b.name} must have chapters > 0`);
+  assert.ok(b.files && b.files.telugu && b.files.niv && b.files.kjv, `Book ${b.name} must have files for telugu, niv, and kjv`);
+});
+console.log('✓ Verified: All 66 books mapped with Telugu and English titles and translations');
+
+// Verify book resolution
+assert.strictEqual(BibleReader.resolveBook('Genesis').telugu, 'ఆదికాండము', 'Genesis must resolve to ఆదికాండము');
+assert.strictEqual(BibleReader.resolveBook('ఆదికాండము').name, 'Genesis', 'ఆదికాండము must resolve to Genesis');
+assert.strictEqual(BibleReader.resolveBook('Song of Solomon').name, 'Song of Songs', 'Song of Solomon alias must resolve to Song of Songs');
+assert.strictEqual(BibleReader.resolveBook('మత్తయి').name, 'Matthew', 'మత్తయి must resolve to Matthew');
+console.log('✓ Verified: Bilingual book resolution handles English, Telugu, and historical aliases');
+
+// Verify passage reference parser
+const p1 = BibleReader.parseReference('Genesis 1-3');
+assert.ok(p1 && p1[0].chapters.length === 3, 'Genesis 1-3 parses 3 chapters');
+assert.deepStrictEqual(p1[0].chapters, [1, 2, 3], 'Genesis 1-3 chapter range is [1, 2, 3]');
+
+const p2 = BibleReader.parseReference('Matthew 3 / Genesis 6-8');
+assert.strictEqual(p2.length, 2, 'Dual reading parses into 2 book portions');
+assert.strictEqual(p2[0].book.name, 'Matthew');
+assert.deepStrictEqual(p2[1].chapters, [6, 7, 8]);
+console.log('✓ Verified: Passage reference parser parses single and dual plan readings');
+
+// Verify NIV default & KJV switcher
+assert.strictEqual(BibleReader.englishVersion, 'niv', 'Default English translation must be NIV');
+BibleReader.setEnglishVersion('kjv');
+assert.strictEqual(BibleReader.englishVersion, 'kjv', 'Must switch to KJV');
+BibleReader.setEnglishVersion('niv');
+assert.strictEqual(BibleReader.englishVersion, 'niv', 'Must switch back to NIV');
+console.log('✓ Verified: English translation defaults to NIV and switches seamlessly to KJV');
+
+// Verify view mode switcher (Bilingual / Telugu / English)
+assert.strictEqual(BibleReader.viewMode, 'bilingual', 'Default view mode must be bilingual');
+BibleReader.setViewMode('telugu');
+assert.strictEqual(BibleReader.viewMode, 'telugu', 'Must switch to Telugu only');
+BibleReader.setViewMode('english');
+assert.strictEqual(BibleReader.viewMode, 'english', 'Must switch to English only');
+BibleReader.setViewMode('bilingual');
+assert.strictEqual(BibleReader.viewMode, 'bilingual', 'Must switch back to bilingual');
+console.log('✓ Verified: View modes toggle cleanly between Bilingual (తెలుగు + Eng), Telugu, and English');
+
+// Verify App integration
+assert.strictEqual(typeof App.openMoreBibleReader, 'function', 'App.openMoreBibleReader must be a function');
+console.log('✓ Verified: App controller connects directly to Holy Bible Reader');
 
 console.log('============================================================');
 console.log('ALL FRONTEND & THEME SYSTEM TESTS PASSED SUCCESSFULLY (100%)');
 console.log('============================================================\n');
+
 
 

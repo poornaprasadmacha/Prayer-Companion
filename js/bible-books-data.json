@@ -1,0 +1,860 @@
+[
+  {
+    "index": 1,
+    "id": "genesis",
+    "name": "Genesis",
+    "telugu": "ఆదికాండము",
+    "chapters": 50,
+    "testament": "OT",
+    "files": {
+      "telugu": "Genesis.json",
+      "niv": "Genesis.json",
+      "kjv": "Genesis.json"
+    }
+  },
+  {
+    "index": 2,
+    "id": "exodus",
+    "name": "Exodus",
+    "telugu": "నిర్గమకాండము",
+    "chapters": 40,
+    "testament": "OT",
+    "files": {
+      "telugu": "Exodus.json",
+      "niv": "Exodus.json",
+      "kjv": "Exodus.json"
+    }
+  },
+  {
+    "index": 3,
+    "id": "leviticus",
+    "name": "Leviticus",
+    "telugu": "లేవీయకాండము",
+    "chapters": 27,
+    "testament": "OT",
+    "files": {
+      "telugu": "Leviticus.json",
+      "niv": "Leviticus.json",
+      "kjv": "Leviticus.json"
+    }
+  },
+  {
+    "index": 4,
+    "id": "numbers",
+    "name": "Numbers",
+    "telugu": "సంఖ్యాకాండము",
+    "chapters": 36,
+    "testament": "OT",
+    "files": {
+      "telugu": "Numbers.json",
+      "niv": "Numbers.json",
+      "kjv": "Numbers.json"
+    }
+  },
+  {
+    "index": 5,
+    "id": "deuteronomy",
+    "name": "Deuteronomy",
+    "telugu": "ద్వితీయోపదేశకాండము",
+    "chapters": 34,
+    "testament": "OT",
+    "files": {
+      "telugu": "Deuteronomy.json",
+      "niv": "Deuteronomy.json",
+      "kjv": "Deuteronomy.json"
+    }
+  },
+  {
+    "index": 6,
+    "id": "joshua",
+    "name": "Joshua",
+    "telugu": "యెహొషువ",
+    "chapters": 24,
+    "testament": "OT",
+    "files": {
+      "telugu": "Joshua.json",
+      "niv": "Joshua.json",
+      "kjv": "Joshua.json"
+    }
+  },
+  {
+    "index": 7,
+    "id": "judges",
+    "name": "Judges",
+    "telugu": "న్యాయాధిపతులు",
+    "chapters": 21,
+    "testament": "OT",
+    "files": {
+      "telugu": "Judges.json",
+      "niv": "Judges.json",
+      "kjv": "Judges.json"
+    }
+  },
+  {
+    "index": 8,
+    "id": "ruth",
+    "name": "Ruth",
+    "telugu": "రూతు",
+    "chapters": 4,
+    "testament": "OT",
+    "files": {
+      "telugu": "Ruth.json",
+      "niv": "Ruth.json",
+      "kjv": "Ruth.json"
+    }
+  },
+  {
+    "index": 9,
+    "id": "1samuel",
+    "name": "1 Samuel",
+    "telugu": "సమూయేలు మొదటి గ్రంథము",
+    "chapters": 31,
+    "testament": "OT",
+    "files": {
+      "telugu": "1 Samuel.json",
+      "niv": "1 Samuel.json",
+      "kjv": "1Samuel.json"
+    }
+  },
+  {
+    "index": 10,
+    "id": "2samuel",
+    "name": "2 Samuel",
+    "telugu": "సమూయేలు రెండవ గ్రంథము",
+    "chapters": 24,
+    "testament": "OT",
+    "files": {
+      "telugu": "2 Samuel.json",
+      "niv": "2 Samuel.json",
+      "kjv": "2Samuel.json"
+    }
+  },
+  {
+    "index": 11,
+    "id": "1kings",
+    "name": "1 Kings",
+    "telugu": "రాజులు మొదటి గ్రంథము",
+    "chapters": 22,
+    "testament": "OT",
+    "files": {
+      "telugu": "1 Kings.json",
+      "niv": "1 Kings.json",
+      "kjv": "1Kings.json"
+    }
+  },
+  {
+    "index": 12,
+    "id": "2kings",
+    "name": "2 Kings",
+    "telugu": "రాజులు రెండవ గ్రంథము",
+    "chapters": 25,
+    "testament": "OT",
+    "files": {
+      "telugu": "2 Kings.json",
+      "niv": "2 Kings.json",
+      "kjv": "2Kings.json"
+    }
+  },
+  {
+    "index": 13,
+    "id": "1chronicles",
+    "name": "1 Chronicles",
+    "telugu": "దినవృత్తాంతములు మొదటి గ్రంథము",
+    "chapters": 29,
+    "testament": "OT",
+    "files": {
+      "telugu": "1 Chronicles.json",
+      "niv": "1 Chronicles.json",
+      "kjv": "1Chronicles.json"
+    }
+  },
+  {
+    "index": 14,
+    "id": "2chronicles",
+    "name": "2 Chronicles",
+    "telugu": "దినవృత్తాంతములు రెండవ గ్రంథము",
+    "chapters": 36,
+    "testament": "OT",
+    "files": {
+      "telugu": "2 Chronicles.json",
+      "niv": "2 Chronicles.json",
+      "kjv": "2Chronicles.json"
+    }
+  },
+  {
+    "index": 15,
+    "id": "ezra",
+    "name": "Ezra",
+    "telugu": "ఎజ్రా",
+    "chapters": 10,
+    "testament": "OT",
+    "files": {
+      "telugu": "Ezra.json",
+      "niv": "Ezra.json",
+      "kjv": "Ezra.json"
+    }
+  },
+  {
+    "index": 16,
+    "id": "nehemiah",
+    "name": "Nehemiah",
+    "telugu": "నెహెమ్యా",
+    "chapters": 13,
+    "testament": "OT",
+    "files": {
+      "telugu": "Nehemiah.json",
+      "niv": "Nehemiah.json",
+      "kjv": "Nehemiah.json"
+    }
+  },
+  {
+    "index": 17,
+    "id": "esther",
+    "name": "Esther",
+    "telugu": "ఎస్తేరు",
+    "chapters": 10,
+    "testament": "OT",
+    "files": {
+      "telugu": "Esther.json",
+      "niv": "Esther.json",
+      "kjv": "Esther.json"
+    }
+  },
+  {
+    "index": 18,
+    "id": "job",
+    "name": "Job",
+    "telugu": "యోబు గ్రంథము",
+    "chapters": 42,
+    "testament": "OT",
+    "files": {
+      "telugu": "Job.json",
+      "niv": "Job.json",
+      "kjv": "Job.json"
+    }
+  },
+  {
+    "index": 19,
+    "id": "psalms",
+    "name": "Psalms",
+    "telugu": "కీర్తనల గ్రంథము",
+    "chapters": 150,
+    "testament": "OT",
+    "files": {
+      "telugu": "Psalms.json",
+      "niv": "Psalms.json",
+      "kjv": "Psalms.json"
+    }
+  },
+  {
+    "index": 20,
+    "id": "proverbs",
+    "name": "Proverbs",
+    "telugu": "సామెతలు",
+    "chapters": 31,
+    "testament": "OT",
+    "files": {
+      "telugu": "Proverbs.json",
+      "niv": "Proverbs.json",
+      "kjv": "Proverbs.json"
+    }
+  },
+  {
+    "index": 21,
+    "id": "ecclesiastes",
+    "name": "Ecclesiastes",
+    "telugu": "ప్రసంగి",
+    "chapters": 12,
+    "testament": "OT",
+    "files": {
+      "telugu": "Ecclesiastes.json",
+      "niv": "Ecclesiastes.json",
+      "kjv": "Ecclesiastes.json"
+    }
+  },
+  {
+    "index": 22,
+    "id": "songofsongs",
+    "name": "Song of Songs",
+    "telugu": "పరమగీతము",
+    "chapters": 8,
+    "testament": "OT",
+    "files": {
+      "telugu": "Song of Songs.json",
+      "niv": "Song Of Solomon.json",
+      "kjv": "SongofSolomon.json"
+    }
+  },
+  {
+    "index": 23,
+    "id": "isaiah",
+    "name": "Isaiah",
+    "telugu": "యెషయా గ్రంథము",
+    "chapters": 66,
+    "testament": "OT",
+    "files": {
+      "telugu": "Isaiah.json",
+      "niv": "Isaiah.json",
+      "kjv": "Isaiah.json"
+    }
+  },
+  {
+    "index": 24,
+    "id": "jeremiah",
+    "name": "Jeremiah",
+    "telugu": "యిర్మీయా",
+    "chapters": 52,
+    "testament": "OT",
+    "files": {
+      "telugu": "Jeremiah.json",
+      "niv": "Jeremiah.json",
+      "kjv": "Jeremiah.json"
+    }
+  },
+  {
+    "index": 25,
+    "id": "lamentations",
+    "name": "Lamentations",
+    "telugu": "విలాపవాక్యములు",
+    "chapters": 5,
+    "testament": "OT",
+    "files": {
+      "telugu": "Lamentations.json",
+      "niv": "Lamentations.json",
+      "kjv": "Lamentations.json"
+    }
+  },
+  {
+    "index": 26,
+    "id": "ezekiel",
+    "name": "Ezekiel",
+    "telugu": "యెహెజ్కేలు",
+    "chapters": 48,
+    "testament": "OT",
+    "files": {
+      "telugu": "Ezekiel.json",
+      "niv": "Ezekiel.json",
+      "kjv": "Ezekiel.json"
+    }
+  },
+  {
+    "index": 27,
+    "id": "daniel",
+    "name": "Daniel",
+    "telugu": "దానియేలు",
+    "chapters": 12,
+    "testament": "OT",
+    "files": {
+      "telugu": "Daniel.json",
+      "niv": "Daniel.json",
+      "kjv": "Daniel.json"
+    }
+  },
+  {
+    "index": 28,
+    "id": "hosea",
+    "name": "Hosea",
+    "telugu": "హొషేయ",
+    "chapters": 14,
+    "testament": "OT",
+    "files": {
+      "telugu": "Hosea.json",
+      "niv": "Hosea.json",
+      "kjv": "Hosea.json"
+    }
+  },
+  {
+    "index": 29,
+    "id": "joel",
+    "name": "Joel",
+    "telugu": "యోవేలు",
+    "chapters": 3,
+    "testament": "OT",
+    "files": {
+      "telugu": "Joel.json",
+      "niv": "Joel.json",
+      "kjv": "Joel.json"
+    }
+  },
+  {
+    "index": 30,
+    "id": "amos",
+    "name": "Amos",
+    "telugu": "ఆమోసు",
+    "chapters": 9,
+    "testament": "OT",
+    "files": {
+      "telugu": "Amos.json",
+      "niv": "Amos.json",
+      "kjv": "Amos.json"
+    }
+  },
+  {
+    "index": 31,
+    "id": "obadiah",
+    "name": "Obadiah",
+    "telugu": "ఓబద్యా",
+    "chapters": 1,
+    "testament": "OT",
+    "files": {
+      "telugu": "Obadiah.json",
+      "niv": "Obadiah.json",
+      "kjv": "Obadiah.json"
+    }
+  },
+  {
+    "index": 32,
+    "id": "jonah",
+    "name": "Jonah",
+    "telugu": "యోనా",
+    "chapters": 4,
+    "testament": "OT",
+    "files": {
+      "telugu": "Jonah.json",
+      "niv": "Jonah.json",
+      "kjv": "Jonah.json"
+    }
+  },
+  {
+    "index": 33,
+    "id": "micah",
+    "name": "Micah",
+    "telugu": "మీకా",
+    "chapters": 7,
+    "testament": "OT",
+    "files": {
+      "telugu": "Micah.json",
+      "niv": "Micah.json",
+      "kjv": "Micah.json"
+    }
+  },
+  {
+    "index": 34,
+    "id": "nahum",
+    "name": "Nahum",
+    "telugu": "నహూము",
+    "chapters": 3,
+    "testament": "OT",
+    "files": {
+      "telugu": "Nahum.json",
+      "niv": "Nahum.json",
+      "kjv": "Nahum.json"
+    }
+  },
+  {
+    "index": 35,
+    "id": "habakkuk",
+    "name": "Habakkuk",
+    "telugu": "హబక్కూకు",
+    "chapters": 3,
+    "testament": "OT",
+    "files": {
+      "telugu": "Habakkuk.json",
+      "niv": "Habakkuk.json",
+      "kjv": "Habakkuk.json"
+    }
+  },
+  {
+    "index": 36,
+    "id": "zephaniah",
+    "name": "Zephaniah",
+    "telugu": "జెఫన్యా",
+    "chapters": 3,
+    "testament": "OT",
+    "files": {
+      "telugu": "Zephaniah.json",
+      "niv": "Zephaniah.json",
+      "kjv": "Zephaniah.json"
+    }
+  },
+  {
+    "index": 37,
+    "id": "haggai",
+    "name": "Haggai",
+    "telugu": "హగ్గయి",
+    "chapters": 2,
+    "testament": "OT",
+    "files": {
+      "telugu": "Haggai.json",
+      "niv": "Haggai.json",
+      "kjv": "Haggai.json"
+    }
+  },
+  {
+    "index": 38,
+    "id": "zechariah",
+    "name": "Zechariah",
+    "telugu": "జెకర్యా",
+    "chapters": 14,
+    "testament": "OT",
+    "files": {
+      "telugu": "Zechariah.json",
+      "niv": "Zechariah.json",
+      "kjv": "Zechariah.json"
+    }
+  },
+  {
+    "index": 39,
+    "id": "malachi",
+    "name": "Malachi",
+    "telugu": "మలాకీ",
+    "chapters": 4,
+    "testament": "OT",
+    "files": {
+      "telugu": "Malachi.json",
+      "niv": "Malachi.json",
+      "kjv": "Malachi.json"
+    }
+  },
+  {
+    "index": 40,
+    "id": "matthew",
+    "name": "Matthew",
+    "telugu": "మత్తయి సువార్త",
+    "chapters": 28,
+    "testament": "NT",
+    "files": {
+      "telugu": "Matthew.json",
+      "niv": "Matthew.json",
+      "kjv": "Matthew.json"
+    }
+  },
+  {
+    "index": 41,
+    "id": "mark",
+    "name": "Mark",
+    "telugu": "మార్కు సువార్త",
+    "chapters": 16,
+    "testament": "NT",
+    "files": {
+      "telugu": "Mark.json",
+      "niv": "Mark.json",
+      "kjv": "Mark.json"
+    }
+  },
+  {
+    "index": 42,
+    "id": "luke",
+    "name": "Luke",
+    "telugu": "లూకా సువార్త",
+    "chapters": 24,
+    "testament": "NT",
+    "files": {
+      "telugu": "Luke.json",
+      "niv": "Luke.json",
+      "kjv": "Luke.json"
+    }
+  },
+  {
+    "index": 43,
+    "id": "john",
+    "name": "John",
+    "telugu": "యోహాను సువార్త",
+    "chapters": 21,
+    "testament": "NT",
+    "files": {
+      "telugu": "John.json",
+      "niv": "John.json",
+      "kjv": "John.json"
+    }
+  },
+  {
+    "index": 44,
+    "id": "acts",
+    "name": "Acts",
+    "telugu": "అపొస్తలుల కార్యములు",
+    "chapters": 28,
+    "testament": "NT",
+    "files": {
+      "telugu": "Acts.json",
+      "niv": "Acts.json",
+      "kjv": "Acts.json"
+    }
+  },
+  {
+    "index": 45,
+    "id": "romans",
+    "name": "Romans",
+    "telugu": "రోమీయులకు",
+    "chapters": 16,
+    "testament": "NT",
+    "files": {
+      "telugu": "Romans.json",
+      "niv": "Romans.json",
+      "kjv": "Romans.json"
+    }
+  },
+  {
+    "index": 46,
+    "id": "1corinthians",
+    "name": "1 Corinthians",
+    "telugu": "1 కొరింథీయులకు",
+    "chapters": 16,
+    "testament": "NT",
+    "files": {
+      "telugu": "1 Corinthians.json",
+      "niv": "1 Corinthians.json",
+      "kjv": "1Corinthians.json"
+    }
+  },
+  {
+    "index": 47,
+    "id": "2corinthians",
+    "name": "2 Corinthians",
+    "telugu": "2 కొరింథీయులకు",
+    "chapters": 13,
+    "testament": "NT",
+    "files": {
+      "telugu": "2 Corinthians.json",
+      "niv": "2 Corinthians.json",
+      "kjv": "2Corinthians.json"
+    }
+  },
+  {
+    "index": 48,
+    "id": "galatians",
+    "name": "Galatians",
+    "telugu": "గలతీయులకు",
+    "chapters": 6,
+    "testament": "NT",
+    "files": {
+      "telugu": "Galatians.json",
+      "niv": "Galatians.json",
+      "kjv": "Galatians.json"
+    }
+  },
+  {
+    "index": 49,
+    "id": "ephesians",
+    "name": "Ephesians",
+    "telugu": "ఎఫెసీయులకు",
+    "chapters": 6,
+    "testament": "NT",
+    "files": {
+      "telugu": "Ephesians.json",
+      "niv": "Ephesians.json",
+      "kjv": "Ephesians.json"
+    }
+  },
+  {
+    "index": 50,
+    "id": "philippians",
+    "name": "Philippians",
+    "telugu": "ఫిలిప్పీయులకు",
+    "chapters": 4,
+    "testament": "NT",
+    "files": {
+      "telugu": "Philippians.json",
+      "niv": "Philippians.json",
+      "kjv": "Philippians.json"
+    }
+  },
+  {
+    "index": 51,
+    "id": "colossians",
+    "name": "Colossians",
+    "telugu": "కొలొస్సయులకు",
+    "chapters": 4,
+    "testament": "NT",
+    "files": {
+      "telugu": "Colossians.json",
+      "niv": "Colossians.json",
+      "kjv": "Colossians.json"
+    }
+  },
+  {
+    "index": 52,
+    "id": "1thessalonians",
+    "name": "1 Thessalonians",
+    "telugu": "1 థెస్సలొనీకయులకు",
+    "chapters": 5,
+    "testament": "NT",
+    "files": {
+      "telugu": "1 Thessalonians.json",
+      "niv": "1 Thessalonians.json",
+      "kjv": "1Thessalonians.json"
+    }
+  },
+  {
+    "index": 53,
+    "id": "2thessalonians",
+    "name": "2 Thessalonians",
+    "telugu": "2 థెస్సలొనీకయులకు",
+    "chapters": 3,
+    "testament": "NT",
+    "files": {
+      "telugu": "2 Thessalonians.json",
+      "niv": "2 Thessalonians.json",
+      "kjv": "2Thessalonians.json"
+    }
+  },
+  {
+    "index": 54,
+    "id": "1timothy",
+    "name": "1 Timothy",
+    "telugu": "1 తిమోతికి",
+    "chapters": 6,
+    "testament": "NT",
+    "files": {
+      "telugu": "1 Timothy.json",
+      "niv": "1 Timothy.json",
+      "kjv": "1Timothy.json"
+    }
+  },
+  {
+    "index": 55,
+    "id": "2timothy",
+    "name": "2 Timothy",
+    "telugu": "2 తిమోతికి",
+    "chapters": 4,
+    "testament": "NT",
+    "files": {
+      "telugu": "2 Timothy.json",
+      "niv": "2 Timothy.json",
+      "kjv": "2Timothy.json"
+    }
+  },
+  {
+    "index": 56,
+    "id": "titus",
+    "name": "Titus",
+    "telugu": "తీతుకు",
+    "chapters": 3,
+    "testament": "NT",
+    "files": {
+      "telugu": "Titus.json",
+      "niv": "Titus.json",
+      "kjv": "Titus.json"
+    }
+  },
+  {
+    "index": 57,
+    "id": "philemon",
+    "name": "Philemon",
+    "telugu": "ఫిలేమోనుకు",
+    "chapters": 1,
+    "testament": "NT",
+    "files": {
+      "telugu": "Philemon.json",
+      "niv": "Philemon.json",
+      "kjv": "Philemon.json"
+    }
+  },
+  {
+    "index": 58,
+    "id": "hebrews",
+    "name": "Hebrews",
+    "telugu": "హెబ్రీయులకు",
+    "chapters": 13,
+    "testament": "NT",
+    "files": {
+      "telugu": "Hebrews.json",
+      "niv": "Hebrews.json",
+      "kjv": "Hebrews.json"
+    }
+  },
+  {
+    "index": 59,
+    "id": "james",
+    "name": "James",
+    "telugu": "యాకోబు",
+    "chapters": 5,
+    "testament": "NT",
+    "files": {
+      "telugu": "James.json",
+      "niv": "James.json",
+      "kjv": "James.json"
+    }
+  },
+  {
+    "index": 60,
+    "id": "1peter",
+    "name": "1 Peter",
+    "telugu": "1 పేతురు",
+    "chapters": 5,
+    "testament": "NT",
+    "files": {
+      "telugu": "1 Peter.json",
+      "niv": "1 Peter.json",
+      "kjv": "1Peter.json"
+    }
+  },
+  {
+    "index": 61,
+    "id": "2peter",
+    "name": "2 Peter",
+    "telugu": "2 పేతురు",
+    "chapters": 3,
+    "testament": "NT",
+    "files": {
+      "telugu": "2 Peter.json",
+      "niv": "2 Peter.json",
+      "kjv": "2Peter.json"
+    }
+  },
+  {
+    "index": 62,
+    "id": "1john",
+    "name": "1 John",
+    "telugu": "1 యోహాను",
+    "chapters": 5,
+    "testament": "NT",
+    "files": {
+      "telugu": "1 John.json",
+      "niv": "1 John.json",
+      "kjv": "1John.json"
+    }
+  },
+  {
+    "index": 63,
+    "id": "2john",
+    "name": "2 John",
+    "telugu": "2 యోహాను",
+    "chapters": 1,
+    "testament": "NT",
+    "files": {
+      "telugu": "2 John.json",
+      "niv": "2 John.json",
+      "kjv": "2John.json"
+    }
+  },
+  {
+    "index": 64,
+    "id": "3john",
+    "name": "3 John",
+    "telugu": "3 యోహాను",
+    "chapters": 1,
+    "testament": "NT",
+    "files": {
+      "telugu": "3 John.json",
+      "niv": "3 John.json",
+      "kjv": "3John.json"
+    }
+  },
+  {
+    "index": 65,
+    "id": "jude",
+    "name": "Jude",
+    "telugu": "యూదా",
+    "chapters": 1,
+    "testament": "NT",
+    "files": {
+      "telugu": "Jude.json",
+      "niv": "Jude.json",
+      "kjv": "Jude.json"
+    }
+  },
+  {
+    "index": 66,
+    "id": "revelation",
+    "name": "Revelation",
+    "telugu": "ప్రకటన గ్రంథము",
+    "chapters": 22,
+    "testament": "NT",
+    "files": {
+      "telugu": "Revelation.json",
+      "niv": "Revelation.json",
+      "kjv": "Revelation.json"
+    }
+  }
+]
