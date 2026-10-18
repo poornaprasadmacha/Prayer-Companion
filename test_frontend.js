@@ -54,6 +54,8 @@ const scripts = [
   'js/bible-plan-data.js',
   'js/bible-plan.js',
   'js/bible-reader.js',
+  'js/sermons-data.js',
+  'js/sermons.js',
   'js/app.js'
 ];
 
@@ -275,7 +277,14 @@ const requiredIds = [
   'bible-reader-btn-next',
   'bible-reader-close-btn',
   'bible-picker-dialog',
-  'more-btn-holy-bible'
+  'more-btn-holy-bible',
+  // Bible Sermons Fast Access
+  'header-btn-sermons',
+  'home-sermons-quick-bar',
+  'view-sermons',
+  'modal-sermon-player',
+  'sermon-player-body',
+  'more-btn-sermons'
 ];
 
 requiredIds.forEach(id => {
@@ -557,9 +566,95 @@ console.log('✓ Verified: View modes toggle cleanly between Bilingual (తె�
 assert.strictEqual(typeof App.openMoreBibleReader, 'function', 'App.openMoreBibleReader must be a function');
 console.log('✓ Verified: App controller connects directly to Holy Bible Reader');
 
+// ============================================================================
+// 8. VERIFY CLEAN ENGLISH ON UI BUTTONS & NAVIGATION (NO TELUGU WORDS ON BUTTONS)
+// ============================================================================
+console.log('\nVerifying Clean English on UI Buttons & Navigation...');
+assert.ok(!indexHtml.includes('Read • చదవండి'), 'UI buttons must not contain Telugu words; must be clean English "Read"');
+assert.ok(!indexHtml.includes('Previous • మునుపటి'), 'Footer navigation must not contain Telugu words; must be clean English "Previous"');
+assert.ok(!indexHtml.includes('Next • తరువాతి'), 'Footer navigation must not contain Telugu words; must be clean English "Next"');
+assert.ok(!indexHtml.includes('Select Book • గ్రంథాన్ని ఎంచుకోండి'), 'Book picker header must not contain Telugu words; must be clean English "Select Book"');
+assert.ok(/>\s*Both\s*</.test(indexHtml), 'View mode pills must include clean English "Both"');
+assert.ok(/>\s*Telugu\s*</.test(indexHtml), 'View mode pills must include clean English "Telugu"');
+assert.ok(/>\s*English\s*</.test(indexHtml), 'View mode pills must include clean English "English"');
+assert.ok(indexHtml.includes('Select Book'), 'Picker modal title must say "Select Book"');
+console.log('✓ Verified: UI buttons, tabs, and headers strictly use clean English');
+
+// ============================================================================
+// 9. VERIFY BIBLE SERMONS FAST-ACCESS FEATURE (TELUGU & ENGLISH)
+// ============================================================================
+console.log('\nVerifying Bible Sermons Fast-Access Feature...');
+const SermonsData = require('./js/sermons-data.js');
+const Sermons = require('./js/sermons.js');
+
+// Global mock for Node testing environment
+global.BIBLE_SERMONS = SermonsData;
+
+assert.ok(Array.isArray(SermonsData), 'SermonsData must be an array');
+assert.ok(SermonsData.length >= 8, 'Must contain at least 8 curated Bible sermons');
+
+// Verify sermon structure
+SermonsData.forEach(s => {
+  assert.ok(s.id, `Sermon ${s.title} must have id`);
+  assert.ok(s.title, `Sermon ${s.id} must have title`);
+  assert.ok(s.speaker, `Sermon ${s.id} must have speaker`);
+  assert.ok(s.category, `Sermon ${s.id} must have category`);
+  assert.ok(s.language === 'English' || s.language === 'Telugu', `Sermon ${s.id} language must be English or Telugu`);
+  assert.ok(s.scripture, `Sermon ${s.id} must have scripture`);
+  assert.ok(s.duration, `Sermon ${s.id} must have duration`);
+  assert.ok(s.summary, `Sermon ${s.id} must have summary`);
+  assert.ok(Array.isArray(s.keyTakeaways) && s.keyTakeaways.length > 0, `Sermon ${s.id} must have key takeaways array`);
+  assert.ok(s.prayerPrompt, `Sermon ${s.id} must have prayer prompt`);
+});
+console.log(`✓ Verified: All ${SermonsData.length} sermons have complete metadata, takeaways, and prayer prompts`);
+
+// Verify Telugu and English sermons both exist
+const teluguSermons = SermonsData.filter(s => s.language === 'Telugu');
+const englishSermons = SermonsData.filter(s => s.language === 'English');
+assert.ok(teluguSermons.length >= 3, 'Must have at least 3 Telugu sermons');
+assert.ok(englishSermons.length >= 3, 'Must have at least 3 English sermons');
+console.log(`✓ Verified: Bilingual sermons collection includes ${teluguSermons.length} Telugu and ${englishSermons.length} English messages`);
+
+// Verify Instant Filtering
+Sermons.setCategory('All');
+Sermons.setSearchQuery('');
+assert.strictEqual(Sermons.getFilteredSermons().length, SermonsData.length, 'Filter All should return all sermons');
+
+// Test category filter
+Sermons.setCategory('Prayer');
+const prayerSermons = Sermons.getFilteredSermons();
+assert.ok(prayerSermons.length > 0, 'Prayer category must yield results');
+prayerSermons.forEach(s => assert.strictEqual(s.category, 'Prayer'));
+
+// Test language filter via setCategory
+Sermons.setCategory('Telugu');
+const teluguFiltered = Sermons.getFilteredSermons();
+assert.strictEqual(teluguFiltered.length, teluguSermons.length, 'Telugu category must yield all Telugu sermons');
+
+Sermons.setCategory('English');
+const englishFiltered = Sermons.getFilteredSermons();
+assert.strictEqual(englishFiltered.length, englishSermons.length, 'English category must yield all English sermons');
+
+// Test instant search query
+Sermons.setCategory('All');
+Sermons.setSearchQuery('peace');
+const searchResults = Sermons.getFilteredSermons();
+assert.ok(searchResults.length > 0, 'Search for "peace" must yield matching sermons');
+Sermons.setSearchQuery('');
+
+console.log('✓ Verified: Fast search & category filtering operate seamlessly');
+
+// Verify App integrations
+assert.strictEqual(typeof App.openSermonsFiltered, 'function', 'App.openSermonsFiltered must be a function');
+assert.strictEqual(typeof Sermons.openPlayer, 'function', 'Sermons.openPlayer must be a function');
+assert.strictEqual(typeof Sermons.closePlayer, 'function', 'Sermons.closePlayer must be a function');
+assert.strictEqual(typeof Sermons.prayWithSermon, 'function', 'Sermons.prayWithSermon must be a function');
+console.log('✓ Verified: App and Sermons player/prayer integrations fully connected');
+
 console.log('============================================================');
 console.log('ALL FRONTEND & THEME SYSTEM TESTS PASSED SUCCESSFULLY (100%)');
 console.log('============================================================\n');
+
 
 
 

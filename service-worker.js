@@ -4,7 +4,7 @@
  * and Cache-First strategy for static assets.
  */
 
-const CACHE_NAME = 'prayerly-v28';
+const CACHE_NAME = 'prayerly-v29';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -28,6 +28,8 @@ const STATIC_ASSETS = [
   './js/bible-plan-data.js',
   './js/bible-plan.js',
   './js/bible-reader.js',
+  './js/sermons-data.js',
+  './js/sermons.js',
   './js/app.js',
   './assets/prayerly-logo.png',
   './assets/daily-devotional.jpg',

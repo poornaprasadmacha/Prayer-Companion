@@ -673,14 +673,14 @@
       container.innerHTML = `
         <div class="bible-picker-tabs">
           <button class="bible-picker-tab ${!q && activeTestament === 'OT' ? 'active' : ''}" onclick="BibleReader.renderPicker('OT')">
-            Old Testament &bull; పాత నిబంధన (39)
+            Old Testament (39)
           </button>
           <button class="bible-picker-tab ${!q && activeTestament === 'NT' ? 'active' : ''}" onclick="BibleReader.renderPicker('NT')">
-            New Testament &bull; క్రొత్త నిబంధన (27)
+            New Testament (27)
           </button>
         </div>
         <div class="bible-picker-search-wrap">
-          <input type="text" class="bible-picker-search-input" placeholder="Search book (e.g. Genesis, యోహాను)..." value="${filterQuery}" oninput="BibleReader.renderPicker('${activeTestament}', this.value)" />
+          <input type="text" class="bible-picker-search-input" placeholder="Search book (e.g. Genesis, Matthew)..." value="${filterQuery}" oninput="BibleReader.renderPicker('${activeTestament}', this.value)" />
         </div>
         <div class="bible-picker-grid">
           ${filtered.map(b => `
@@ -731,9 +731,11 @@
       // Update header title
       if (titleEl) {
         titleEl.innerHTML = `
-          <span class="reader-title-telugu">${book.telugu}</span>
-          <span class="reader-title-separator">&bull;</span>
           <span class="reader-title-english">${book.name} ${this.currentChapter}</span>
+          ${(this.viewMode === 'telugu' || this.viewMode === 'bilingual') ? `
+            <span class="reader-title-separator">&bull;</span>
+            <span class="reader-title-telugu">${book.telugu}</span>
+          ` : ''}
         `;
       }
 
@@ -774,7 +776,7 @@
             <span class="assigned-bar-label">Day Reading:</span>
             ${this.assignedChapters.map(ch => `
               <button class="assigned-chip ${ch === this.currentChapter ? 'active' : ''}" onclick="BibleReader.openChapter('${book.id}', ${ch}, { assignedChapters: BibleReader.assignedChapters, clearContext: false })">
-                ${book.teluguShort} ${ch}
+                ${book.name} ${ch}
               </button>
             `).join('')}
           `;
@@ -790,7 +792,7 @@
           const isDone = (typeof BiblePlan !== 'undefined' && BiblePlan.getState && BiblePlan.getState().completedDays.includes(this.readingContext.dayNum));
           completeBtnWrap.innerHTML = `
             <button id="bible-reader-complete-btn" class="bible-reader-footer-btn ${isDone ? 'btn-day-done' : 'btn-day-complete'}" onclick="BibleReader.markDayRead()">
-              <span>${isDone ? `✓ Completed Day ${this.readingContext.dayNum}` : `✓ Mark Day ${this.readingContext.dayNum} as Read`}</span>
+              <span>${isDone ? `✓ Completed Day ${this.readingContext.dayNum}` : `Mark Day ${this.readingContext.dayNum} as Read`}</span>
             </button>
           `;
           completeBtnWrap.style.display = 'block';
@@ -807,8 +809,7 @@
           <div class="bible-reader-loading">
             <div class="bible-reader-spinner"></div>
             <p class="bible-reader-loading-text">
-              <span>పరిశుద్ధ వాక్యము లోడ్ అవుతోంది...</span>
-              <span style="font-size: 13px; opacity: 0.8;">Loading scripture text...</span>
+              <span>Loading Scripture...</span>
             </p>
           </div>
         `;
@@ -832,8 +833,12 @@
         // Render Verses
         const html = `
           <div class="bible-chapter-header">
-            <h2 class="bible-chapter-h2">${paired.book.telugu} ${paired.chapter}</h2>
-            <div class="bible-chapter-sub">${paired.book.name} Chapter ${paired.chapter} &bull; ${paired.englishVersion}</div>
+            <h2 class="bible-chapter-h2">${paired.book.name} Chapter ${paired.chapter}</h2>
+            ${(this.viewMode === 'telugu' || this.viewMode === 'bilingual') ? `
+              <div class="bible-chapter-sub">${paired.book.telugu} &bull; ${paired.englishVersion}</div>
+            ` : `
+              <div class="bible-chapter-sub">${paired.englishVersion}</div>
+            `}
           </div>
           <div class="bible-verses-stream">
             ${paired.verses.map(v => `

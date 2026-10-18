@@ -420,6 +420,14 @@ const App = {
     }
   },
 
+  openSermonsFiltered(cat) {
+    this.closeAllModals();
+    if (typeof Sermons !== 'undefined') {
+      Sermons.setCategory(cat || 'All');
+    }
+    this.switchTab('sermons');
+  },
+
   openMoreManual() {
     this.closeAllModals();
     if (typeof Settings !== 'undefined' && Settings.openManualModal) {
@@ -955,7 +963,7 @@ const App = {
 
     const mobileMoreBtn = document.getElementById('btn-mobile-more');
     if (mobileMoreBtn) {
-      if (tabName === 'settings' || tabName === 'history' || tabName === 'stories' || tabName === 'bible-plan') {
+      if (tabName === 'settings' || tabName === 'history' || tabName === 'stories' || tabName === 'bible-plan' || tabName === 'sermons') {
         mobileMoreBtn.classList.add('active');
       } else {
         mobileMoreBtn.classList.remove('active');
@@ -1002,6 +1010,11 @@ const App = {
       case 'bible-plan':
         if (typeof BiblePlan !== 'undefined') {
           BiblePlan.render();
+        }
+        break;
+      case 'sermons':
+        if (typeof Sermons !== 'undefined') {
+          Sermons.render();
         }
         break;
       case 'admin':
@@ -1327,6 +1340,10 @@ const App = {
         date: new Date().toDateString()
       }));
     } catch (_) {}
+
+    if (typeof Sermons !== 'undefined' && Sermons.renderHomeQuickBar) {
+      Sermons.renderHomeQuickBar();
+    }
   },
 
   renderCachedDashboardSync() {
