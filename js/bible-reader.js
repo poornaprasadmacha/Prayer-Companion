@@ -210,6 +210,37 @@
           this.preloadBook('niv', 'genesis');
         });
       }
+
+      // Hardware/browser back button listener to exit dedicated Bible reading page cleanly
+      if (typeof window !== 'undefined' && window.addEventListener) {
+        window.addEventListener('popstate', () => {
+          if (typeof document !== 'undefined' && document.body && document.body.classList.contains('bible-full-page-active')) {
+            const modal = document.getElementById('modal-bible-reader');
+            if (modal && modal.classList.contains('active')) {
+              this.closeModal(true); // pass true to prevent recursive history.back()
+            }
+          }
+        });
+
+        // Keyboard shortcuts: Escape closes picker or reader, Left/Right arrows navigate chapters
+        window.addEventListener('keydown', (e) => {
+          if (!document.body || !document.body.classList.contains('bible-full-page-active')) return;
+          if (e.target && ['input', 'textarea', 'select'].includes((e.target.tagName || '').toLowerCase())) return;
+
+          if (e.key === 'Escape') {
+            const picker = document.getElementById('bible-picker-dialog');
+            if (picker && picker.style.display !== 'none') {
+              this.closePicker();
+            } else {
+              this.closeModal();
+            }
+          } else if (e.key === 'ArrowLeft') {
+            this.prevChapter();
+          } else if (e.key === 'ArrowRight') {
+            this.nextChapter();
+          }
+        });
+      }
     },
 
     // -----------------------------------------------------------------------
@@ -467,17 +498,37 @@
       const modal = document.getElementById('modal-bible-reader');
       if (modal) {
         modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        if (typeof document !== 'undefined' && document.body) {
+          document.body.classList.add('bible-full-page-active');
+          document.body.style.overflow = 'hidden';
+        }
       }
+      try {
+        if (typeof window !== 'undefined' && window.location && window.location.hash !== '#bible') {
+          window.history.pushState({ page: 'bible' }, '', '#bible');
+        }
+      } catch (e) {}
     },
 
-    closeModal() {
+    closeModal(isPopState = false) {
       const modal = document.getElementById('modal-bible-reader');
       if (modal) {
         modal.classList.remove('active');
-        document.body.style.overflow = '';
+        if (typeof document !== 'undefined' && document.body) {
+          document.body.classList.remove('bible-full-page-active');
+          document.body.style.overflow = '';
+        }
       }
       this.closePicker();
+      try {
+        if (!isPopState && typeof window !== 'undefined' && window.location && window.location.hash === '#bible') {
+          if (window.history.state && window.history.state.page === 'bible') {
+            window.history.back();
+          } else {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+        }
+      } catch (e) {}
     },
 
     // -----------------------------------------------------------------------

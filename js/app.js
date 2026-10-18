@@ -2555,6 +2555,13 @@ const App = {
     document.querySelectorAll('.modal-backdrop').forEach(modal => {
       modal.classList.remove('active');
     });
+    if (typeof document !== 'undefined' && document.body) {
+      document.body.classList.remove('bible-full-page-active');
+      document.body.style.overflow = '';
+    }
+    if (typeof BibleReader !== 'undefined' && BibleReader.closePicker) {
+      BibleReader.closePicker();
+    }
   },
 
   openAuthModal(initialStep = 'email') {

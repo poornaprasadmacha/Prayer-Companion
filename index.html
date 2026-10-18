@@ -1658,24 +1658,31 @@
   </div>
 
   <!-- ====================================================================
-       MODAL: HOLY BIBLE READER (TELUGU & ENGLISH)
+       PAGE: HOLY BIBLE READER (DEDICATED FULL-PAGE VIEW)
        ==================================================================== -->
-  <div id="modal-bible-reader" class="modal-backdrop bible-reader-backdrop">
-    <div class="modal-card bible-reader-modal-card">
-      <div class="modal-drag-handle"></div>
+  <div id="modal-bible-reader" class="modal-backdrop bible-reader-backdrop bible-reader-page-view" role="dialog" aria-modal="true" aria-label="Holy Bible Reader">
+    <div class="modal-card bible-reader-modal-card bible-page-card">
 
-      <!-- Header Navigation & Settings Bar -->
-      <div class="bible-reader-header">
+      <!-- Header Navigation & Settings Bar (Dedicated Bible Page Top Bar) -->
+      <header class="bible-reader-header bible-dedicated-navbar">
         <div class="bible-reader-header-top">
-          <!-- Book & Chapter Trigger Dropdown -->
-          <button id="bible-reader-book-picker-btn" class="bible-reader-title-btn" onclick="BibleReader.togglePicker()" title="Select Book and Chapter">
-            <span id="bible-reader-title-text" class="bible-reader-title-content">
-              <span class="reader-title-telugu">ఆదికాండము</span>
-              <span class="reader-title-separator">&bull;</span>
-              <span class="reader-title-english">Genesis 1</span>
-            </span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bible-reader-arrow-icon"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
+          <!-- Left: Back Button & Book Picker -->
+          <div class="bible-nav-left-group">
+            <button id="bible-reader-close-btn" class="bible-nav-back-btn" onclick="BibleReader.closeModal()" aria-label="Back to Prayerly" title="Back to Prayerly">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="bible-back-arrow"><polyline points="15 18 9 12 15 6"/></svg>
+              <span class="bible-back-text">Back</span>
+            </button>
+            <div class="bible-nav-divider" aria-hidden="true"></div>
+            <!-- Book & Chapter Trigger Dropdown -->
+            <button id="bible-reader-book-picker-btn" class="bible-reader-title-btn" onclick="BibleReader.togglePicker()" title="Select Book and Chapter" aria-haspopup="dialog">
+              <span id="bible-reader-title-text" class="bible-reader-title-content">
+                <span class="reader-title-english">Genesis 1</span>
+                <span class="reader-title-separator">&bull;</span>
+                <span class="reader-title-telugu">ఆదికాండము</span>
+              </span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="bible-reader-arrow-icon"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
 
           <!-- Right Action Controls -->
           <div class="bible-reader-top-actions">
@@ -1685,9 +1692,10 @@
               <button class="bible-reader-tool-btn" onclick="BibleReader.adjustFontSize(1)" title="Larger text" aria-label="Increase font size">A+</button>
             </div>
 
-            <!-- Close Reader -->
-            <button id="bible-reader-close-btn" class="icon-btn modal-close-btn bible-reader-close" onclick="BibleReader.closeModal()" aria-label="Close reader">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <!-- In-Reader Theme Toggle -->
+            <button id="bible-theme-toggle-btn" class="bible-reader-tool-btn bible-theme-toggle" onclick="App.toggleTheme()" title="Toggle Light/Dark Theme" aria-label="Toggle theme">
+              <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             </button>
           </div>
         </div>
@@ -1695,7 +1703,7 @@
         <!-- Mode & Translation Controls Row -->
         <div class="bible-reader-header-subbar">
           <!-- View Mode: Both / Telugu / English -->
-          <div class="bible-reader-view-modes" role="tablist">
+          <div class="bible-reader-view-modes" role="tablist" aria-label="View Mode">
             <button class="bible-reader-view-btn active" data-mode="bilingual" onclick="BibleReader.setViewMode('bilingual')">
               Both
             </button>
@@ -1717,15 +1725,15 @@
 
         <!-- Assigned Reading Chapters Chips (if reading multi-chapter day) -->
         <div id="bible-reader-assigned-bar" class="bible-reader-assigned-bar" style="display: none;"></div>
-      </div>
+      </header>
 
-      <!-- Scrollable Scripture Content Body -->
-      <div id="bible-reader-content" class="bible-reader-content-body font-normal mode-bilingual">
+      <!-- Scrollable Scripture Content Body (Centered Executive Reading Canvas) -->
+      <main id="bible-reader-content" class="bible-reader-content-body font-normal mode-bilingual" tabindex="0">
         <!-- Scripture verses stream rendered dynamically -->
-      </div>
+      </main>
 
       <!-- Bottom Reader Navigation Footer -->
-      <div class="bible-reader-footer">
+      <footer class="bible-reader-footer">
         <div class="bible-reader-footer-nav">
           <button id="bible-reader-btn-prev" class="bible-reader-footer-btn btn-prev" onclick="BibleReader.prevChapter()" title="Previous chapter">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1739,10 +1747,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>
-      </div>
+      </footer>
 
       <!-- Standalone Book & Chapter Quick Picker Dialog -->
-      <div id="bible-picker-dialog" class="bible-picker-dialog" style="display: none;">
+      <div id="bible-picker-dialog" class="bible-picker-dialog" style="display: none;" role="dialog" aria-modal="true" aria-label="Book and Chapter Picker">
         <div class="bible-picker-dialog-card">
           <div class="bible-picker-dialog-header">
             <span class="bible-picker-dialog-title">Select Book</span>

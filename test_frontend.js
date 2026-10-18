@@ -568,6 +568,57 @@ assert.strictEqual(typeof App.openStoryReader, 'undefined', 'App.openStoryReader
 assert.strictEqual(typeof App.openSermonsFiltered, 'undefined', 'App.openSermonsFiltered must be removed');
 console.log('✓ Verified: Bible Stories and Sermons are completely removed from DOM and controllers');
 
+// ============================================================================
+// 10. VERIFY DEDICATED FULL-PAGE BIBLE READER & HEADER REMOVAL
+// ============================================================================
+console.log('\nVerifying Dedicated Full-Page Bible Reader & Header Removal...');
+
+// 1. Verify CSS styles for body.bible-full-page-active hiding app header and bottom nav
+assert.ok(stylesCss.includes('body.bible-full-page-active .app-header'), 'CSS must target .app-header when Bible page is active');
+assert.ok(stylesCss.includes('body.bible-full-page-active .mobile-bottom-nav'), 'CSS must target .mobile-bottom-nav when Bible page is active');
+assert.ok(stylesCss.includes('body.bible-full-page-active #pwa-install-banner'), 'CSS must target #pwa-install-banner when Bible page is active');
+
+// 2. Verify full 100vw x 100vh page isolation
+assert.ok(stylesCss.includes('100vw !important') && stylesCss.includes('100vh !important'), 'Bible reader backdrop must be 100vw x 100vh');
+
+// 3. Verify markup for dedicated navigation top bar
+assert.ok(indexHtml.includes('bible-dedicated-navbar'), 'Dedicated Bible navigation top bar must be present');
+assert.ok(indexHtml.includes('bible-nav-back-btn'), 'Back button with class bible-nav-back-btn must exist');
+assert.ok(indexHtml.includes('bible-theme-toggle-btn'), 'Theme toggle button bible-theme-toggle-btn must exist');
+
+// 4. Verify controller toggling body class
+const classListSet = new Set();
+global.document.body = {
+  classList: {
+    add: (cls) => classListSet.add(cls),
+    remove: (cls) => classListSet.delete(cls),
+    contains: (cls) => classListSet.has(cls)
+  },
+  style: {}
+};
+mockElements['modal-bible-reader'] = {
+  classList: {
+    add: (cls) => classListSet.add(cls),
+    remove: (cls) => classListSet.delete(cls),
+    contains: (cls) => classListSet.has(cls)
+  }
+};
+mockElements['bible-picker-dialog'] = { style: { display: 'none' } };
+
+BibleReader.showModal();
+assert.ok(classListSet.has('bible-full-page-active'), 'body must have bible-full-page-active when Bible reader opens');
+BibleReader.closeModal();
+assert.ok(!classListSet.has('bible-full-page-active'), 'body must remove bible-full-page-active when Bible reader closes');
+
+// App.closeAllModals() also cleans up
+BibleReader.showModal();
+assert.ok(classListSet.has('bible-full-page-active'), 'body must have bible-full-page-active before closeAllModals');
+global.document.querySelectorAll = () => [];
+App.closeAllModals();
+assert.ok(!classListSet.has('bible-full-page-active'), 'App.closeAllModals must remove bible-full-page-active');
+
+console.log('✓ Verified: Bible opens as dedicated full page with Prayerly header removed and clean return');
+
 console.log('============================================================');
 console.log('ALL FRONTEND & THEME SYSTEM TESTS PASSED SUCCESSFULLY (100%)');
 console.log('============================================================\n');
