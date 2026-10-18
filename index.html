@@ -249,15 +249,12 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 5px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
           <span class="signin-text">Sign In</span>
         </button>
-        <button id="theme-toggle-btn" class="icon-btn theme-toggle-btn" title="Theme (Light / Dark / System)" aria-label="Toggle Theme">
+        <button id="theme-toggle-btn" class="icon-btn theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
           <span class="icon-sun">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
           </span>
           <span class="icon-moon" style="display: none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-          </span>
-          <span class="icon-system" style="display: none;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 17px; height: 17px;"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
           </span>
         </button>
         <span id="user-email-badge" class="user-badge" title="Account Settings" style="display: none;">
@@ -305,7 +302,7 @@
       <div class="greeting-section">
         <div class="greeting-row">
           <div>
-            <h1 id="dashboard-greeting" class="greeting-title">Good morning, <span class="greeting-short-name" id="dashboard-user-name">Poorna</span></h1>
+            <h1 id="dashboard-greeting" class="greeting-title">Good morning, <span class="greeting-short-name" id="dashboard-user-name">Friend</span></h1>
             <p id="dashboard-date" class="greeting-date">Today</p>
           </div>
           <div class="greeting-actions">
@@ -318,7 +315,7 @@
         <script>
           (function() {
             try {
-              var n = localStorage.getItem('prayer_user_short_name') || 'Poorna';
+              var n = localStorage.getItem('prayer_user_short_name') || 'Friend';
               var now = new Date();
               var h = now.getHours();
               var g = h < 12 ? 'Good morning' : (h < 17 ? 'Good afternoon' : 'Good evening');
@@ -1338,11 +1335,11 @@
         <div id="auth-step-email">
           <div class="form-group" style="margin-bottom: 14px;">
             <label class="form-label" for="auth-name-input">Your Name</label>
-            <input type="text" id="auth-name-input" class="form-input" placeholder="e.g. Poorna" maxlength="40" autocomplete="name">
+            <input type="text" id="auth-name-input" class="form-input" placeholder="Your name" maxlength="40" autocomplete="name">
           </div>
           <div class="form-group" style="margin-bottom: 18px;">
             <label class="form-label" for="auth-email-input">Email Address *</label>
-            <input type="email" id="auth-email-input" class="form-input" placeholder="poornaprasad12344@gmail.com" required autocomplete="email">
+            <input type="email" id="auth-email-input" class="form-input" placeholder="name@example.com" required autocomplete="email">
           </div>
           <button id="btn-send-otp" class="btn btn-primary" style="width: 100%; height: 46px; font-size: 15px; font-weight: 600;">
             Send OTP
@@ -2025,7 +2022,7 @@
 
         <div class="form-group" style="margin-bottom: 18px;">
           <label class="form-label" for="friend-sender-name-input">Your Name (Shown in Invitation)</label>
-          <input type="text" id="friend-sender-name-input" class="form-input" placeholder="e.g. Poorna" maxlength="40">
+          <input type="text" id="friend-sender-name-input" class="form-input" placeholder="Your name" maxlength="40">
         </div>
 
         <button id="btn-send-friend-email" class="btn btn-primary" style="width: 100%; height: 44px; font-weight: 600;" onclick="App.sendEmailToFriend()">

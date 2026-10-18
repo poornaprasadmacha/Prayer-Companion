@@ -128,11 +128,11 @@ const App = {
     const savedTheme = this.getTheme();
     this.applyTheme(savedTheme);
 
-    // 3. Header Theme Toggle Button Click Listener (Cycle: Light -> Dark -> System -> Light)
+    // 3. Header Theme Toggle Button Click Listener (Direct Light <-> Dark toggle)
     const toggleBtn = document.getElementById('theme-toggle-btn');
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
-        this.cycleTheme();
+        this.toggleTheme();
       });
     }
 
@@ -170,16 +170,19 @@ const App = {
   },
 
   cycleTheme() {
-    const current = this.getTheme();
-    let next = 'dark';
-    if (current === 'light') next = 'dark';
-    else if (current === 'dark') next = 'system';
-    else next = 'light';
-    this.setTheme(next, true);
+    this.toggleTheme();
   },
 
   toggleTheme() {
-    this.cycleTheme();
+    // Top navigation toggles directly between Light and Dark mode
+    let isCurrentlyDark = false;
+    if (typeof document !== 'undefined' && document.documentElement) {
+      isCurrentlyDark = document.documentElement.classList.contains('dark-theme');
+    } else {
+      isCurrentlyDark = (this.getTheme() === 'dark');
+    }
+    const nextTheme = isCurrentlyDark ? 'light' : 'dark';
+    this.setTheme(nextTheme, true);
   },
 
   applyTheme(mode) {
@@ -216,31 +219,22 @@ const App = {
         }
       }
 
-      // Update Header Toggle Button Icons & Accessibility
+      // Update Header Toggle Button Icons & Accessibility (Only Light & Dark in Top Nav)
       const sunIcon = document.querySelector ? document.querySelector('#theme-toggle-btn .icon-sun') : null;
       const moonIcon = document.querySelector ? document.querySelector('#theme-toggle-btn .icon-moon') : null;
-      const sysIcon = document.querySelector ? document.querySelector('#theme-toggle-btn .icon-system') : null;
       const headerToggleBtn = document.getElementById ? document.getElementById('theme-toggle-btn') : null;
 
       if (headerToggleBtn) {
-        if (mode === 'light') {
-          if (sunIcon) sunIcon.style.display = 'inline-flex';
-          if (moonIcon) moonIcon.style.display = 'none';
-          if (sysIcon) sysIcon.style.display = 'none';
-          headerToggleBtn.title = 'Theme: Light (Click to switch to Dark)';
-          headerToggleBtn.setAttribute('aria-label', 'Theme: Light');
-        } else if (mode === 'dark') {
+        if (isDark) {
           if (sunIcon) sunIcon.style.display = 'none';
           if (moonIcon) moonIcon.style.display = 'inline-flex';
-          if (sysIcon) sysIcon.style.display = 'none';
-          headerToggleBtn.title = 'Theme: Dark (Click to switch to System)';
-          headerToggleBtn.setAttribute('aria-label', 'Theme: Dark');
+          headerToggleBtn.title = 'Switch to Light Mode';
+          headerToggleBtn.setAttribute('aria-label', 'Switch to Light Mode');
         } else {
-          if (sunIcon) sunIcon.style.display = 'none';
+          if (sunIcon) sunIcon.style.display = 'inline-flex';
           if (moonIcon) moonIcon.style.display = 'none';
-          if (sysIcon) sysIcon.style.display = 'inline-flex';
-          headerToggleBtn.title = `Theme: System (${isDark ? 'Dark' : 'Light'}) (Click to switch to Light)`;
-          headerToggleBtn.setAttribute('aria-label', 'Theme: System Default');
+          headerToggleBtn.title = 'Switch to Dark Mode';
+          headerToggleBtn.setAttribute('aria-label', 'Switch to Dark Mode');
         }
       }
 
@@ -1030,10 +1024,10 @@ const App = {
     else if (hours < 17) greeting = 'Good afternoon';
     else greeting = 'Good evening';
 
-    const shortName = (typeof Settings !== 'undefined' && Settings.getUserShortName) ? Settings.getUserShortName() : 'Poorna';
+    const shortName = (typeof Settings !== 'undefined' && Settings.getUserShortName) ? Settings.getUserShortName() : 'Friend';
 
     if (greetingEl) {
-      greetingEl.innerHTML = `${greeting}, <span class="greeting-short-name" id="dashboard-user-name">${UI.escape(shortName)}</span>`;
+      greetingEl.innerHTML = `${greeting}, <span class="greeting-short-name" id="dashboard-user-name">${UI.escape(shortName || 'Friend')}</span>`;
     }
 
     if (dateEl) {
@@ -2386,7 +2380,7 @@ const App = {
       const verseRef = verseRefEl ? verseRefEl.textContent : '— 1 Thessalonians 5:16-18';
 
       const userEmail = Auth.getUserEmail() || 'Personal Devotions';
-      const userName = (typeof Settings !== 'undefined' && Settings.getUserShortName) ? Settings.getUserShortName() : 'Poorna';
+      const userName = (typeof Settings !== 'undefined' && Settings.getUserShortName) ? Settings.getUserShortName() : 'Friend';
       const todayStr = new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
       let html = `
@@ -2781,11 +2775,9 @@ const App = {
       }
     };
 
-    // Pre-fill inputs from storage if available
-    const savedName = (typeof Settings !== 'undefined' && Settings.getUserShortName) ? Settings.getUserShortName() : 'Poorna';
-    if (nameInput && !nameInput.value) nameInput.value = savedName;
-    const lastEmail = localStorage.getItem('prayer_last_attempted_email') || (Auth.currentUser?.email && !Auth.isLocalMode() ? Auth.currentUser.email : 'poornaprasad12344@gmail.com');
-    if (emailInput && !emailInput.value) emailInput.value = lastEmail;
+    // Start with clean, empty inputs for user privacy
+    if (nameInput) nameInput.value = '';
+    if (emailInput) emailInput.value = '';
 
     if (backEmailBtn) backEmailBtn.onclick = () => showStep('email');
 

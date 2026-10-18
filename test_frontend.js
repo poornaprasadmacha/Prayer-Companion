@@ -458,16 +458,22 @@ assert.ok(stylesCss.includes('body.dark-theme .btn-primary'), 'Dark mode primary
 console.log('✓ Verified: Smooth 180ms transitions, reduced motion, and WCAG AAA button contrast');
 
 // 4. Verify Theme Selector in DOM
-assert.ok(indexHtml.includes('icon-sun') && indexHtml.includes('icon-moon') && indexHtml.includes('icon-system'), 'Header toggle must contain sun, moon, and system icons');
+assert.ok(indexHtml.includes('icon-sun') && indexHtml.includes('icon-moon'), 'Header toggle must contain sun and moon icons');
+assert.ok(!indexHtml.includes('class="icon-system"'), 'Header toggle must not contain system icon in top navigation');
 assert.ok(indexHtml.includes('data-theme-mode="light"') && indexHtml.includes('data-theme-mode="dark"') && indexHtml.includes('data-theme-mode="system"'), 'Settings must include 3-theme selector buttons (Light, Dark, System)');
-console.log('✓ Verified: Theme selector buttons with icons present in header and settings');
+console.log('✓ Verified: Top navigation has direct Sun/Moon toggle; Settings retains Light, Dark, System');
 
-// 5. Verify App Theme Controller Logic
+// 5. Verify Floating Blue Home Bible Card (No harsh left colored line)
+assert.ok(!stylesCss.includes('.home-bible-card {\n  background: var(--bg-card);\n  border: 1px solid var(--border-primary);\n  border-left: 3.5px solid var(--accent-primary);'), 'home-bible-card must not have harsh left colored border line');
+assert.ok(stylesCss.includes('rgba(239, 246, 255'), 'home-bible-card must have soft floating blue theme ambiance');
+console.log('✓ Verified: Harsh left colored line removed; floating blue theme ambiance in place');
+
+// 6. Verify App Theme Controller Logic
 const App = require('./js/app.js');
 assert.strictEqual(typeof App.initTheme, 'function', 'App.initTheme must be a function');
 assert.strictEqual(typeof App.getTheme, 'function', 'App.getTheme must be a function');
 assert.strictEqual(typeof App.setTheme, 'function', 'App.setTheme must be a function');
-assert.strictEqual(typeof App.cycleTheme, 'function', 'App.cycleTheme must be a function');
+assert.strictEqual(typeof App.toggleTheme, 'function', 'App.toggleTheme must be a function');
 
 // Test switching themes
 App.setTheme('light');
@@ -477,13 +483,12 @@ assert.strictEqual(App.getTheme(), 'dark', 'Theme should be dark after setting d
 App.setTheme('system');
 assert.strictEqual(App.getTheme(), 'system', 'Theme should be system after setting system');
 
-// Test cycle: system -> light -> dark -> system
-App.cycleTheme();
-assert.strictEqual(App.getTheme(), 'light', 'Cycling from system should advance to light');
-App.cycleTheme();
-assert.strictEqual(App.getTheme(), 'dark', 'Cycling from light should advance to dark');
-App.cycleTheme();
-assert.strictEqual(App.getTheme(), 'system', 'Cycling from dark should advance to system');
+// Test top nav toggle (Light <-> Dark)
+App.setTheme('light');
+App.toggleTheme();
+assert.strictEqual(App.getTheme(), 'dark', 'Toggling from light should switch to dark');
+App.toggleTheme();
+assert.strictEqual(App.getTheme(), 'light', 'Toggling from dark should switch to light');
 console.log('✓ Verified: App theme controller seamlessly manages light, dark, and system modes');
 
 console.log('============================================================');
