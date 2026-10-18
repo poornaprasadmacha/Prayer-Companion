@@ -420,14 +420,6 @@ const App = {
     }
   },
 
-  openSermonsFiltered(cat) {
-    this.closeAllModals();
-    if (typeof Sermons !== 'undefined') {
-      Sermons.setCategory(cat || 'All');
-    }
-    this.switchTab('sermons');
-  },
-
   openMoreManual() {
     this.closeAllModals();
     if (typeof Settings !== 'undefined' && Settings.openManualModal) {
@@ -911,21 +903,6 @@ const App = {
       });
     }
 
-    // Story Category Filter
-    const storyCatFilter = document.getElementById('story-filter-category');
-    if (storyCatFilter) {
-      storyCatFilter.addEventListener('change', () => this.renderStoriesView());
-    }
-
-    // Story Search Filter
-    const storySearch = document.getElementById('story-search-input');
-    if (storySearch) {
-      storySearch.addEventListener('input', () => {
-        clearTimeout(this.storySearchTimer);
-        this.storySearchTimer = setTimeout(() => this.renderStoriesView(), 200);
-      });
-    }
-
     // Export PDF Buttons
     const exportPdfHistory = document.getElementById('btn-export-pdf-history');
     if (exportPdfHistory) {
@@ -935,12 +912,6 @@ const App = {
     const exportPdfSettings = document.getElementById('btn-export-pdf-settings');
     if (exportPdfSettings) {
       exportPdfSettings.addEventListener('click', () => this.exportWeeklySummaryPdf());
-    }
-
-    // Read Stories Settings Button
-    const btnStoriesSettings = document.getElementById('btn-settings-read-stories');
-    if (btnStoriesSettings) {
-      btnStoriesSettings.addEventListener('click', () => this.switchTab('stories'));
     }
 
     // Short Name changed event
@@ -963,7 +934,7 @@ const App = {
 
     const mobileMoreBtn = document.getElementById('btn-mobile-more');
     if (mobileMoreBtn) {
-      if (tabName === 'settings' || tabName === 'history' || tabName === 'stories' || tabName === 'bible-plan' || tabName === 'sermons') {
+      if (tabName === 'settings' || tabName === 'history' || tabName === 'bible-plan') {
         mobileMoreBtn.classList.add('active');
       } else {
         mobileMoreBtn.classList.remove('active');
@@ -1004,17 +975,9 @@ const App = {
       case 'history':
         await this.renderHistoryView();
         break;
-      case 'stories':
-        await this.renderStoriesView();
-        break;
       case 'bible-plan':
         if (typeof BiblePlan !== 'undefined') {
           BiblePlan.render();
-        }
-        break;
-      case 'sermons':
-        if (typeof Sermons !== 'undefined') {
-          Sermons.render();
         }
         break;
       case 'admin':
@@ -1340,10 +1303,6 @@ const App = {
         date: new Date().toDateString()
       }));
     } catch (_) {}
-
-    if (typeof Sermons !== 'undefined' && Sermons.renderHomeQuickBar) {
-      Sermons.renderHomeQuickBar();
-    }
   },
 
   renderCachedDashboardSync() {
@@ -2218,157 +2177,6 @@ const App = {
         </div>
       `).join('');
     }
-  },
-
-  // ==========================================================================
-  // BIBLE PRAYER STORIES VIEW
-  // ==========================================================================
-
-  filterStories() {
-    this.renderStoriesView();
-  },
-
-  renderStoriesView() {
-    const container = document.getElementById('stories-grid-container');
-    const emptyState = document.getElementById('stories-empty-state');
-    const categorySelect = document.getElementById('story-category-filter') || document.getElementById('story-filter-category');
-    const searchInput = document.getElementById('story-search-input');
-    if (!container) return;
-
-    if (typeof BibleStories === 'undefined') return;
-
-    const category = categorySelect ? categorySelect.value : 'all';
-    const query = searchInput ? searchInput.value.trim() : '';
-
-    let stories = BibleStories.getAll();
-    if (category && category !== 'all') {
-      stories = stories.filter(s => s.category.toLowerCase() === category.toLowerCase());
-    }
-    if (query) {
-      const searchResults = BibleStories.search(query);
-      const searchIds = new Set(searchResults.map(s => s.id));
-      stories = stories.filter(s => searchIds.has(s.id));
-    }
-
-    if (stories.length === 0) {
-      container.innerHTML = '';
-      if (emptyState) emptyState.style.display = 'block';
-      return;
-    }
-
-    if (emptyState) emptyState.style.display = 'none';
-
-    container.innerHTML = stories.map(story => {
-      const imgSrc = story.image || story.coverImage || '';
-      const scriptureRef = story.reference || story.scripture || '';
-      return `
-      <div class="story-card" onclick="App.openStoryReader('${story.id}')">
-        <div class="story-card-img-wrap">
-          <img src="${imgSrc}" alt="${UI.escape(story.title)}" class="story-card-img" loading="lazy" />
-        </div>
-        <div class="story-card-body">
-          <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 6px;">
-            <span class="story-scripture-citation">${UI.escape(scriptureRef)}</span>
-          </div>
-          <h3 class="story-card-title">${UI.escape(story.title)}</h3>
-          <p class="story-card-summary">${UI.escape(story.summary)}</p>
-          <div class="story-card-footer">
-            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); App.openStoryReader('${story.id}')">Read Story &rarr;</button>
-          </div>
-        </div>
-      </div>
-    `;
-    }).join('');
-  },
-
-  openStoryReader(storyId) {
-    if (typeof BibleStories === 'undefined') return;
-    const story = BibleStories.getById(storyId);
-    if (!story) return;
-
-    try {
-      this.closeAllModals();
-
-      // 1. Populate Full-Page Devotional Story View
-      const detailImg = document.getElementById('story-detail-img');
-      const detailScrip = document.getElementById('story-detail-scripture');
-      const detailTitle = document.getElementById('story-detail-title');
-      const detailSummary = document.getElementById('story-detail-summary');
-      const detailNarrative = document.getElementById('story-detail-narrative');
-      const detailTakeaway = document.getElementById('story-detail-takeaway');
-      const detailApp = document.getElementById('story-detail-application');
-      const detailPrayBtn = document.getElementById('btn-story-detail-pray');
-
-      const narrativeParagraphs = Array.isArray(story.narrative) && story.narrative.length > 0
-        ? story.narrative
-        : [story.summary, story.scriptureQuote].filter(Boolean);
-
-      if (detailImg) {
-        detailImg.src = story.image || story.coverImage || '';
-        detailImg.alt = story.title;
-      }
-      if (detailScrip) {
-        detailScrip.textContent = story.reference || story.scripture || '';
-      }
-      if (detailTitle) {
-        detailTitle.textContent = story.title;
-      }
-      if (detailSummary) {
-        detailSummary.textContent = story.summary;
-      }
-      if (detailNarrative) {
-        detailNarrative.innerHTML = narrativeParagraphs.map(p => `<p>${UI.escape(p)}</p>`).join('');
-      }
-      if (detailTakeaway) {
-        detailTakeaway.textContent = story.keyTakeaway || story.takeaway || '';
-      }
-      if (detailApp) {
-        detailApp.textContent = story.application || story.prayerApplication || '';
-      }
-
-      if (detailPrayBtn) {
-        detailPrayBtn.onclick = () => {
-          const appText = story.application || story.prayerApplication || '';
-          const refText = story.reference || story.scripture || '';
-          this.openPrayerModal({
-            title: `Prayer inspired by ${story.title}`,
-            description: `${appText}\n\nClaimed Scripture: ${refText}`,
-            category: 'Spiritual Growth',
-            priority: 'Medium'
-          });
-        };
-      }
-
-      // Also populate legacy modal elements for DOM safety
-      const imgEl = document.getElementById('story-reader-img');
-      const scripEl = document.getElementById('story-reader-scripture');
-      const titleEl = document.getElementById('story-reader-title');
-      const summaryEl = document.getElementById('story-reader-summary');
-      const contentEl = document.getElementById('story-reader-content');
-      const takeawayEl = document.getElementById('story-reader-takeaway');
-      const appEl = document.getElementById('story-reader-application');
-      if (imgEl) { imgEl.src = story.image || story.coverImage || ''; imgEl.alt = story.title; }
-      if (scripEl) scripEl.textContent = story.reference || story.scripture || '';
-      if (titleEl) titleEl.textContent = story.title;
-      if (summaryEl) summaryEl.textContent = story.summary;
-      if (contentEl) contentEl.innerHTML = narrativeParagraphs.map(p => `<p>${UI.escape(p)}</p>`).join('');
-      if (takeawayEl) takeawayEl.textContent = story.keyTakeaway || story.takeaway || '';
-      if (appEl) appEl.textContent = story.application || story.prayerApplication || '';
-
-      // 2. Switch to full-page reader view panel (No popup modal!)
-      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
-      const detailView = document.getElementById('view-story-detail');
-      if (detailView) {
-        detailView.classList.add('active');
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (err) {
-      console.error('[Stories] Failed to open story reader:', err);
-    }
-  },
-
-  backToStoriesList() {
-    this.switchTab('stories');
   },
 
   // ==========================================================================

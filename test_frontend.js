@@ -28,17 +28,8 @@ const scripts = [
   'assets/onboarding-step2.svg',
   'assets/onboarding-step3.svg',
   'assets/onboarding-step4.svg',
-  'assets/stories/story-hannah.svg',
-  'assets/stories/story-elijah.svg',
-  'assets/stories/story-daniel.svg',
-  'assets/stories/story-gethsemane.svg',
-  'assets/stories/story-nehemiah.svg',
-  'assets/stories/story-paul-silas.svg',
-  'assets/stories/story-solomon.svg',
-  'assets/stories/story-hezekiah.svg',
   'js/icons.js',
   'js/content.js',
-  'js/stories.js',
   'js/voice.js',
   'js/db.js',
   'js/auth.js',
@@ -54,8 +45,6 @@ const scripts = [
   'js/bible-plan-data.js',
   'js/bible-plan.js',
   'js/bible-reader.js',
-  'js/sermons-data.js',
-  'js/sermons.js',
   'js/app.js'
 ];
 
@@ -239,33 +228,15 @@ const requiredIds = [
   'btn-onboarding-finish',
   'btn-settings-guided-tour',
   'btn-manual-guided-tour',
-  // New Feature IDs: Habit Heatmap, Stories, Verse Notification, PDF Export
+  // New Feature IDs: Habit Heatmap, Verse Notification, PDF Export
   'btn-export-pdf-history',
   'history-longest-streak',
   'history-total-days',
   'history-total-prayers',
   'history-heatmap-container',
-  'view-stories',
-  'story-search-input',
-  'story-category-filter',
-  'stories-grid-container',
-  'stories-empty-state',
-  'modal-story-reader',
-  'story-reader-modal-title',
-  'story-reader-hero-wrap',
-  'story-reader-img',
-  'story-reader-category',
-  'story-reader-scripture',
-  'story-reader-title',
-  'story-reader-summary',
-  'story-reader-content',
-  'story-reader-takeaway',
-  'story-reader-application',
-  'btn-story-pray-now',
   'settings-verse-notify-enabled',
   'btn-test-verse-notification',
   'btn-export-pdf-settings',
-  'btn-settings-read-stories',
   'printable-prayer-summary',
   // 365-Day Bible Reading Plan
   'view-bible-plan',
@@ -277,14 +248,7 @@ const requiredIds = [
   'bible-reader-btn-next',
   'bible-reader-close-btn',
   'bible-picker-dialog',
-  'more-btn-holy-bible',
-  // Bible Sermons Fast Access
-  'header-btn-sermons',
-  'home-sermons-quick-bar',
-  'view-sermons',
-  'modal-sermon-player',
-  'sermon-player-body',
-  'more-btn-sermons'
+  'more-btn-holy-bible'
 ];
 
 requiredIds.forEach(id => {
@@ -581,75 +545,28 @@ assert.ok(indexHtml.includes('Select Book'), 'Picker modal title must say "Selec
 console.log('✓ Verified: UI buttons, tabs, and headers strictly use clean English');
 
 // ============================================================================
-// 9. VERIFY BIBLE SERMONS FAST-ACCESS FEATURE (TELUGU & ENGLISH)
+// 9. VERIFY BIBLE STORIES AND SERMONS ARE COMPLETELY REMOVED
 // ============================================================================
-console.log('\nVerifying Bible Sermons Fast-Access Feature...');
-const SermonsData = require('./js/sermons-data.js');
-const Sermons = require('./js/sermons.js');
+console.log('\nVerifying Bible Stories and Sermons are completely removed...');
+assert.ok(!indexHtml.includes('view-stories'), 'view-stories must not exist in index.html');
+assert.ok(!indexHtml.includes('view-story-detail'), 'view-story-detail must not exist in index.html');
+assert.ok(!indexHtml.includes('modal-story-reader'), 'modal-story-reader must not exist in index.html');
+assert.ok(!indexHtml.includes('data-tab="stories"'), 'stories nav tab must not exist in index.html');
+assert.ok(!indexHtml.includes('btn-settings-read-stories'), 'btn-settings-read-stories must not exist in index.html');
+assert.ok(!indexHtml.includes('js/stories.js'), 'js/stories.js script must not exist in index.html');
 
-// Global mock for Node testing environment
-global.BIBLE_SERMONS = SermonsData;
+assert.ok(!indexHtml.includes('view-sermons'), 'view-sermons must not exist in index.html');
+assert.ok(!indexHtml.includes('modal-sermon-player'), 'modal-sermon-player must not exist in index.html');
+assert.ok(!indexHtml.includes('home-sermons-quick-bar'), 'home-sermons-quick-bar must not exist in index.html');
+assert.ok(!indexHtml.includes('header-btn-sermons'), 'header-btn-sermons must not exist in index.html');
+assert.ok(!indexHtml.includes('data-tab="sermons"'), 'sermons nav tab must not exist in index.html');
+assert.ok(!indexHtml.includes('more-btn-sermons'), 'more-btn-sermons must not exist in index.html');
+assert.ok(!indexHtml.includes('js/sermons'), 'sermons scripts must not exist in index.html');
 
-assert.ok(Array.isArray(SermonsData), 'SermonsData must be an array');
-assert.ok(SermonsData.length >= 8, 'Must contain at least 8 curated Bible sermons');
-
-// Verify sermon structure
-SermonsData.forEach(s => {
-  assert.ok(s.id, `Sermon ${s.title} must have id`);
-  assert.ok(s.title, `Sermon ${s.id} must have title`);
-  assert.ok(s.speaker, `Sermon ${s.id} must have speaker`);
-  assert.ok(s.category, `Sermon ${s.id} must have category`);
-  assert.ok(s.language === 'English' || s.language === 'Telugu', `Sermon ${s.id} language must be English or Telugu`);
-  assert.ok(s.scripture, `Sermon ${s.id} must have scripture`);
-  assert.ok(s.duration, `Sermon ${s.id} must have duration`);
-  assert.ok(s.summary, `Sermon ${s.id} must have summary`);
-  assert.ok(Array.isArray(s.keyTakeaways) && s.keyTakeaways.length > 0, `Sermon ${s.id} must have key takeaways array`);
-  assert.ok(s.prayerPrompt, `Sermon ${s.id} must have prayer prompt`);
-});
-console.log(`✓ Verified: All ${SermonsData.length} sermons have complete metadata, takeaways, and prayer prompts`);
-
-// Verify Telugu and English sermons both exist
-const teluguSermons = SermonsData.filter(s => s.language === 'Telugu');
-const englishSermons = SermonsData.filter(s => s.language === 'English');
-assert.ok(teluguSermons.length >= 3, 'Must have at least 3 Telugu sermons');
-assert.ok(englishSermons.length >= 3, 'Must have at least 3 English sermons');
-console.log(`✓ Verified: Bilingual sermons collection includes ${teluguSermons.length} Telugu and ${englishSermons.length} English messages`);
-
-// Verify Instant Filtering
-Sermons.setCategory('All');
-Sermons.setSearchQuery('');
-assert.strictEqual(Sermons.getFilteredSermons().length, SermonsData.length, 'Filter All should return all sermons');
-
-// Test category filter
-Sermons.setCategory('Prayer');
-const prayerSermons = Sermons.getFilteredSermons();
-assert.ok(prayerSermons.length > 0, 'Prayer category must yield results');
-prayerSermons.forEach(s => assert.strictEqual(s.category, 'Prayer'));
-
-// Test language filter via setCategory
-Sermons.setCategory('Telugu');
-const teluguFiltered = Sermons.getFilteredSermons();
-assert.strictEqual(teluguFiltered.length, teluguSermons.length, 'Telugu category must yield all Telugu sermons');
-
-Sermons.setCategory('English');
-const englishFiltered = Sermons.getFilteredSermons();
-assert.strictEqual(englishFiltered.length, englishSermons.length, 'English category must yield all English sermons');
-
-// Test instant search query
-Sermons.setCategory('All');
-Sermons.setSearchQuery('peace');
-const searchResults = Sermons.getFilteredSermons();
-assert.ok(searchResults.length > 0, 'Search for "peace" must yield matching sermons');
-Sermons.setSearchQuery('');
-
-console.log('✓ Verified: Fast search & category filtering operate seamlessly');
-
-// Verify App integrations
-assert.strictEqual(typeof App.openSermonsFiltered, 'function', 'App.openSermonsFiltered must be a function');
-assert.strictEqual(typeof Sermons.openPlayer, 'function', 'Sermons.openPlayer must be a function');
-assert.strictEqual(typeof Sermons.closePlayer, 'function', 'Sermons.closePlayer must be a function');
-assert.strictEqual(typeof Sermons.prayWithSermon, 'function', 'Sermons.prayWithSermon must be a function');
-console.log('✓ Verified: App and Sermons player/prayer integrations fully connected');
+assert.strictEqual(typeof App.renderStoriesView, 'undefined', 'App.renderStoriesView must be removed');
+assert.strictEqual(typeof App.openStoryReader, 'undefined', 'App.openStoryReader must be removed');
+assert.strictEqual(typeof App.openSermonsFiltered, 'undefined', 'App.openSermonsFiltered must be removed');
+console.log('✓ Verified: Bible Stories and Sermons are completely removed from DOM and controllers');
 
 console.log('============================================================');
 console.log('ALL FRONTEND & THEME SYSTEM TESTS PASSED SUCCESSFULLY (100%)');
