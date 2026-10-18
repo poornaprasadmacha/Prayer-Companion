@@ -65,7 +65,6 @@ const requiredIds = [
   'user-email-badge',
   'sync-status-indicator',
   'pwa-install-banner',
-  'btn-pwa-dismiss',
   'btn-pwa-install',
   'nav-admin-btn',
   'mobile-nav-admin-btn',
