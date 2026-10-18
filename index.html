@@ -1151,6 +1151,35 @@
         </div>
       </div>
 
+      <!-- 4.5. HOLY BIBLE OFFLINE STORAGE & DOWNLOAD CARD -->
+      <div class="settings-card" id="settings-bible-offline-card" style="margin-bottom: 14px;">
+        <h3 class="settings-card-title" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <span>Holy Bible Offline Storage</span>
+          <span id="settings-bible-offline-badge" class="badge" style="font-size: 11px; padding: 3px 8px; background: var(--accent-soft); color: var(--accent-interactive);">Checking...</span>
+        </h3>
+        <p class="settings-card-desc">
+          Download all 66 books of the Holy Bible (Telugu & English NIV/KJV) to your device for instant, zero-lag reading anytime, anywhere — even without internet.
+        </p>
+        <div id="settings-bible-progress-bar-wrap" style="display: none; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span id="settings-bible-progress-label">Downloading books...</span>
+            <span id="settings-bible-progress-percent">0%</span>
+          </div>
+          <div class="bible-offline-progress-track">
+            <div id="settings-bible-progress-bar" class="bible-offline-progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btn-download-all-bible" class="btn btn-primary btn-sm" onclick="BibleReader.startFullOfflineDownload()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download All for Offline</span>
+          </button>
+          <button id="btn-clear-bible-cache" class="btn btn-secondary btn-sm" onclick="BibleReader.clearOfflineCache()">
+            <span>Clear Bible Cache</span>
+          </button>
+        </div>
+      </div>
+
       <!-- 5. SHARE & EMAIL A FRIEND (END OF SETTINGS) -->
       <div class="settings-card" style="margin-bottom: 24px;">
         <div class="settings-share-footer-row">
@@ -1686,6 +1715,12 @@
 
           <!-- Right Action Controls -->
           <div class="bible-reader-top-actions">
+            <!-- Offline Status / Download Pill -->
+            <button id="bible-reader-offline-btn" class="bible-offline-badge-btn" onclick="BibleReader.openOfflineModal()" title="Holy Bible Offline Status & Download" aria-label="Bible offline status">
+              <span id="bible-reader-offline-icon" class="bible-offline-icon">✓</span>
+              <span id="bible-reader-offline-text" class="bible-offline-text">Offline Ready</span>
+            </button>
+
             <!-- Font Size Adjusters -->
             <div class="bible-reader-font-controls" role="group" aria-label="Font size">
               <button class="bible-reader-tool-btn" onclick="BibleReader.adjustFontSize(-1)" title="Smaller text" aria-label="Decrease font size">A−</button>
@@ -1758,12 +1793,83 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
+          <div id="bible-picker-offline-bar" class="bible-picker-offline-bar">
+            <div class="bible-picker-offline-status">
+              <span class="bible-picker-offline-dot"></span>
+              <span id="bible-picker-offline-label">Offline: Checking...</span>
+            </div>
+            <button id="bible-picker-offline-dl-btn" class="bible-picker-offline-dl-btn" onclick="BibleReader.startFullOfflineDownload()">
+              Download All (Offline)
+            </button>
+          </div>
           <div id="bible-picker-content" class="bible-picker-content">
             <!-- Tabs, search and book cards rendered dynamically -->
           </div>
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL: HOLY BIBLE OFFLINE STORAGE & DOWNLOAD
+       ==================================================================== -->
+  <div id="modal-bible-offline" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="modal-header-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--accent-interactive);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">Offline Bible Storage</h3>
+            <p class="modal-subtitle">Read all 66 books anywhere without internet</p>
+          </div>
+        </div>
+        <button class="icon-btn modal-close-btn" onclick="BibleReader.closeOfflineModal()" aria-label="Close dialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px;">
+        <div id="bible-offline-status-card" class="bible-offline-summary-box">
+          <div class="bible-offline-stat-row">
+            <span class="bible-offline-stat-label">Telugu Bible (66 Books):</span>
+            <span id="bible-offline-telugu-stat" class="bible-offline-stat-val">Checking...</span>
+          </div>
+          <div class="bible-offline-stat-row">
+            <span class="bible-offline-stat-label">English NIV (66 Books):</span>
+            <span id="bible-offline-niv-stat" class="bible-offline-stat-val">Checking...</span>
+          </div>
+          <div class="bible-offline-stat-row">
+            <span class="bible-offline-stat-label">English KJV (66 Books):</span>
+            <span id="bible-offline-kjv-stat" class="bible-offline-stat-val">Checking...</span>
+          </div>
+        </div>
+
+        <div id="bible-offline-progress-section" style="display: none; margin-top: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; margin-bottom: 6px;">
+            <span id="bible-offline-progress-msg" style="color: var(--text-primary);">Downloading books...</span>
+            <span id="bible-offline-progress-pct" style="color: var(--accent-interactive);">0%</span>
+          </div>
+          <div class="bible-offline-progress-track">
+            <div id="bible-offline-progress-fill" class="bible-offline-progress-fill" style="width: 0%;"></div>
+          </div>
+          <p id="bible-offline-progress-sub" style="font-size: 11.5px; color: var(--text-muted); margin-top: 6px;">Saved securely to your browser's IndexedDB</p>
+        </div>
+
+        <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin-top: 14px;">
+          Once downloaded, books open instantaneously in under 5ms with zero network usage. You can safely read scripture on airplanes, in rural areas, or during prayer without Wi-Fi.
+        </p>
+      </div>
+
+      <div class="modal-footer" style="padding: 14px 20px; display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="btn-bible-clear-cache-dialog" class="btn btn-secondary btn-sm" onclick="BibleReader.clearOfflineCache()">Clear Cache</button>
+        <button id="btn-bible-start-download-dialog" class="btn btn-primary btn-sm" onclick="BibleReader.startFullOfflineDownload()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span id="btn-bible-download-label">Download All 66 Books</span>
+        </button>
+      </div>
     </div>
   </div>
 

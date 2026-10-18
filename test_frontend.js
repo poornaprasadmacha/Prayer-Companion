@@ -248,7 +248,10 @@ const requiredIds = [
   'bible-reader-btn-next',
   'bible-reader-close-btn',
   'bible-picker-dialog',
-  'more-btn-holy-bible'
+  'more-btn-holy-bible',
+  'bible-reader-offline-btn',
+  'modal-bible-offline',
+  'btn-download-all-bible'
 ];
 
 requiredIds.forEach(id => {
@@ -618,6 +621,42 @@ App.closeAllModals();
 assert.ok(!classListSet.has('bible-full-page-active'), 'App.closeAllModals must remove bible-full-page-active');
 
 console.log('✓ Verified: Bible opens as dedicated full page with Prayerly header removed and clean return');
+
+// ============================================================================
+// 11. VERIFY HOLY BIBLE COMPLETE OFFLINE AVAILABILITY & PRELOADER
+// ============================================================================
+console.log('\nVerifying Holy Bible Complete Offline Availability & Preloader...');
+
+// 1. Verify Service Worker CDN cache rule
+const swContent = fs.readFileSync('service-worker.js', 'utf8');
+assert.ok(swContent.includes('prayerly-bible-cdn-v1'), 'service-worker.js must contain prayerly-bible-cdn-v1 cache store');
+assert.ok(swContent.includes('cdn.jsdelivr.net') && swContent.includes('raw.githubusercontent.com'), 'service-worker.js must intercept Bible CDN and GitHub raw URLs');
+
+// 2. Verify Offline UI elements in index.html
+assert.ok(indexHtml.includes('id="bible-reader-offline-btn"'), 'index.html must have bible-reader-offline-btn');
+assert.ok(indexHtml.includes('id="bible-picker-offline-bar"'), 'index.html must have bible-picker-offline-bar');
+assert.ok(indexHtml.includes('id="modal-bible-offline"'), 'index.html must have modal-bible-offline');
+assert.ok(indexHtml.includes('id="settings-bible-offline-card"'), 'index.html must have settings-bible-offline-card');
+assert.ok(indexHtml.includes('id="btn-download-all-bible"'), 'index.html must have btn-download-all-bible');
+
+// 3. Verify Offline Engine methods in BibleReader
+assert.strictEqual(typeof BibleReader.getOfflineStatus, 'function', 'BibleReader.getOfflineStatus must be a function');
+assert.strictEqual(typeof BibleReader.updateOfflineUI, 'function', 'BibleReader.updateOfflineUI must be a function');
+assert.strictEqual(typeof BibleReader.openOfflineModal, 'function', 'BibleReader.openOfflineModal must be a function');
+assert.strictEqual(typeof BibleReader.closeOfflineModal, 'function', 'BibleReader.closeOfflineModal must be a function');
+assert.strictEqual(typeof BibleReader.startFullOfflineDownload, 'function', 'BibleReader.startFullOfflineDownload must be a function');
+assert.strictEqual(typeof BibleReader.clearOfflineCache, 'function', 'BibleReader.clearOfflineCache must be a function');
+assert.strictEqual(typeof BibleReader.autoCachePlanBooks, 'function', 'BibleReader.autoCachePlanBooks must be a function');
+
+// 4. Test offline status calculation
+(async () => {
+  const status = await BibleReader.getOfflineStatus();
+  assert.strictEqual(status.totalBooks, 66, 'Total books count must be 66');
+  assert.strictEqual(typeof status.teluguCount, 'number', 'teluguCount must be number');
+  assert.strictEqual(typeof status.nivCount, 'number', 'nivCount must be number');
+  assert.strictEqual(typeof status.percent, 'number', 'percent must be number');
+  console.log('✓ Verified: BibleReader offline engine calculates 66-book offline availability metrics');
+})();
 
 console.log('============================================================');
 console.log('ALL FRONTEND & THEME SYSTEM TESTS PASSED SUCCESSFULLY (100%)');

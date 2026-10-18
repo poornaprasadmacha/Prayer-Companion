@@ -161,6 +161,67 @@
       } catch (e) {
         // silent fallback
       }
+    },
+
+    async getAllKeys() {
+      try {
+        const db = await this.getDb();
+        if (!db) return [];
+        return new Promise((resolve) => {
+          const tx = db.transaction('books', 'readonly');
+          const store = tx.objectStore('books');
+          if (typeof store.getAllKeys === 'function') {
+            const req = store.getAllKeys();
+            req.onsuccess = () => resolve(req.result || []);
+            req.onerror = () => resolve([]);
+          } else {
+            const keys = [];
+            const req = store.openCursor();
+            req.onsuccess = (e) => {
+              const cursor = e.target.result;
+              if (cursor) {
+                keys.push(cursor.key);
+                cursor.continue();
+              } else {
+                resolve(keys);
+              }
+            };
+            req.onerror = () => resolve([]);
+          }
+        });
+      } catch (e) {
+        return [];
+      }
+    },
+
+    async count() {
+      try {
+        const db = await this.getDb();
+        if (!db) return 0;
+        return new Promise((resolve) => {
+          const tx = db.transaction('books', 'readonly');
+          const store = tx.objectStore('books');
+          const req = store.count();
+          req.onsuccess = () => resolve(req.result || 0);
+          req.onerror = () => resolve(0);
+        });
+      } catch (e) {
+        return 0;
+      }
+    },
+
+    async clear() {
+      try {
+        const db = await this.getDb();
+        if (!db) return;
+        return new Promise((resolve) => {
+          const tx = db.transaction('books', 'readwrite');
+          const store = tx.objectStore('books');
+          store.clear();
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        });
+      } catch (e) {}
     }
   };
 
@@ -186,6 +247,10 @@
     englishVersion: 'niv',        // 'niv' (default) or 'kjv'
     fontSize: 'normal',           // 'small', 'normal', 'large', 'xlarge'
 
+    // Offline Engine State
+    isDownloadingOffline: false,
+    offlineProgress: { current: 0, total: 132, percent: 0 },
+
     init() {
       // Load user preferences
       try {
@@ -203,13 +268,11 @@
         }
       } catch (e) {}
 
-      // Pre-cache Genesis & Matthew in background for instant first-run experience
-      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-        window.requestIdleCallback(() => {
-          this.preloadBook('telugu', 'genesis');
-          this.preloadBook('niv', 'genesis');
-        });
-      }
+      // Initialize offline status UI
+      this.updateOfflineUI();
+
+      // Intelligent background pre-caching for 100% offline access
+      this.autoCachePlanBooks();
 
       // Hardware/browser back button listener to exit dedicated Bible reading page cleanly
       if (typeof window !== 'undefined' && window.addEventListener) {
@@ -503,6 +566,7 @@
           document.body.style.overflow = 'hidden';
         }
       }
+      this.updateOfflineUI();
       try {
         if (typeof window !== 'undefined' && window.location && window.location.hash !== '#bible') {
           window.history.pushState({ page: 'bible' }, '', '#bible');
@@ -520,6 +584,7 @@
         }
       }
       this.closePicker();
+      this.closeOfflineModal();
       try {
         if (!isPopState && typeof window !== 'undefined' && window.location && window.location.hash === '#bible') {
           if (window.history.state && window.history.state.page === 'bible') {
@@ -702,6 +767,7 @@
       if (!pickerEl) return;
       pickerEl.style.display = 'block';
       this.renderPicker('OT');
+      this.updateOfflineUI();
     },
 
     closePicker() {
@@ -921,16 +987,310 @@
 
         contentEl.innerHTML = html;
         contentEl.scrollTop = 0;
+        this.updateOfflineUI();
       } catch (err) {
         console.error('Error rendering chapter:', err);
         if (contentEl) {
+          const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
           contentEl.innerHTML = `
             <div class="bible-reader-empty">
-              <p style="color: var(--danger);">Failed to load scripture: ${this.escapeHtml(err.message)}</p>
-              <button class="btn btn-secondary btn-sm" onclick="BibleReader.render()">Try Again</button>
+              <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">
+                ${isOffline ? 'Book Not Saved Offline Yet' : 'Failed to Load Scripture'}
+              </h3>
+              <p style="color: var(--text-secondary); max-width: 440px; margin: 0 auto 14px auto; font-size: 13px; line-height: 1.5;">
+                ${isOffline
+                  ? `"${book.name}" has not been downloaded for offline reading yet. Connect to the internet once and tap "Download All" to have all 66 books available offline forever.`
+                  : this.escapeHtml(err.message)}
+              </p>
+              <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn btn-primary btn-sm" onclick="BibleReader.startFullOfflineDownload()">Download All for Offline</button>
+                <button class="btn btn-secondary btn-sm" onclick="BibleReader.render()">Try Again</button>
+              </div>
             </div>
           `;
         }
+      }
+    },
+
+    // -----------------------------------------------------------------------
+    // Offline Engine & Storage Manager
+    // -----------------------------------------------------------------------
+
+    async getOfflineStatus() {
+      const keys = await BibleCache.getAllKeys();
+      const keySet = new Set(keys);
+
+      let teluguCount = 0;
+      let nivCount = 0;
+      let kjvCount = 0;
+
+      BIBLE_BOOKS.forEach(b => {
+        if (keySet.has(`telugu_${b.id}`)) teluguCount++;
+        if (keySet.has(`niv_${b.id}`)) nivCount++;
+        if (keySet.has(`kjv_${b.id}`)) kjvCount++;
+      });
+
+      const totalTarget = BIBLE_BOOKS.length; // 66
+      const isFullyOffline = (teluguCount === totalTarget && nivCount === totalTarget);
+      const percent = Math.min(100, Math.round(((teluguCount + nivCount) / (totalTarget * 2)) * 100));
+
+      return {
+        totalBooks: totalTarget,
+        teluguCount,
+        nivCount,
+        kjvCount,
+        isFullyOffline,
+        percent
+      };
+    },
+
+    async updateOfflineUI() {
+      try {
+        const status = await this.getOfflineStatus();
+
+        // 1. Bible Reader Top Bar Button
+        const offlineBtn = document.getElementById('bible-reader-offline-btn');
+        const offlineIcon = document.getElementById('bible-reader-offline-icon');
+        const offlineText = document.getElementById('bible-reader-offline-text');
+
+        if (offlineBtn && offlineText && offlineIcon) {
+          if (this.isDownloadingOffline) {
+            offlineBtn.className = 'bible-offline-badge-btn downloading';
+            offlineIcon.className = 'bible-offline-spinner';
+            offlineIcon.textContent = '';
+            offlineText.textContent = `Offline: ${this.offlineProgress.percent}%`;
+            offlineBtn.title = `Downloading books (${this.offlineProgress.current} / ${this.offlineProgress.total})...`;
+          } else if (status.isFullyOffline || status.teluguCount === status.totalBooks) {
+            offlineBtn.className = 'bible-offline-badge-btn';
+            offlineIcon.className = 'bible-offline-icon';
+            offlineIcon.textContent = '✓';
+            offlineText.textContent = 'Offline Ready';
+            offlineBtn.title = '100% Offline Ready (All 66 Books Saved)';
+          } else {
+            offlineBtn.className = 'bible-offline-badge-btn needs-download';
+            offlineIcon.className = 'bible-offline-icon';
+            offlineIcon.textContent = '📥';
+            offlineText.textContent = status.percent > 0 ? `${status.percent}% Offline` : 'Make Offline';
+            offlineBtn.title = `Tap to download all 66 books (${status.teluguCount}/${status.totalBooks} saved)`;
+          }
+        }
+
+        // 2. Picker Bar Label
+        const pickerLabel = document.getElementById('bible-picker-offline-label');
+        const pickerBtn = document.getElementById('bible-picker-offline-dl-btn');
+        if (pickerLabel) {
+          if (status.isFullyOffline) {
+            pickerLabel.textContent = 'Offline: All 66 Books Available Offline (100%)';
+            if (pickerBtn) pickerBtn.style.display = 'none';
+          } else {
+            pickerLabel.textContent = `Offline: ${status.teluguCount}/66 Books Saved (${status.percent}%)`;
+            if (pickerBtn) {
+              pickerBtn.style.display = 'inline-block';
+              pickerBtn.textContent = this.isDownloadingOffline ? `Downloading (${status.percent}%)...` : 'Download All (Offline)';
+            }
+          }
+        }
+
+        // 3. Settings Card
+        const settingsBadge = document.getElementById('settings-bible-offline-badge');
+        if (settingsBadge) {
+          if (status.isFullyOffline) {
+            settingsBadge.className = 'badge';
+            settingsBadge.style.background = 'rgba(16, 185, 129, 0.12)';
+            settingsBadge.style.color = '#059669';
+            settingsBadge.textContent = '100% Offline Ready';
+          } else {
+            settingsBadge.className = 'badge';
+            settingsBadge.style.background = 'rgba(37, 99, 235, 0.1)';
+            settingsBadge.style.color = 'var(--accent-interactive)';
+            settingsBadge.textContent = `${status.percent}% Offline (${status.teluguCount}/${status.totalBooks} Books)`;
+          }
+        }
+
+        // 4. Offline Dialog Stats
+        const teluguStat = document.getElementById('bible-offline-telugu-stat');
+        const nivStat = document.getElementById('bible-offline-niv-stat');
+        const kjvStat = document.getElementById('bible-offline-kjv-stat');
+        const dlBtnLabel = document.getElementById('btn-bible-download-label');
+
+        if (teluguStat) teluguStat.textContent = `${status.teluguCount} / ${status.totalBooks} Books (${Math.round((status.teluguCount / status.totalBooks) * 100)}%)`;
+        if (nivStat) nivStat.textContent = `${status.nivCount} / ${status.totalBooks} Books (${Math.round((status.nivCount / status.totalBooks) * 100)}%)`;
+        if (kjvStat) kjvStat.textContent = `${status.kjvCount} / ${status.totalBooks} Books (${Math.round((status.kjvCount / status.totalBooks) * 100)}%)`;
+        if (dlBtnLabel) {
+          dlBtnLabel.textContent = status.isFullyOffline ? 'Re-verify All 66 Books' : 'Download All 66 Books';
+        }
+      } catch (e) {}
+    },
+
+    openOfflineModal() {
+      const modal = document.getElementById('modal-bible-offline');
+      if (modal) {
+        modal.classList.add('active');
+        this.updateOfflineUI();
+      }
+    },
+
+    closeOfflineModal() {
+      const modal = document.getElementById('modal-bible-offline');
+      if (modal) {
+        modal.classList.remove('active');
+      }
+    },
+
+    async startFullOfflineDownload() {
+      if (this.isDownloadingOffline) {
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast('Offline download is already in progress...', 'info');
+        }
+        return;
+      }
+
+      this.isDownloadingOffline = true;
+      const progressSection = document.getElementById('bible-offline-progress-section');
+      const settingsProgressWrap = document.getElementById('settings-bible-progress-bar-wrap');
+      if (progressSection) progressSection.style.display = 'block';
+      if (settingsProgressWrap) settingsProgressWrap.style.display = 'block';
+
+      const totalTasks = BIBLE_BOOKS.length * 2; // Telugu + NIV
+      let completed = 0;
+
+      const keys = await BibleCache.getAllKeys();
+      const keySet = new Set(keys);
+
+      const updateProgress = (bookName, current, total) => {
+        const pct = Math.min(100, Math.round((current / total) * 100));
+        this.offlineProgress = { current, total, percent: pct };
+
+        const msgEl = document.getElementById('bible-offline-progress-msg');
+        const pctEl = document.getElementById('bible-offline-progress-pct');
+        const fillEl = document.getElementById('bible-offline-progress-fill');
+        const settingsFill = document.getElementById('settings-bible-progress-bar');
+        const settingsPct = document.getElementById('settings-bible-progress-percent');
+        const settingsLbl = document.getElementById('settings-bible-progress-label');
+
+        if (msgEl) msgEl.textContent = `Saving ${bookName}... (${current}/${total})`;
+        if (pctEl) pctEl.textContent = `${pct}%`;
+        if (fillEl) fillEl.style.width = `${pct}%`;
+        if (settingsFill) settingsFill.style.width = `${pct}%`;
+        if (settingsPct) settingsPct.textContent = `${pct}%`;
+        if (settingsLbl) settingsLbl.textContent = `Saving ${bookName}...`;
+
+        const offlineText = document.getElementById('bible-reader-offline-text');
+        if (offlineText) offlineText.textContent = `Offline: ${pct}%`;
+      };
+
+      try {
+        for (const book of BIBLE_BOOKS) {
+          if (!this.isDownloadingOffline) break;
+
+          // 1. Check & Download Telugu
+          if (!keySet.has(`telugu_${book.id}`)) {
+            try {
+              await this.fetchBook('telugu', book.id);
+            } catch (e) {}
+          }
+          completed++;
+          updateProgress(book.telugu, completed, totalTasks);
+
+          // Small yielding interval
+          await new Promise(r => setTimeout(r, 20));
+
+          // 2. Check & Download NIV
+          if (!keySet.has(`niv_${book.id}`)) {
+            try {
+              await this.fetchBook('niv', book.id);
+            } catch (e) {}
+          }
+          completed++;
+          updateProgress(book.name, completed, totalTasks);
+
+          await new Promise(r => setTimeout(r, 20));
+        }
+
+        this.isDownloadingOffline = false;
+        await this.updateOfflineUI();
+
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast('All 66 books downloaded! Holy Bible is now 100% available offline.', 'success');
+        }
+
+        setTimeout(() => {
+          if (progressSection) progressSection.style.display = 'none';
+          if (settingsProgressWrap) settingsProgressWrap.style.display = 'none';
+        }, 1500);
+      } catch (err) {
+        this.isDownloadingOffline = false;
+        await this.updateOfflineUI();
+        if (typeof UI !== 'undefined' && UI.toast) {
+          UI.toast('Offline download paused. Any downloaded books remain saved.', 'warning');
+        }
+      }
+    },
+
+    async clearOfflineCache() {
+      if (typeof window !== 'undefined' && window.confirm) {
+        const ok = window.confirm('Are you sure you want to clear the offline Bible cache? This will delete saved offline scripture files.');
+        if (!ok) return;
+      }
+      this.isDownloadingOffline = false;
+      await BibleCache.clear();
+      MEM_CACHE.clear();
+      await this.updateOfflineUI();
+      if (typeof UI !== 'undefined' && UI.toast) {
+        UI.toast('Holy Bible offline cache cleared.', 'info');
+      }
+    },
+
+    // -----------------------------------------------------------------------
+    // Intelligent Background Auto-Preloading
+    // Pre-caches current reading plan days, New Testament, and Psalms ahead of time
+    // -----------------------------------------------------------------------
+
+    autoCachePlanBooks() {
+      if (typeof window === 'undefined') return;
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+
+      const runPreload = async () => {
+        try {
+          // 1. Preload Genesis and Matthew immediately
+          await this.preloadBook('telugu', 'genesis');
+          await this.preloadBook('niv', 'genesis');
+          await this.preloadBook('telugu', 'matthew');
+          await this.preloadBook('niv', 'matthew');
+
+          // 2. Preload active plan's upcoming readings
+          if (typeof BiblePlan !== 'undefined' && BiblePlan.getActivePlan) {
+            const plan = BiblePlan.getActivePlan();
+            if (plan && plan.days) {
+              const currentDay = BiblePlan.getCurrentDayNumber ? BiblePlan.getCurrentDayNumber() : 1;
+              const upcoming = plan.days.slice(Math.max(0, currentDay - 1), currentDay + 7);
+              for (const day of upcoming) {
+                const passage = day.morning ? `${day.morning} / ${day.night}` : day.reading;
+                const parsed = this.parseReference(passage);
+                for (const p of parsed) {
+                  await this.preloadBook('telugu', p.book.id);
+                  await this.preloadBook('niv', p.book.id);
+                }
+              }
+            }
+          }
+
+          // 3. Progressively preload New Testament books during idle
+          const ntBooks = BIBLE_BOOKS.filter(b => b.testament === 'NT');
+          for (const b of ntBooks) {
+            await new Promise(r => setTimeout(r, 200));
+            await this.preloadBook('telugu', b.id);
+            await this.preloadBook('niv', b.id);
+          }
+
+          await this.updateOfflineUI();
+        } catch (e) {}
+      };
+
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(() => runPreload(), { timeout: 3000 });
+      } else {
+        setTimeout(runPreload, 2500);
       }
     },
 

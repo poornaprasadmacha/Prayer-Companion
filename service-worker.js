@@ -4,7 +4,7 @@
  * and Cache-First strategy for static assets.
  */
 
-const CACHE_NAME = 'prayerly-v31';
+const CACHE_NAME = 'prayerly-v32';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -87,6 +87,29 @@ self.addEventListener('fetch', (event) => {
         }), {
           headers: { 'Content-Type': 'application/json' }
         });
+      })
+    );
+    return;
+  }
+
+  // Holy Bible CDN assets: Stale-While-Revalidate / Cache-First strategy for instant offline access
+  if (requestUrl.hostname.includes('cdn.jsdelivr.net') || requestUrl.hostname.includes('raw.githubusercontent.com')) {
+    event.respondWith(
+      caches.open('prayerly-bible-cdn-v1').then(async (cache) => {
+        const cached = await cache.match(event.request);
+        if (cached) {
+          return cached;
+        }
+        try {
+          const networkResponse = await fetch(event.request);
+          if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
+            cache.put(event.request, networkResponse.clone());
+          }
+          return networkResponse;
+        } catch (err) {
+          if (cached) return cached;
+          throw err;
+        }
       })
     );
     return;
