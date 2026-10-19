@@ -608,6 +608,10 @@
     // UI Actions & Reader Opening
     // -----------------------------------------------------------------------
 
+    open(bookId, chapterNum) {
+      this.openChapter(bookId || this.currentBookId || 'genesis', chapterNum || this.currentChapter || 1);
+    },
+
     openChapter(bookId, chapterNum, options = {}) {
       const book = BOOK_BY_ID.get(bookId) || BIBLE_BOOKS[0];
       this.currentBookId = book.id;
@@ -967,6 +971,11 @@
       const textareaEl = document.getElementById('bible-verse-note-text');
       const deleteBtn = document.getElementById('btn-delete-bible-note');
 
+      const refEl = document.getElementById('bible-verse-note-ref');
+      if (refEl) {
+        refEl.textContent = `${book.telugu} ${this.currentChapter}:${verseNum}`;
+      }
+
       if (titleEl) {
         titleEl.textContent = `${book.name} ${this.currentChapter}:${verseNum}`;
       }
@@ -1060,6 +1069,156 @@
       if (typeof UI !== 'undefined' && UI.toast) {
         UI.toast('Note deleted', 'info');
       }
+    },
+
+    // -----------------------------------------------------------------------
+    // Verse Context Menu (Long-Press Action Sheet: Bookmark, Share, Note)
+    // -----------------------------------------------------------------------
+
+    openVerseMenu(verseNum) {
+      this._selectedVerseForMenu = verseNum;
+      const book = BOOK_BY_ID.get(this.currentBookId) || BIBLE_BOOKS[0];
+      const modal = document.getElementById('modal-bible-verse-menu');
+      const refEl = document.getElementById('bible-verse-menu-ref');
+      const bookmarkLabel = document.getElementById('bible-menu-label-bookmark');
+
+      if (refEl) {
+        refEl.textContent = `${book.telugu} ${this.currentChapter}:${verseNum} (${book.name} ${this.currentChapter}:${verseNum})`;
+      }
+
+      const vKey = `${book.id}_${this.currentChapter}_${verseNum}`;
+      const isBookmarked = this.getBookmarks().has(vKey);
+      if (bookmarkLabel) {
+        bookmarkLabel.textContent = isBookmarked ? 'Remove Bookmark' : 'Bookmark';
+      }
+
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    },
+
+    closeVerseMenu(e) {
+      if (e && e.target && e.target.closest('.bible-verse-menu-sheet')) {
+        return;
+      }
+      const modal = document.getElementById('modal-bible-verse-menu');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    },
+
+    menuActionBookmark() {
+      if (!this._selectedVerseForMenu) return;
+      const verseNum = this._selectedVerseForMenu;
+      this.closeVerseMenu();
+      this.toggleBookmark(verseNum);
+    },
+
+    menuActionShare() {
+      if (!this._selectedVerseForMenu) return;
+      const verseNum = this._selectedVerseForMenu;
+      const book = BOOK_BY_ID.get(this.currentBookId) || BIBLE_BOOKS[0];
+      const teluguText = (this.currentTeluguChapter && this.currentTeluguChapter[verseNum]) || '';
+      const englishText = (this.currentEnglishChapter && this.currentEnglishChapter[verseNum]) || '';
+
+      const shareTitle = `${book.name} ${this.currentChapter}:${verseNum} (${book.telugu})`;
+      const shareBody = `${book.telugu} ${this.currentChapter}:${verseNum}\n"${teluguText}"\n\n${book.name} ${this.currentChapter}:${verseNum} (${(this.englishVersion || 'NIV').toUpperCase()})\n"${englishText}"\n\n— via Prayerly (prayerly.ceeras.in)`;
+
+      this.closeVerseMenu();
+
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        navigator.share({
+          title: shareTitle,
+          text: shareBody,
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        this.copyToClipboard(shareBody, 'Verse copied to clipboard!');
+      }
+    },
+
+    menuActionNote() {
+      if (!this._selectedVerseForMenu) return;
+      const verseNum = this._selectedVerseForMenu;
+      this.closeVerseMenu();
+      this.openVerseNoteModal(verseNum);
+    },
+
+    bindVerseLongPress(rowEl, verseNum) {
+      if (!rowEl) return;
+      let pressTimer = null;
+      let startX = 0;
+      let startY = 0;
+      let didTrigger = false;
+
+      const startPress = (clientX, clientY) => {
+        didTrigger = false;
+        startX = clientX;
+        startY = clientY;
+        if (pressTimer) clearTimeout(pressTimer);
+        pressTimer = setTimeout(() => {
+          didTrigger = true;
+          if (typeof navigator !== 'undefined' && navigator.vibrate) {
+            try { navigator.vibrate(35); } catch(e) {}
+          }
+          BibleReader.openVerseMenu(verseNum);
+        }, 400);
+      };
+
+      const cancelPress = () => {
+        if (pressTimer) {
+          clearTimeout(pressTimer);
+          pressTimer = null;
+        }
+      };
+
+      // Touch events (Mobile)
+      rowEl.addEventListener('touchstart', (e) => {
+        if (e.target && e.target.closest('button')) return;
+        const touch = e.touches[0];
+        startPress(touch.clientX, touch.clientY);
+      }, { passive: true });
+
+      rowEl.addEventListener('touchmove', (e) => {
+        if (!pressTimer) return;
+        const touch = e.touches[0];
+        if (Math.hypot(touch.clientX - startX, touch.clientY - startY) > 8) {
+          cancelPress();
+        }
+      }, { passive: true });
+
+      rowEl.addEventListener('touchend', (e) => {
+        cancelPress();
+        if (didTrigger && e.cancelable) {
+          e.preventDefault();
+        }
+      });
+
+      rowEl.addEventListener('touchcancel', cancelPress);
+
+      // Mouse events (Desktop)
+      rowEl.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        if (e.target && e.target.closest('button')) return;
+        startPress(e.clientX, e.clientY);
+      });
+
+      rowEl.addEventListener('mousemove', (e) => {
+        if (!pressTimer) return;
+        if (Math.hypot(e.clientX - startX, e.clientY - startY) > 6) {
+          cancelPress();
+        }
+      });
+
+      rowEl.addEventListener('mouseup', cancelPress);
+      rowEl.addEventListener('mouseleave', cancelPress);
+
+      // Context menu suppression
+      rowEl.addEventListener('contextmenu', (e) => {
+        if (didTrigger) {
+          e.preventDefault();
+        }
+      });
     },
 
     handleVerseTap(verseNum, event) {
@@ -1166,10 +1325,24 @@
 
     navSelectLink(type) {
       this.navLinkFilter = type;
-      if (type === 'PS') {
+      if (type === 'PS' || type === 'Ps') {
         this.navSelectedBookId = 'psalms';
-      } else if (type === 'PROV') {
+      } else if (type === 'PROV' || type === 'Prov') {
         this.navSelectedBookId = 'proverbs';
+      } else if (type === 'Isa') {
+        this.navSelectedBookId = 'isaiah';
+      } else if (type === 'Luke') {
+        this.navSelectedBookId = 'luke';
+      } else if (type === 'Acts') {
+        this.navSelectedBookId = 'acts';
+      } else if (type === 'Rom') {
+        this.navSelectedBookId = 'romans';
+      } else if (type === 'Gal') {
+        this.navSelectedBookId = 'galatians';
+      } else if (type === '1Pet') {
+        this.navSelectedBookId = '1peter';
+      } else if (type === 'Rev') {
+        this.navSelectedBookId = 'revelation';
       } else if (type === 'OT') {
         const cur = BOOK_BY_ID.get(this.navSelectedBookId);
         if (!cur || cur.testament !== 'OT') {
@@ -1183,6 +1356,9 @@
       }
       this.navSelectedChapter = 1;
       this.render4ColNavigator();
+      this.fetchBook(this.englishVersion, this.navSelectedBookId).then(() => {
+        this.render4ColVerses();
+      }).catch(() => {});
     },
 
     navSelectBook(bookId) {
@@ -1190,6 +1366,7 @@
       if (!book) return;
       this.navSelectedBookId = book.id;
       this.navSelectedChapter = 1;
+      this.navLinkFilter = null;
       this.render4ColNavigator();
       this.fetchBook(this.englishVersion, book.id).then(() => {
         this.render4ColVerses();
@@ -1230,37 +1407,31 @@
     },
 
     render4ColNavigator() {
-      // 1. Column 1: Links (OT, NT, Psalms, Proverbs, and 3 Recent books)
+      // 1. Column 1: Links (Screenshots 1-4: 10 items, NO Recent or Links subheaders)
       const linksCol = document.getElementById('bible-col-links');
       if (linksCol) {
-        const recents = this.getRecentBooks();
-        linksCol.innerHTML = `
-          <div class="bible-col-section-label">Links</div>
-          <button class="bible-nav-link-btn ${this.navLinkFilter === 'OT' ? 'active' : ''}" onclick="BibleReader.navSelectLink('OT')">
-            OT
-          </button>
-          <button class="bible-nav-link-btn ${this.navLinkFilter === 'NT' ? 'active' : ''}" onclick="BibleReader.navSelectLink('NT')">
-            NT
-          </button>
-          <button class="bible-nav-link-btn ${this.navSelectedBookId === 'psalms' ? 'active' : ''}" onclick="BibleReader.navSelectLink('PS')">
-            Psalms
-          </button>
-          <button class="bible-nav-link-btn ${this.navSelectedBookId === 'proverbs' ? 'active' : ''}" onclick="BibleReader.navSelectLink('PROV')">
-            Proverbs
-          </button>
+        const linkItems = [
+          { key: 'OT', label: 'OT', bookId: 'genesis' },
+          { key: 'NT', label: 'NT', bookId: 'matthew' },
+          { key: 'Ps', label: 'Ps', bookId: 'psalms' },
+          { key: 'Isa', label: 'Isa', bookId: 'isaiah' },
+          { key: 'Luke', label: 'Luke', bookId: 'luke' },
+          { key: 'Acts', label: 'Acts', bookId: 'acts' },
+          { key: 'Rom', label: 'Rom', bookId: 'romans' },
+          { key: 'Gal', label: 'Gal', bookId: 'galatians' },
+          { key: '1Pet', label: '1Pet', bookId: '1peter' },
+          { key: 'Rev', label: 'Rev', bookId: 'revelation' }
+        ];
 
-          <div class="bible-col-section-label" style="margin-top: 10px;">Recent</div>
-          ${recents.map(rId => {
-            const b = BOOK_BY_ID.get(rId);
-            if (!b) return '';
-            const isActive = (this.navSelectedBookId === b.id);
-            return `
-              <button class="bible-nav-link-btn bible-recent-link-btn ${isActive ? 'active' : ''}" onclick="BibleReader.navSelectBook('${b.id}')" title="${b.telugu} (${b.name})">
-                ${b.name.length > 7 ? b.name.substring(0, 6) + '.' : b.name}
-              </button>
-            `;
-          }).join('')}
-        `;
+        linksCol.innerHTML = linkItems.map(item => {
+          const isActive = (this.navLinkFilter === item.key) ||
+                           (!this.navLinkFilter && this.navSelectedBookId === item.bookId);
+          return `
+            <button class="bible-nav-link-btn ${isActive ? 'active' : ''}" onclick="BibleReader.navSelectLink('${item.key}')">
+              ${item.label}
+            </button>
+          `;
+        }).join('');
       }
 
       // 2. Column 2: Books (Telugu & English)
@@ -1280,10 +1451,24 @@
           filtered = BIBLE_BOOKS.filter(b => b.testament === 'OT');
         } else if (this.navLinkFilter === 'NT') {
           filtered = BIBLE_BOOKS.filter(b => b.testament === 'NT');
-        } else if (this.navLinkFilter === 'PS') {
+        } else if (this.navLinkFilter === 'PS' || this.navLinkFilter === 'Ps') {
           filtered = BIBLE_BOOKS.filter(b => b.id === 'psalms');
-        } else if (this.navLinkFilter === 'PROV') {
+        } else if (this.navLinkFilter === 'PROV' || this.navLinkFilter === 'Prov') {
           filtered = BIBLE_BOOKS.filter(b => b.id === 'proverbs');
+        } else if (this.navLinkFilter === 'Isa') {
+          filtered = BIBLE_BOOKS.filter(b => b.id === 'isaiah');
+        } else if (this.navLinkFilter === 'Luke') {
+          filtered = BIBLE_BOOKS.filter(b => b.id === 'luke');
+        } else if (this.navLinkFilter === 'Acts') {
+          filtered = BIBLE_BOOKS.filter(b => b.id === 'acts');
+        } else if (this.navLinkFilter === 'Rom') {
+          filtered = BIBLE_BOOKS.filter(b => b.id === 'romans');
+        } else if (this.navLinkFilter === 'Gal') {
+          filtered = BIBLE_BOOKS.filter(b => b.id === 'galatians');
+        } else if (this.navLinkFilter === '1Pet') {
+          filtered = BIBLE_BOOKS.filter(b => b.id === '1peter');
+        } else if (this.navLinkFilter === 'Rev') {
+          filtered = BIBLE_BOOKS.filter(b => b.id === 'revelation');
         }
 
         if (filtered.length > 0 && !filtered.some(b => b.id === this.navSelectedBookId)) {
@@ -1293,8 +1478,8 @@
 
         booksCol.innerHTML = filtered.map(b => `
           <div class="bible-nav-book-row ${b.id === this.navSelectedBookId ? 'active' : ''}" onclick="BibleReader.navSelectBook('${b.id}')" id="nav-book-row-${b.id}">
-            <span class="nav-book-telugu">${b.telugu}</span>
-            <span class="nav-book-english">${b.name}</span>
+            <span class="nav-book-telugu b-tel">${b.telugu}</span>
+            <span class="nav-book-english b-eng">${b.name}</span>
           </div>
         `).join('');
 
@@ -1559,8 +1744,6 @@
               <div class="bible-verse-row ${isMarked ? 'is-bookmarked' : ''} ${hasNote ? 'has-note' : ''}" id="verse-row-${v.verse}" onclick="BibleReader.handleVerseTap(${v.verse}, event)">
                 <div class="verse-num-cell">
                   <span class="verse-num-badge">${v.verse}</span>
-                  <span class="verse-bookmark-badge" title="Bookmarked verse">★</span>
-                  <span class="verse-note-badge" title="Verse note" onclick="event.stopPropagation(); BibleReader.openVerseNoteModal(${v.verse})">✎</span>
                 </div>
                 <div class="verse-text-cell">
                   ${(this.viewMode === 'bilingual' || this.viewMode === 'telugu') ? `
@@ -1582,6 +1765,16 @@
 
         contentEl.innerHTML = html;
         contentEl.scrollTop = 0;
+
+        // Bind high-performance long press listeners to all verse rows
+        const verseRows = contentEl.querySelectorAll('.bible-verse-row');
+        verseRows.forEach(row => {
+          const vNum = parseInt(row.id.replace('verse-row-', ''), 10);
+          if (vNum) {
+            this.bindVerseLongPress(row, vNum);
+          }
+        });
+
         this.updateOfflineUI();
       } catch (err) {
         console.error('Error rendering chapter:', err);

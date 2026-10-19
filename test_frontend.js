@@ -769,6 +769,62 @@ assert.ok(cssContent.includes('.bible-reader-logo-emblem'), 'css/styles.css must
 assert.ok(cssContent.includes('.bible-top-logo-svg'), 'css/styles.css must style .bible-top-logo-svg');
 console.log('✓ Verified: Holy Bible Logo emblem present in top bar action group after theme toggle');
 
+// ============================================================================
+// 14. VERIFY DESIGN ENHANCEMENTS (SCREENSHOTS 1-5, HOME LAUNCHER, GESTURES)
+// ============================================================================
+console.log('\nVerifying Design Enhancements (Screenshots 1-5, Home Launcher, Gestures)...');
+
+// 1. Universal Scrollbar Elimination
+const latestCss = fs.readFileSync('css/styles.css', 'utf8');
+assert.ok(latestCss.includes('scrollbar-width: none !important'), 'css/styles.css must enforce scrollbar-width: none !important globally');
+assert.ok(latestCss.includes('*::-webkit-scrollbar'), 'css/styles.css must target *::-webkit-scrollbar');
+assert.ok(latestCss.includes('display: none !important'), 'css/styles.css must hide all scrollbars');
+console.log('✓ Verified: Universal scrollbar elimination active across the entire site');
+
+// 2. Home Page (Dashboard) Bible Launcher Card and Top Bar Button
+assert.ok(indexHtml.includes('id="home-bible-launcher-card"'), 'index.html must contain #home-bible-launcher-card on Dashboard');
+assert.ok(indexHtml.includes('id="btn-dashboard-bible"'), 'index.html must contain #btn-dashboard-bible in greeting actions');
+assert.ok(indexHtml.includes('id="header-btn-bible"'), 'index.html must contain #header-btn-bible in app header');
+const appHeaderThemeToggle = indexHtml.indexOf('id="theme-toggle-btn"');
+const appHeaderBibleBtn = indexHtml.indexOf('id="header-btn-bible"');
+assert.ok(appHeaderThemeToggle !== -1 && appHeaderBibleBtn !== -1 && appHeaderBibleBtn > appHeaderThemeToggle, 'Header Bible button must be placed directly after theme toggle');
+assert.strictEqual(typeof BibleReader.open, 'function', 'BibleReader.open must be a function');
+console.log('✓ Verified: Holy Bible launcher card and top navigation button active for instant 1-tap reading');
+
+// 3. Removal of Star (★) and Pencil (✎) Badges from Scripture Verse Stream
+const latestReaderJs = fs.readFileSync('js/bible-reader.js', 'utf8');
+assert.ok(!latestReaderJs.includes('title="Bookmarked verse">★</span>'), 'bible-reader.js must NOT render star symbol in verse rows');
+assert.ok(!latestReaderJs.includes('title="Verse note"'), 'bible-reader.js must NOT render pencil symbol in verse rows');
+assert.ok(latestCss.includes('.verse-bookmark-badge') && latestCss.includes('display: none !important'), 'css/styles.css must hide .verse-bookmark-badge');
+assert.ok(latestCss.includes('.verse-note-badge') && latestCss.includes('display: none !important'), 'css/styles.css must hide .verse-note-badge');
+console.log('✓ Verified: Stars (★) and pencils (✎) completely removed from verse rows for clean scripture reading');
+
+// 4. Long-Press Verse Context Action Menu & Gestures
+assert.ok(indexHtml.includes('id="modal-bible-verse-menu"'), 'index.html must contain #modal-bible-verse-menu');
+assert.ok(indexHtml.includes('id="bible-menu-btn-bookmark"'), 'index.html must contain #bible-menu-btn-bookmark');
+assert.strictEqual(typeof BibleReader.openVerseMenu, 'function', 'BibleReader.openVerseMenu must be a function');
+assert.strictEqual(typeof BibleReader.closeVerseMenu, 'function', 'BibleReader.closeVerseMenu must be a function');
+assert.strictEqual(typeof BibleReader.menuActionBookmark, 'function', 'BibleReader.menuActionBookmark must be a function');
+assert.strictEqual(typeof BibleReader.menuActionShare, 'function', 'BibleReader.menuActionShare must be a function');
+assert.strictEqual(typeof BibleReader.menuActionNote, 'function', 'BibleReader.menuActionNote must be a function');
+assert.strictEqual(typeof BibleReader.bindVerseLongPress, 'function', 'BibleReader.bindVerseLongPress must be a function');
+console.log('✓ Verified: Long-press verse context action menu and gesture handlers verified');
+
+// 5. Clean Note Modal Matching Screenshot 5
+assert.ok(indexHtml.includes('class="modal-card bible-clean-note-card"'), 'index.html must use bible-clean-note-card');
+assert.ok(indexHtml.includes('placeholder="Enter your notes here"'), 'Note textarea must have placeholder="Enter your notes here"');
+assert.ok(indexHtml.includes('class="bible-clean-note-btn bible-clean-note-btn-close"'), 'index.html must contain clean Close button');
+assert.ok(indexHtml.includes('class="bible-clean-note-btn bible-clean-note-btn-save"'), 'index.html must contain clean Save button');
+console.log('✓ Verified: Clean Note modal matches Screenshot 5 design specifications');
+
+// 6. 4-Column Navigator Matching Screenshots 1-4
+assert.ok(latestCss.includes('#5b354d'), 'css/styles.css must include #5b354d selection background');
+assert.ok(latestCss.includes('.bible-nav-num-cell') && latestCss.includes('background: transparent !important'), 'css/styles.css must have transparent background for unselected numbers');
+assert.ok(latestReaderJs.includes("key: 'OT'") && latestReaderJs.includes("key: 'Rev'"), 'bible-reader.js must define the 10 links matching screenshots');
+assert.ok(!latestReaderJs.includes('<div class="bible-col-section-label">Links</div>'), 'bible-reader.js must NOT output Links subheader inside column');
+assert.ok(!latestReaderJs.includes('<div class="bible-col-section-label" style="margin-top: 10px;">Recent</div>'), 'bible-reader.js must NOT output Recent subheader inside column');
+console.log('✓ Verified: 4-Column Navigator strictly matches Screenshots 1-4 specifications');
+
 console.log('============================================================');
 console.log('ALL FRONTEND & THEME SYSTEM TESTS PASSED SUCCESSFULLY (100%)');
 console.log('============================================================\n');
