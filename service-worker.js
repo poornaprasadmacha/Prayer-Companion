@@ -4,7 +4,7 @@
  * and Cache-First strategy for static assets.
  */
 
-const CACHE_NAME = 'prayerly-v44';
+const CACHE_NAME = 'prayerly-v45';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -58,23 +58,41 @@ const STATIC_ASSETS = [
   './assets/qr-code.svg'
 ];
 
-// Install Event - Pre-cache App Shell
+// Install Event - Pre-cache App Shell with redirect follow & resilience
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
+    caches.open(CACHE_NAME).then(async (cache) => {
       console.log('[ServiceWorker] Pre-caching static app shell');
-      return cache.addAll(STATIC_ASSETS);
+      await Promise.allSettled(
+        STATIC_ASSETS.map(async (asset) => {
+          try {
+            const response = await fetch(asset, { redirect: 'follow' });
+            if (response && (response.ok || response.status === 200 || response.type === 'opaque')) {
+              await cache.put(asset, response.clone());
+              // Store aliases so matches succeed whether requested as './', '/', or 'index.html'
+              if (asset === './' || asset === './index.html') {
+                await cache.put('./', response.clone());
+                await cache.put('./index.html', response.clone());
+                await cache.put('/index.html', response.clone());
+              }
+            }
+          } catch (err) {
+            console.warn('[ServiceWorker] Pre-cache skip for:', asset, err);
+          }
+        })
+      );
+      console.log('[ServiceWorker] App shell pre-caching complete');
     }).then(() => self.skipWaiting())
   );
 });
 
-// Activate Event - Clean up obsolete caches
+// Activate Event - Clean up obsolete caches and immediately claim clients
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keyList) => {
       return Promise.all(
         keyList.map((key) => {
-          if (key !== CACHE_NAME) {
+          if (key !== CACHE_NAME && key !== 'prayerly-bible-cdn-v1') {
             console.log('[ServiceWorker] Removing obsolete cache:', key);
             return caches.delete(key);
           }
@@ -84,11 +102,11 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Event - Network-First for static assets, Pass-through for Apps Script, Cache Fallback when Offline
+// Fetch Event - App Shell First for Navigations, Network-First for Apps Script, Cache-First for Assets
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
 
-  // If request is directed to Google Apps Script or external API, pass through without caching
+  // 1. Google Apps Script or external API pass-through
   if (requestUrl.hostname.includes('script.google.com') || requestUrl.hostname.includes('googleusercontent.com')) {
     event.respondWith(
       fetch(event.request).catch(() => {
@@ -104,7 +122,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Holy Bible CDN assets: Stale-While-Revalidate / Cache-First strategy for instant offline access
+  // 2. Holy Bible CDN assets: Stale-While-Revalidate / Cache-First strategy for instant offline access
   if (requestUrl.hostname.includes('cdn.jsdelivr.net') || requestUrl.hostname.includes('raw.githubusercontent.com')) {
     event.respondWith(
       caches.open('prayerly-bible-cdn-v1').then(async (cache) => {
@@ -127,10 +145,67 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static Assets: Stale-While-Revalidate / Cache-First strategy for instant (<15ms) app launch
+  // 3. Navigation Requests (PWA App Launch & Page Loads):
+  // Return cached App Shell immediately (<10ms) so downloaded app opens instantly without network delay
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      caches.match(event.request, { ignoreSearch: true }).then(async (cached) => {
+        if (cached) {
+          // Revalidate in background to keep shell fresh
+          fetch(event.request).then((netRes) => {
+            if (netRes && netRes.ok) {
+              const clone = netRes.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, clone);
+                cache.put('./', clone);
+                cache.put('./index.html', clone);
+              });
+            }
+          }).catch(() => {});
+          return cached;
+        }
+
+        // Try standard App Shell fallbacks in cache
+        const shell = (await caches.match('./', { ignoreSearch: true })) ||
+                      (await caches.match('./index.html', { ignoreSearch: true })) ||
+                      (await caches.match('/index.html', { ignoreSearch: true }));
+        if (shell) {
+          fetch(event.request).then((netRes) => {
+            if (netRes && netRes.ok) {
+              const clone = netRes.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, clone);
+                cache.put('./', clone);
+                cache.put('./index.html', clone);
+              });
+            }
+          }).catch(() => {});
+          return shell;
+        }
+
+        // If not in cache yet, fetch from network and cache
+        return fetch(event.request).then((netRes) => {
+          if (netRes && netRes.ok) {
+            const clone = netRes.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, clone);
+              cache.put('./', clone);
+              cache.put('./index.html', clone);
+            });
+          }
+          return netRes;
+        }).catch(async () => {
+          return (await caches.match('./', { ignoreSearch: true })) ||
+                 (await caches.match('./index.html', { ignoreSearch: true }));
+        });
+      })
+    );
+    return;
+  }
+
+  // 4. Static Assets: Stale-While-Revalidate / Cache-First strategy for instant (<15ms) app launch
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
-      // Revalidate in background to keep cache fresh without delaying initial paint
       const fetchPromise = fetch(event.request)
         .then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
@@ -141,27 +216,17 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         })
-        .catch(() => {
-          // Network offline / unreachable; cached version continues to serve safely
-        });
+        .catch(() => {});
 
-      // If asset is already cached, return immediately for instant app opening
       if (cachedResponse) {
         return cachedResponse;
       }
 
-      // If not in cache, wait for network fetch and fallback to index.html for navigation
       return fetchPromise.then((networkResponse) => {
         if (networkResponse) {
           return networkResponse;
         }
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html', { ignoreSearch: true });
-        }
-      }).catch(() => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html', { ignoreSearch: true });
-        }
+        return caches.match('./', { ignoreSearch: true });
       });
     })
   );

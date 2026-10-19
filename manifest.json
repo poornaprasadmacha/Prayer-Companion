@@ -2,7 +2,8 @@
   "name": "Prayerly — Personal Prayer & Thanksgiving",
   "short_name": "Prayerly",
   "description": "Prayerly: Personal prayer journal, daily prayer tracking, answered prayers, community companions, and thanksgiving.",
-  "start_url": "./index.html",
+  "id": "/",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#111827",
@@ -34,21 +35,21 @@
       "name": "Holy Bible",
       "short_name": "Bible",
       "description": "Read Holy Bible in Telugu and English",
-      "url": "./index.html?tab=bible",
+      "url": "./?tab=bible",
       "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Add Prayer",
       "short_name": "New Prayer",
       "description": "Record a new prayer request",
-      "url": "./index.html?action=add-prayer",
+      "url": "./?action=add-prayer",
       "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Daily Reading Plan",
       "short_name": "Bible Plan",
       "description": "Continue 365-Day Bible Reading Plan",
-      "url": "./index.html?tab=dashboard",
+      "url": "./?tab=dashboard",
       "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
