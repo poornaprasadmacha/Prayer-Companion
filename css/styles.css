@@ -6347,7 +6347,7 @@ body:not(.dark-theme) .bible-theme-toggle .theme-icon-moon {
   border: 1px solid var(--border-primary);
   border-radius: 12px;
   box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.25);
-  display: flex;
+  display: none;
   flex-direction: column;
   overflow: hidden;
 }
@@ -7289,12 +7289,16 @@ body.dark-theme .bible-reader-logo-emblem {
   border: none !important;
   z-index: 99999 !important;
   background: var(--bg-card) !important;
-  display: flex !important;
+  display: none !important;
   flex-direction: column !important;
   overflow: hidden !important;
   box-shadow: none !important;
   margin: 0 !important;
   padding: 0 !important;
+}
+
+.bible-picker-dialog.active {
+  display: flex !important;
 }
 
 .bible-verse-navigator-card,

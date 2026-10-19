@@ -624,6 +624,7 @@
     },
 
     openChapter(bookId, chapterNum, options = {}) {
+      this.closePicker();
       const book = BOOK_BY_ID.get(bookId) || BIBLE_BOOKS[0];
       this.currentBookId = book.id;
       this.currentChapter = Math.max(1, Math.min(book.chapters, parseInt(chapterNum, 10) || 1));
@@ -1351,7 +1352,8 @@
     togglePicker() {
       const pickerEl = document.getElementById('bible-picker-dialog');
       if (!pickerEl) return;
-      if (pickerEl.style.display === 'none' || !pickerEl.style.display) {
+      const isActive = pickerEl.classList ? pickerEl.classList.contains('active') : (pickerEl.style && pickerEl.style.display === 'flex');
+      if (!isActive) {
         this.openPicker();
       } else {
         this.closePicker();
@@ -1361,8 +1363,11 @@
     openPicker(initialTab = null) {
       const pickerEl = document.getElementById('bible-picker-dialog');
       if (!pickerEl) return;
-      pickerEl.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
+      if (pickerEl.classList) pickerEl.classList.add('active');
+      if (pickerEl.style) pickerEl.style.display = 'flex';
+      if (typeof document !== 'undefined' && document.body && document.body.style) {
+        document.body.style.overflow = 'hidden';
+      }
 
       const curBook = BOOK_BY_ID.get(this.currentBookId) || BIBLE_BOOKS[0];
       this.navSelectedBookId = curBook.id;
@@ -1381,8 +1386,13 @@
 
     closePicker() {
       const pickerEl = document.getElementById('bible-picker-dialog');
-      if (pickerEl) pickerEl.style.display = 'none';
-      document.body.style.overflow = '';
+      if (pickerEl) {
+        if (pickerEl.classList) pickerEl.classList.remove('active');
+        if (pickerEl.style) pickerEl.style.display = 'none';
+      }
+      if (typeof document !== 'undefined' && document.body && document.body.style) {
+        document.body.style.overflow = '';
+      }
     },
 
     navSelectLink(type) {
