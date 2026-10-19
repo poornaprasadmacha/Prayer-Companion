@@ -616,6 +616,7 @@
       const book = BOOK_BY_ID.get(bookId) || BIBLE_BOOKS[0];
       this.currentBookId = book.id;
       this.currentChapter = Math.max(1, Math.min(book.chapters, parseInt(chapterNum, 10) || 1));
+      this.recordRecentBook(book.id);
 
       if (options.assignedChapters && Array.isArray(options.assignedChapters)) {
         this.assignedChapters = options.assignedChapters;
@@ -1276,7 +1277,29 @@
           }
         }
       } catch (e) {}
-      return ['matthew', 'john', 'psalms'];
+      return ['romans', '1peter', 'revelation'];
+    },
+
+    getBookShortCode(book) {
+      if (!book) return '';
+      const SHORT_CODES = {
+        genesis: 'Gen', exodus: 'Exod', leviticus: 'Lev', numbers: 'Num', deuteronomy: 'Deut',
+        joshua: 'Josh', judges: 'Judg', ruth: 'Ruth', '1samuel': '1Sam', '2samuel': '2Sam',
+        '1kings': '1Kgs', '2kings': '2Kgs', '1chronicles': '1Chr', '2chronicles': '2Chr',
+        ezra: 'Ezra', nehemiah: 'Neh', esther: 'Esth', job: 'Job', psalms: 'Ps',
+        proverbs: 'Prov', ecclesiastes: 'Eccl', songofsongs: 'Song', isaiah: 'Isa',
+        jeremiah: 'Jer', lamentations: 'Lam', ezekiel: 'Ezek', daniel: 'Dan', hosea: 'Hos',
+        joel: 'Joel', amos: 'Amos', obadiah: 'Obad', jonah: 'Jon', micah: 'Mic',
+        nahum: 'Nah', habakkuk: 'Hab', zephaniah: 'Zeph', haggai: 'Hag', zechariah: 'Zech',
+        malachi: 'Mal', matthew: 'Matt', mark: 'Mark', luke: 'Luke', john: 'John',
+        acts: 'Acts', romans: 'Rom', '1corinthians': '1Cor', '2corinthians': '2Cor',
+        galatians: 'Gal', ephesians: 'Eph', philippians: 'Phil', colossians: 'Col',
+        '1thessalonians': '1Th', '2thessalonians': '2Th', '1timothy': '1Tim', '2timothy': '2Tim',
+        titus: 'Tit', philemon: 'Phlm', hebrews: 'Heb', james: 'Jas', '1peter': '1Pet',
+        '2peter': '2Pet', '1john': '1Jn', '2john': '2Jn', '3john': '3Jn', jude: 'Jude',
+        revelation: 'Rev'
+      };
+      return SHORT_CODES[book.id] || book.name.slice(0, 4);
     },
 
     recordRecentBook(bookId) {
@@ -1301,7 +1324,8 @@
     openPicker(initialTab = null) {
       const pickerEl = document.getElementById('bible-picker-dialog');
       if (!pickerEl) return;
-      pickerEl.style.display = 'block';
+      pickerEl.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
 
       const curBook = BOOK_BY_ID.get(this.currentBookId) || BIBLE_BOOKS[0];
       this.navSelectedBookId = curBook.id;
@@ -1321,6 +1345,7 @@
     closePicker() {
       const pickerEl = document.getElementById('bible-picker-dialog');
       if (pickerEl) pickerEl.style.display = 'none';
+      document.body.style.overflow = '';
     },
 
     navSelectLink(type) {
@@ -1353,6 +1378,8 @@
         if (!cur || cur.testament !== 'NT') {
           this.navSelectedBookId = 'matthew';
         }
+      } else if (BOOK_BY_ID.has(type)) {
+        this.navSelectedBookId = type;
       }
       this.navSelectedChapter = 1;
       this.render4ColNavigator();
@@ -1407,21 +1434,31 @@
     },
 
     render4ColNavigator() {
-      // 1. Column 1: Links (Screenshots 1-4: 10 items, NO Recent or Links subheaders)
+      // 1. Column 1: Links (Top 7 anchors + Last 3 dynamic Most Recently Used books)
       const linksCol = document.getElementById('bible-col-links');
       if (linksCol) {
-        const linkItems = [
+        const baseLinks = [
           { key: 'OT', label: 'OT', bookId: 'genesis' },
           { key: 'NT', label: 'NT', bookId: 'matthew' },
           { key: 'Ps', label: 'Ps', bookId: 'psalms' },
+          { key: 'Prov', label: 'Prov', bookId: 'proverbs' },
           { key: 'Isa', label: 'Isa', bookId: 'isaiah' },
           { key: 'Luke', label: 'Luke', bookId: 'luke' },
-          { key: 'Acts', label: 'Acts', bookId: 'acts' },
-          { key: 'Rom', label: 'Rom', bookId: 'romans' },
-          { key: 'Gal', label: 'Gal', bookId: 'galatians' },
-          { key: '1Pet', label: '1Pet', bookId: '1peter' },
-          { key: 'Rev', label: 'Rev', bookId: 'revelation' }
+          { key: 'Acts', label: 'Acts', bookId: 'acts' }
         ];
+
+        // Dynamic last 3 links: populated from user's most recently used books (defaulting to Rom, 1Pet, Rev)
+        const recentIds = this.getRecentBooks();
+        const recentLinks = recentIds.map(id => {
+          const b = BOOK_BY_ID.get(id);
+          const shortCode = this.getBookShortCode(b);
+          if (id === 'revelation') return { key: 'Rev', label: shortCode, bookId: id };
+          if (id === 'romans') return { key: 'Rom', label: shortCode, bookId: id };
+          if (id === '1peter') return { key: '1Pet', label: shortCode, bookId: id };
+          return { key: id, label: shortCode, bookId: id };
+        });
+
+        const linkItems = [...baseLinks, ...recentLinks];
 
         linksCol.innerHTML = linkItems.map(item => {
           const isActive = (this.navLinkFilter === item.key) ||

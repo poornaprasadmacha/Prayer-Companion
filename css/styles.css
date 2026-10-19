@@ -7197,22 +7197,49 @@ body.dark-theme .bible-reader-logo-emblem {
   border: 1px solid var(--border-primary) !important;
 }
 
-/* 2. 4-Column "Select Verse" Navigator Card (Screenshots 1-4) */
-.bible-verse-navigator-card {
-  width: 95% !important;
-  max-width: 680px !important;
-  height: 85vh !important;
-  max-height: 85vh !important;
-  max-height: 85dvh !important;
+/* 2. Full-Screen 4-Column "Select Verse" Navigator (Theme Aligned: Light & Dark Mode) */
+.bible-picker-dialog {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
+  transform: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  z-index: 99999 !important;
+  background: var(--bg-card) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.bible-verse-navigator-card,
+.bible-picker-dialog-card {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
   display: flex !important;
   flex-direction: column !important;
   padding: 0 !important;
-  border-radius: 12px !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
   overflow: hidden !important;
-  background: #181a20 !important;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #FFFFFF !important;
+  background: var(--bg-card) !important;
+  box-shadow: none !important;
+  border: none !important;
+  color: var(--text-primary) !important;
 }
 
 /* Top Modal Header */
@@ -7221,16 +7248,16 @@ body.dark-theme .bible-reader-logo-emblem {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: #1e2029;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-primary);
   flex-shrink: 0;
 }
 
 .bible-nav-modal-header .bible-picker-dialog-title {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: var(--text-primary);
   letter-spacing: -0.01em;
 }
 
@@ -7239,24 +7266,24 @@ body.dark-theme .bible-reader-logo-emblem {
   align-items: center;
   gap: 6px;
   flex: 1;
-  max-width: 280px;
+  max-width: 340px;
   position: relative;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
-  padding: 0 10px;
-  transition: border-color 0.15s ease;
+  padding: 0 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .bible-nav-search-wrap:focus-within {
-  border-color: #a78bfa;
-  box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
+  border-color: var(--accent-interactive);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
 }
 
 .bible-nav-search-icon {
-  width: 14px;
-  height: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  width: 15px;
+  height: 15px;
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
@@ -7264,20 +7291,20 @@ body.dark-theme .bible-reader-logo-emblem {
   width: 100%;
   border: none;
   background: transparent;
-  padding: 6px 0;
-  font-size: 13px;
-  color: #FFFFFF;
+  padding: 8px 0;
+  font-size: 13.5px;
+  color: var(--text-primary);
   outline: none;
 }
 
 .bible-nav-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 .bible-nav-search-clear {
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   font-size: 16px;
   cursor: pointer;
   padding: 2px 4px;
@@ -7286,7 +7313,7 @@ body.dark-theme .bible-reader-logo-emblem {
 
 .bible-nav-close-btn {
   flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -7295,29 +7322,30 @@ body.dark-theme .bible-reader-logo-emblem {
   align-items: center;
   justify-content: center;
   border-radius: 6px;
+  transition: all 0.15s ease;
 }
 
 .bible-nav-close-btn:hover {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
 /* 4-Column Table Header Row */
 .bible-4col-header-row {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: #1e2029;
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-primary);
   font-size: 13px;
   font-weight: 700;
-  color: #9ca3af;
+  color: var(--text-secondary);
   flex-shrink: 0;
   user-select: none;
 }
 
 .bible-col-header {
-  padding: 10px 8px;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 11px 8px;
+  border-right: 1px solid var(--border-primary);
   text-align: center;
 }
 
@@ -7326,41 +7354,42 @@ body.dark-theme .bible-reader-logo-emblem {
 }
 
 .bible-col-header.col-links {
-  width: 60px;
-  min-width: 60px;
+  width: 68px;
+  min-width: 68px;
 }
 
 .bible-col-header.col-books {
   flex: 1;
   text-align: left;
-  padding-left: 14px;
+  padding-left: 18px;
 }
 
 .bible-col-header.col-chapters {
-  width: 54px;
-  min-width: 54px;
+  width: 60px;
+  min-width: 60px;
 }
 
 .bible-col-header.col-verses {
-  width: 54px;
-  min-width: 54px;
+  width: 60px;
+  min-width: 60px;
 }
 
-/* 4-Column Body Canvas */
+/* 4-Column Body Canvas (Full Screen Stretch) */
 .bible-4col-body {
   display: flex;
   flex: 1;
-  min-height: 380px;
-  height: 100%;
+  min-height: 0;
+  height: calc(100vh - 110px);
+  height: calc(100dvh - 110px);
   overflow: hidden;
-  background: #181a20;
+  background: var(--bg-card);
 }
 
 .bible-col {
   height: 100%;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid var(--border-primary);
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
@@ -7375,9 +7404,9 @@ body.dark-theme .bible-reader-logo-emblem {
 }
 
 .bible-col.col-links {
-  width: 60px;
-  min-width: 60px;
-  background: #181a20;
+  width: 68px;
+  min-width: 68px;
+  background: var(--bg-primary);
   display: flex;
   flex-direction: column;
   padding: 0;
@@ -7388,22 +7417,22 @@ body.dark-theme .bible-reader-logo-emblem {
 .bible-col.col-books {
   flex: 1;
   min-width: 140px;
-  background: #181a20;
+  background: var(--bg-card);
 }
 
 .bible-col.col-chapters {
-  width: 54px;
-  min-width: 54px;
-  background: #181a20;
+  width: 60px;
+  min-width: 60px;
+  background: var(--bg-primary);
 }
 
 .bible-col.col-verses {
-  width: 54px;
-  min-width: 54px;
-  background: #181a20;
+  width: 60px;
+  min-width: 60px;
+  background: var(--bg-card);
 }
 
-/* Column 1: Links / Shortcuts (Screenshots 1-4: 10 clean buttons) */
+/* Column 1: Links / Shortcuts */
 .bible-nav-link-btn {
   display: flex;
   align-items: center;
@@ -7413,9 +7442,9 @@ body.dark-theme .bible-reader-logo-emblem {
   min-height: 48px;
   border-radius: 0;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border-primary);
   background: transparent;
-  color: #e5e7eb;
+  color: var(--text-primary);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -7426,15 +7455,21 @@ body.dark-theme .bible-reader-logo-emblem {
 }
 
 .bible-nav-link-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #FFFFFF;
+  background: var(--bg-hover);
 }
 
-/* Wine/Plum selection color from screenshots 1-4 */
+/* Active Theme Selection */
 .bible-nav-link-btn.active {
-  background: #5b354d !important;
+  background: var(--accent-interactive, #5b354d) !important;
   color: #FFFFFF !important;
   font-weight: 700;
+}
+
+body.dark-theme .bible-nav-link-btn.active,
+body.dark-theme .bible-nav-book-row.active,
+body.dark-theme .bible-nav-num-cell.active {
+  background: #2563EB !important;
+  color: #FFFFFF !important;
 }
 
 /* Column 2: Books (Telugu on top, English below) */
@@ -7443,19 +7478,20 @@ body.dark-theme .bible-reader-logo-emblem {
   flex-direction: column;
   justify-content: center;
   min-height: 52px;
-  padding: 8px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 18px;
+  border-bottom: 1px solid var(--border-primary);
   cursor: pointer;
   transition: background 0.12s ease;
   user-select: none;
+  background: var(--bg-card);
 }
 
 .bible-nav-book-row:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-hover);
 }
 
 .bible-nav-book-row.active {
-  background: #5b354d !important;
+  background: var(--accent-interactive, #5b354d) !important;
   border-left: none !important;
 }
 
@@ -7468,9 +7504,9 @@ body.dark-theme .bible-reader-logo-emblem {
 
 .bible-nav-book-row .nav-book-telugu,
 .bible-nav-book-row .b-tel {
-  font-size: 14.5px;
+  font-size: 15px;
   font-weight: 600;
-  color: #FFFFFF;
+  color: var(--text-primary);
   line-height: 1.35;
   font-family: system-ui, -apple-system, "Nirmala UI", "Gautami", "Kohinoor Telugu", sans-serif;
 }
@@ -7478,7 +7514,7 @@ body.dark-theme .bible-reader-logo-emblem {
 .bible-nav-book-row .nav-book-english,
 .bible-nav-book-row .b-eng {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--text-secondary);
   margin-top: 2px;
 }
 
@@ -7490,11 +7526,11 @@ body.dark-theme .bible-reader-logo-emblem {
   height: 48px;
   min-height: 48px;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: transparent !important; /* No background color box for numbers */
+  border-bottom: 1px solid var(--border-primary);
+  background: transparent !important;
   font-size: 14.5px;
   font-weight: 500;
-  color: #e5e7eb;
+  color: var(--text-primary);
   cursor: pointer;
   transition: background 0.1s ease, color 0.1s ease;
   user-select: none;
@@ -7502,49 +7538,46 @@ body.dark-theme .bible-reader-logo-emblem {
 }
 
 .bible-nav-num-cell:hover {
-  background: rgba(255, 255, 255, 0.06) !important;
-  color: #FFFFFF;
+  background: var(--bg-hover) !important;
 }
 
-/* Wine/Plum selection for active chapter or verse */
 .bible-nav-num-cell.active {
-  background: #5b354d !important;
+  background: var(--accent-interactive, #5b354d) !important;
   color: #FFFFFF !important;
   font-weight: 700;
 }
 
-/* Bottom Modal Footer (Simple right-aligned Close button) */
+/* Bottom Modal Footer */
 .bible-nav-modal-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: #1e2029;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-primary);
+  background: var(--bg-primary);
   flex-shrink: 0;
 }
 
 .bible-nav-selection-hint {
-  font-size: 12.5px;
-  color: #9ca3af;
-  font-weight: 500;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .bible-nav-footer-close {
   background: transparent;
   border: none;
-  color: #c4b5fd; /* Soft lavender close button */
+  color: var(--accent-interactive);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 14.5px;
   cursor: pointer;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 6px;
   transition: all 0.15s ease;
 }
 
 .bible-nav-footer-close:hover {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-hover);
   text-decoration: none;
 }
 
@@ -7559,18 +7592,18 @@ body.dark-theme .bible-reader-logo-emblem {
 
 .verse-bookmark-badge,
 .verse-note-badge {
-  display: none !important; /* Completely removed from display per user feedback */
+  display: none !important;
 }
 
 /* Clean, dignified bookmarked and note indicators on verse rows */
 .bible-verse-row.is-bookmarked {
   border-left: 3px solid #F59E0B !important;
-  background: rgba(245, 158, 11, 0.04);
+  background: rgba(245, 158, 11, 0.05);
 }
 
 .bible-verse-row.has-note {
   border-left: 3px solid #8B5CF6 !important;
-  background: rgba(139, 92, 246, 0.04);
+  background: rgba(139, 92, 246, 0.05);
 }
 
 .bible-verse-row.is-bookmarked.has-note {
@@ -7579,7 +7612,7 @@ body.dark-theme .bible-reader-logo-emblem {
 }
 
 /* ==========================================================================
-   VERSE ACTION MENU (LONG PRESS BOTTOM SHEET / MODAL)
+   VERSE ACTION MENU (LONG PRESS BOTTOM SHEET / MODAL) - THEME ALIGNED
    ========================================================================== */
 .bible-verse-menu-backdrop {
   position: fixed;
@@ -7587,10 +7620,10 @@ body.dark-theme .bible-reader-logo-emblem {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  z-index: 9999;
+  z-index: 99999;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -7608,11 +7641,11 @@ body.dark-theme .bible-reader-logo-emblem {
 .bible-verse-menu-sheet {
   width: 100%;
   max-width: 440px;
-  background: #1e2029;
+  background: var(--bg-card);
   border-radius: 16px 16px 0 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
-  color: #FFFFFF;
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.25);
+  color: var(--text-primary);
   overflow: hidden;
   animation: slideUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -7620,30 +7653,31 @@ body.dark-theme .bible-reader-logo-emblem {
 @media (min-width: 601px) {
   .bible-verse-menu-sheet {
     border-radius: 16px;
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
     animation: popIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 
 .bible-verse-menu-header {
   padding: 16px 18px 12px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border-primary);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: var(--bg-primary);
 }
 
 .bible-verse-menu-ref-title {
   font-size: 16px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: var(--text-primary);
   font-family: system-ui, -apple-system, "Nirmala UI", sans-serif;
 }
 
 .bible-verse-menu-close {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 4px;
   display: flex;
@@ -7651,7 +7685,7 @@ body.dark-theme .bible-reader-logo-emblem {
 }
 
 .bible-verse-menu-close:hover {
-  color: #FFFFFF;
+  color: var(--text-primary);
 }
 
 .bible-verse-menu-items {
@@ -7659,6 +7693,7 @@ body.dark-theme .bible-reader-logo-emblem {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  background: var(--bg-card);
 }
 
 .bible-verse-menu-item {
@@ -7670,7 +7705,7 @@ body.dark-theme .bible-reader-logo-emblem {
   border-radius: 10px;
   background: transparent;
   border: none;
-  color: #FFFFFF;
+  color: var(--text-primary);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -7680,74 +7715,76 @@ body.dark-theme .bible-reader-logo-emblem {
 
 .bible-verse-menu-item:hover,
 .bible-verse-menu-item:active {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-hover);
 }
 
 .bible-verse-menu-item svg {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: #c4b5fd;
+  color: var(--accent-interactive);
 }
 
 .bible-verse-menu-item.action-bookmark svg {
-  color: #fbbf24;
+  color: #f59e0b;
 }
 
 /* ==========================================================================
-   CLEAN NOTE MODAL (Matching Screenshot 5)
+   CLEAN NOTE MODAL (Matching Screenshot 5) - THEME ALIGNED
    ========================================================================== */
 .bible-clean-note-card {
   width: 95% !important;
   max-width: 480px !important;
-  background: #181a20 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-primary) !important;
   border-radius: 14px !important;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5) !important;
-  color: #FFFFFF !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.25) !important;
+  color: var(--text-primary) !important;
   overflow: hidden !important;
   padding: 0 !important;
 }
 
 .bible-clean-note-header {
   padding: 18px 20px 10px 20px;
+  background: var(--bg-primary);
 }
 
 .bible-clean-note-title {
   font-size: 20px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: var(--text-primary);
   margin: 0 0 12px 0;
 }
 
 .bible-clean-note-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-primary);
   margin-bottom: 12px;
 }
 
 .bible-clean-note-ref {
   font-size: 14.5px;
   font-weight: 600;
-  color: #c4b5fd;
+  color: var(--accent-interactive);
   font-family: system-ui, -apple-system, "Nirmala UI", sans-serif;
   margin-bottom: 10px;
 }
 
 .bible-clean-note-body {
-  padding: 0 20px 16px 20px;
+  padding: 16px 20px;
+  background: var(--bg-card);
 }
 
 .bible-clean-note-textarea {
   width: 100%;
   min-height: 140px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
   border-radius: 10px;
   padding: 12px 14px;
   font-size: 14.5px;
   line-height: 1.5;
-  color: #FFFFFF;
+  color: var(--text-primary);
   resize: vertical;
   outline: none;
   font-family: inherit;
@@ -7755,12 +7792,12 @@ body.dark-theme .bible-reader-logo-emblem {
 }
 
 .bible-clean-note-textarea:focus {
-  border-color: #a78bfa;
-  box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
+  border-color: var(--accent-interactive);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
 }
 
 .bible-clean-note-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 .bible-clean-note-footer {
@@ -7768,7 +7805,8 @@ body.dark-theme .bible-reader-logo-emblem {
   align-items: center;
   justify-content: space-between;
   padding: 12px 20px 18px 20px;
-  background: transparent;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-primary);
 }
 
 .bible-clean-note-btn {
@@ -7783,30 +7821,28 @@ body.dark-theme .bible-reader-logo-emblem {
 }
 
 .bible-clean-note-btn-close {
-  color: #9ca3af;
+  color: var(--text-secondary);
 }
 
 .bible-clean-note-btn-close:hover {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
 .bible-clean-note-btn-save {
-  color: #c4b5fd;
-  background: rgba(196, 181, 253, 0.12);
+  color: #FFFFFF;
+  background: var(--accent-interactive);
 }
 
 .bible-clean-note-btn-save:hover {
-  color: #FFFFFF;
-  background: #5b354d;
+  opacity: 0.92;
 }
 
 .bible-clean-note-btn-delete {
-  color: #f87171;
+  color: #ef4444;
 }
 
 .bible-clean-note-btn-delete:hover {
-  color: #ef4444;
   background: rgba(239, 68, 68, 0.1);
 }
 
