@@ -334,29 +334,7 @@
         </script>
       </div>
 
-      <!-- Holy Bible Instant Quick Access Banner / Card on Home Dashboard -->
-      <div id="home-bible-launcher-card" class="home-bible-launcher-card" onclick="BibleReader.open()" role="button" tabindex="0" title="Open Holy Bible • పరిశుద్ధ గ్రంథము" aria-label="Open Holy Bible">
-        <div class="home-bible-launcher-left">
-          <div class="home-bible-emblem-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="home-bible-emblem-svg">
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
-              <path d="M12 4v8M9 7h6" stroke="currentColor" stroke-width="2"/>
-              <path d="M6 18h10"/>
-            </svg>
-          </div>
-          <div class="home-bible-launcher-info">
-            <div class="home-bible-launcher-title-row">
-              <span class="home-bible-launcher-title">Holy Bible</span>
-              <span class="home-bible-launcher-badge">పరిశుద్ధ గ్రంథము</span>
-            </div>
-            <p class="home-bible-launcher-subtitle">Telugu &amp; English bilingual scripture • 100% Offline</p>
-          </div>
-        </div>
-        <button class="btn btn-primary btn-sm home-bible-open-btn" onclick="event.stopPropagation(); BibleReader.open()">
-          <span>Read Bible</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; margin-left: 4px;"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      </div>
+
 
       <!-- Dashboard Hero Split: Image Left, 4 Stats Right on Desktop -->
       <div class="dashboard-hero-split">
@@ -1876,9 +1854,62 @@
             <button class="btn-link bible-nav-footer-close" onclick="BibleReader.closePicker()">Close</button>
           </div>
         </div>
+      <!-- ====================================================================
+           MODAL: BIBLE VERSE CONTEXT ACTION MENU (LONG PRESS) - INSIDE BIBLE
+           ==================================================================== -->
+      <div id="modal-bible-verse-menu" class="bible-verse-menu-backdrop" style="display: none;" onclick="BibleReader.closeVerseMenu(event)" role="dialog" aria-modal="true" aria-label="Verse Options">
+        <div class="bible-verse-menu-sheet" onclick="event.stopPropagation()">
+          <div class="bible-verse-menu-header">
+            <span id="bible-verse-menu-ref" class="bible-verse-menu-ref-title">Verse Options</span>
+            <button class="bible-verse-menu-close" onclick="BibleReader.closeVerseMenu()" aria-label="Close menu">&times;</button>
+          </div>
+          <div class="bible-verse-menu-items">
+            <button id="bible-menu-btn-bookmark" class="bible-verse-menu-item action-bookmark" onclick="BibleReader.menuActionBookmark()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+              <span id="bible-menu-label-bookmark">Bookmark</span>
+            </button>
+            <button class="bible-verse-menu-item action-share" onclick="BibleReader.menuActionShare()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              <span>Share</span>
+            </button>
+            <button class="bible-verse-menu-item action-note" onclick="BibleReader.menuActionNote()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <span>Note</span>
+            </button>
+          </div>
+        </div>
       </div>
 
+      <!-- ====================================================================
+           MODAL: BIBLE VERSE NOTE (SCREENSHOT 5) - INSIDE BIBLE
+           ==================================================================== -->
+      <div id="modal-bible-verse-note" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Scripture Note">
+        <div class="modal-card bible-clean-note-card">
+          <div class="bible-clean-note-header">
+            <h3 class="bible-clean-note-title">Note</h3>
+            <div class="bible-clean-note-divider"></div>
+            <div id="bible-verse-note-ref" class="bible-clean-note-ref">Verse Note</div>
+            <!-- Hidden elements preserved for backward compatibility -->
+            <div id="bible-verse-note-snippet" style="display: none;"></div>
+            <span id="bible-verse-note-title" style="display: none;">Scripture Note</span>
+            <span id="bible-verse-note-sub" style="display: none;">Personal reflection</span>
+          </div>
 
+          <div class="bible-clean-note-body">
+            <textarea id="bible-verse-note-text" class="bible-clean-note-textarea" rows="5" placeholder="Enter your notes here"></textarea>
+          </div>
+
+          <div class="bible-clean-note-footer">
+            <button id="btn-delete-bible-note" class="bible-clean-note-btn bible-clean-note-btn-delete" onclick="BibleReader.deleteCurrentVerseNote()" style="display: none;">
+              Delete
+            </button>
+            <div style="display: flex; gap: 8px; margin-left: auto;">
+              <button class="bible-clean-note-btn bible-clean-note-btn-close" onclick="BibleReader.closeVerseNoteModal()">Close</button>
+              <button class="bible-clean-note-btn bible-clean-note-btn-save" onclick="BibleReader.saveCurrentVerseNote()">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -1945,62 +1976,7 @@
     </div>
   </div>
 
-  <!-- ====================================================================
-       MODAL: BIBLE VERSE CONTEXT ACTION MENU (LONG PRESS)
-       ==================================================================== -->
-  <div id="modal-bible-verse-menu" class="bible-verse-menu-backdrop" style="display: none;" onclick="BibleReader.closeVerseMenu(event)" role="dialog" aria-modal="true" aria-label="Verse Options">
-    <div class="bible-verse-menu-sheet" onclick="event.stopPropagation()">
-      <div class="bible-verse-menu-header">
-        <span id="bible-verse-menu-ref" class="bible-verse-menu-ref-title">Verse Options</span>
-        <button class="bible-verse-menu-close" onclick="BibleReader.closeVerseMenu()" aria-label="Close menu">&times;</button>
-      </div>
-      <div class="bible-verse-menu-items">
-        <button id="bible-menu-btn-bookmark" class="bible-verse-menu-item action-bookmark" onclick="BibleReader.menuActionBookmark()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
-          <span id="bible-menu-label-bookmark">Bookmark</span>
-        </button>
-        <button class="bible-verse-menu-item action-share" onclick="BibleReader.menuActionShare()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          <span>Share</span>
-        </button>
-        <button class="bible-verse-menu-item action-note" onclick="BibleReader.menuActionNote()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-          <span>Note</span>
-        </button>
-      </div>
-    </div>
-  </div>
 
-  <!-- ====================================================================
-       MODAL: BIBLE VERSE NOTE (SCREENSHOT 5)
-       ==================================================================== -->
-  <div id="modal-bible-verse-note" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Scripture Note">
-    <div class="modal-card bible-clean-note-card">
-      <div class="bible-clean-note-header">
-        <h3 class="bible-clean-note-title">Note</h3>
-        <div class="bible-clean-note-divider"></div>
-        <div id="bible-verse-note-ref" class="bible-clean-note-ref">Verse Note</div>
-        <!-- Hidden elements preserved for backward compatibility -->
-        <div id="bible-verse-note-snippet" style="display: none;"></div>
-        <span id="bible-verse-note-title" style="display: none;">Scripture Note</span>
-        <span id="bible-verse-note-sub" style="display: none;">Personal reflection</span>
-      </div>
-
-      <div class="bible-clean-note-body">
-        <textarea id="bible-verse-note-text" class="bible-clean-note-textarea" rows="5" placeholder="Enter your notes here"></textarea>
-      </div>
-
-      <div class="bible-clean-note-footer">
-        <button id="btn-delete-bible-note" class="bible-clean-note-btn bible-clean-note-btn-delete" onclick="BibleReader.deleteCurrentVerseNote()" style="display: none;">
-          Delete
-        </button>
-        <div style="display: flex; gap: 8px; margin-left: auto;">
-          <button class="bible-clean-note-btn bible-clean-note-btn-close" onclick="BibleReader.closeVerseNoteModal()">Close</button>
-          <button class="bible-clean-note-btn bible-clean-note-btn-save" onclick="BibleReader.saveCurrentVerseNote()">Save</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
 
 

@@ -20,6 +20,7 @@ const scripts = [
   'assets/Prayerly.png',
   'assets/prayerly-logo.png',
   'assets/Prayerly-Logo-5.png',
+  'assets/Prayerly-Logo-6.png',
   'assets/daily-devotional.jpg',
   'assets/no-active-prayers.png',
   'assets/no-active-prayers-dark.png',
@@ -783,15 +784,15 @@ assert.ok(latestCss.includes('*::-webkit-scrollbar'), 'css/styles.css must targe
 assert.ok(latestCss.includes('display: none !important'), 'css/styles.css must hide all scrollbars');
 console.log('✓ Verified: Universal scrollbar elimination active across the entire site');
 
-// 2. Home Page (Dashboard) Bible Launcher Card and Top Bar Button
-assert.ok(indexHtml.includes('id="home-bible-launcher-card"'), 'index.html must contain #home-bible-launcher-card on Dashboard');
+// 2. Home Page (Dashboard) Bible Access: Top Bar Button and Greeting Button (Banner removed per user request)
+assert.ok(!indexHtml.includes('id="home-bible-launcher-card"'), 'Home bible launcher card must be removed from Dashboard per user feedback');
 assert.ok(indexHtml.includes('id="btn-dashboard-bible"'), 'index.html must contain #btn-dashboard-bible in greeting actions');
 assert.ok(indexHtml.includes('id="header-btn-bible"'), 'index.html must contain #header-btn-bible in app header');
 const appHeaderThemeToggle = indexHtml.indexOf('id="theme-toggle-btn"');
 const appHeaderBibleBtn = indexHtml.indexOf('id="header-btn-bible"');
 assert.ok(appHeaderThemeToggle !== -1 && appHeaderBibleBtn !== -1 && appHeaderBibleBtn > appHeaderThemeToggle, 'Header Bible button must be placed directly after theme toggle');
 assert.strictEqual(typeof BibleReader.open, 'function', 'BibleReader.open must be a function');
-console.log('✓ Verified: Holy Bible launcher card and top navigation button active for instant 1-tap reading');
+console.log('✓ Verified: Holy Bible banner removed from Home screen; top navigation button and greeting button active');
 
 // 3. Removal of Star (★) and Pencil (✎) Badges from Scripture Verse Stream
 const latestReaderJs = fs.readFileSync('js/bible-reader.js', 'utf8');

@@ -698,6 +698,7 @@
       this.closeFastChapterPicker();
       this.closeOfflineModal();
       this.closeVerseNoteModal();
+      this.closeVerseMenu();
       try {
         if (!isPopState && typeof window !== 'undefined' && window.location && window.location.hash === '#bible') {
           if (window.history.state && window.history.state.page === 'bible') {
@@ -1000,6 +1001,7 @@
       }
 
       modal.classList.add('active');
+      modal.style.display = 'flex';
       if (textareaEl) {
         setTimeout(() => textareaEl.focus(), 80);
       }
@@ -1007,7 +1009,10 @@
 
     closeVerseNoteModal() {
       const modal = document.getElementById('modal-bible-verse-note');
-      if (modal) modal.classList.remove('active');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
       this.currentNoteTarget = null;
     },
 
@@ -1094,6 +1099,7 @@
       }
 
       if (modal) {
+        modal.classList.add('active');
         modal.style.display = 'flex';
       }
     },
@@ -1104,6 +1110,7 @@
       }
       const modal = document.getElementById('modal-bible-verse-menu');
       if (modal) {
+        modal.classList.remove('active');
         modal.style.display = 'none';
       }
     },
