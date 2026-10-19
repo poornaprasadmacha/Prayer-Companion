@@ -1,4 +1,0 @@
-# Cloudflare Pages SPA & Canonical URL Routing Rules
-# Rewrites /index.html directly to root with 200 OK (prevents 307 redirect in WebAPK/PWA)
-/index.html    /index.html    200
-/*             /index.html    200
