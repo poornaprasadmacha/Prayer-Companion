@@ -522,6 +522,10 @@
           <h2 class="section-title">Prayer Companions</h2>
           <p class="section-subtitle">Intercede for fellow believers and share prayer needs</p>
         </div>
+        <button class="btn btn-primary btn-sm" onclick="App.openShareCompanionModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 15px; height: 15px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Share Request
+        </button>
       </div>
 
       <!-- Filters & Search -->
@@ -553,7 +557,7 @@
 
       <div id="community-empty-state" class="art-empty-state" style="display: none;">
         <div class="art-header-flex">
-          <div class="art-sticker-wrap" onclick="CommunityView.openShareModal()" style="cursor: pointer;" title="Share prayer request">
+          <div class="art-sticker-wrap" onclick="App.openShareCompanionModal()" style="cursor: pointer;" title="Share prayer request">
             <svg viewBox="0 0 100 100" class="art-sticker-svg" aria-hidden="true">
               <circle cx="53" cy="53" r="42" fill="rgba(0,0,0,0.12)" />
               <circle cx="50" cy="50" r="42" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.8" />
@@ -572,7 +576,7 @@
           Click <strong>"Share with Companions"</strong> to intercede together.
         </p>
         <div class="art-actions">
-          <button class="btn btn-primary btn-sm" onclick="CommunityView.openShareModal()">+ Share Prayer Request</button>
+          <button class="btn btn-primary btn-sm" onclick="App.openShareCompanionModal()">+ Share Prayer Request</button>
         </div>
       </div>
     </section>

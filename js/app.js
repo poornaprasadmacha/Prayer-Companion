@@ -99,7 +99,36 @@ const App = {
     // 10. Background Preload of Community Prayers
     // Loads community prayer requests silently in background even if user has not navigated to community tab
     this.preloadCommunityPrayersInBackground();
+
+    // 11. Handle URL Query Parameters (PWA Shortcuts & Direct Navigation)
+    this.handleUrlParams();
   },
+
+  handleUrlParams() {
+    try {
+      if (typeof window === 'undefined' || !window.location || !window.location.search) return;
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      const action = params.get('action');
+
+      if (tab === 'bible') {
+        if (typeof BibleReader !== 'undefined' && typeof BibleReader.open === 'function') {
+          setTimeout(() => BibleReader.open(), 50);
+        }
+      } else if (tab && this.tabs && this.tabs.includes(tab)) {
+        this.switchTab(tab);
+      }
+
+      if (action === 'add-prayer') {
+        setTimeout(() => this.openPrayerModal(), 100);
+      } else if (action === 'add-thanksgiving') {
+        setTimeout(() => this.openThanksgivingModal(), 100);
+      } else if (action === 'share-companion') {
+        setTimeout(() => this.openShareCompanionModal(), 100);
+      }
+    } catch (_) {}
+  },
+
 
   // ==========================================================================
   // NAVIGATION & ROUTING
@@ -2907,9 +2936,10 @@ const App = {
   },
 
   // Share with Prayer Companions Modal
-  openShareCompanionModal(prayer, existingRequestId = null) {
+  openShareCompanionModal(prayer = {}, existingRequestId = null) {
     const modal = document.getElementById('modal-share-companion');
     if (!modal) return;
+    prayer = prayer || {};
 
     const modalTitle = modal.querySelector('.modal-title');
     const titleInput = document.getElementById('share-form-title');
@@ -2925,7 +2955,8 @@ const App = {
 
     titleInput.value = prayer.title || prayer.prayer_title || '';
     descInput.value = prayer.description || prayer.shared_description || '';
-    nameInput.value = prayer.display_name || '';
+    const userDefaultName = (typeof Auth !== 'undefined' && Auth.user && (Auth.user.name || (Auth.user.email ? Auth.user.email.split('@')[0] : ''))) || '';
+    nameInput.value = prayer.display_name || userDefaultName || '';
     anonCheck.checked = Boolean(prayer.is_anonymous);
     allowEncCheck.checked = prayer.allow_encouragement !== undefined ? Boolean(prayer.allow_encouragement) : true;
     submitBtn.textContent = existingRequestId ? 'Save Changes' : 'Ask Companions to Pray';

@@ -120,6 +120,17 @@ body::-webkit-scrollbar {
   height: 0 !important;
 }
 
+/* Mobile touch responsiveness: eliminate 300ms delay and highlight flicker */
+button,
+[role="button"],
+a,
+input[type="button"],
+input[type="submit"],
+.clickable {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: var(--bg-app);

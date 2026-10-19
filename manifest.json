@@ -5,8 +5,8 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#F0F9FF",
-  "theme_color": "#023E8A",
+  "background_color": "#111827",
+  "theme_color": "#111827",
   "orientation": "portrait-primary",
   "categories": ["lifestyle", "productivity"],
   "icons": [
@@ -27,6 +27,29 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Holy Bible",
+      "short_name": "Bible",
+      "description": "Read Holy Bible in Telugu and English",
+      "url": "./index.html?tab=bible",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Add Prayer",
+      "short_name": "New Prayer",
+      "description": "Record a new prayer request",
+      "url": "./index.html?action=add-prayer",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Daily Reading Plan",
+      "short_name": "Bible Plan",
+      "description": "Continue 365-Day Bible Reading Plan",
+      "url": "./index.html?tab=dashboard",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

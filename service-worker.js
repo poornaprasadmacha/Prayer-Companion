@@ -4,7 +4,7 @@
  * and Cache-First strategy for static assets.
  */
 
-const CACHE_NAME = 'prayerly-v41';
+const CACHE_NAME = 'prayerly-v42';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -45,7 +45,17 @@ const STATIC_ASSETS = [
   './assets/answered-prayers.png',
   './assets/pray-for-others.png',
   './assets/thanksgiving.png',
-  './assets/prayers-completed.svg'
+  './assets/prayers-completed.svg',
+  './assets/onboarding-step1.svg',
+  './assets/onboarding-step2.svg',
+  './assets/onboarding-step3.svg',
+  './assets/onboarding-step4.svg',
+  './assets/feature-cloud.svg',
+  './assets/feature-companion.svg',
+  './assets/feature-journal.svg',
+  './assets/feature-thanksgiving.svg',
+  './assets/landing-hero-preview.svg',
+  './assets/qr-code.svg'
 ];
 
 // Install Event - Pre-cache App Shell
@@ -119,7 +129,7 @@ self.addEventListener('fetch', (event) => {
 
   // Static Assets: Stale-While-Revalidate / Cache-First strategy for instant (<15ms) app launch
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
+    caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
       // Revalidate in background to keep cache fresh without delaying initial paint
       const fetchPromise = fetch(event.request)
         .then((networkResponse) => {
@@ -146,11 +156,11 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         }
         if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
+          return caches.match('./index.html', { ignoreSearch: true });
         }
       }).catch(() => {
         if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
+          return caches.match('./index.html', { ignoreSearch: true });
         }
       });
     })

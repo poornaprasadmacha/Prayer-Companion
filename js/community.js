@@ -287,3 +287,10 @@ const Community = {
 };
 
 window.Community = Community;
+window.CommunityView = {
+  openShareModal(prayer) {
+    if (typeof App !== 'undefined' && typeof App.openShareCompanionModal === 'function') {
+      App.openShareCompanionModal(prayer || {});
+    }
+  }
+};
