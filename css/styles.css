@@ -669,7 +669,7 @@ body.dark-theme .user-badge-icon {
 }
 
 .btn-pwa-later {
-  background: #FFFFFF;
+  background: var(--bg-card);
   border: 1px solid var(--border-light);
   color: var(--text-secondary);
   font-size: 12.5px;
@@ -809,7 +809,7 @@ body.dark-theme .user-badge-icon {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #FFFFFF;
+  background: var(--bg-card);
   color: var(--navy-900);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-pill);
@@ -1389,7 +1389,7 @@ body.dark-theme .prayer-card-date {
 }
 
 .btn-secondary {
-  background: #FFFFFF;
+  background: var(--bg-card);
   color: var(--text-secondary);
   border-color: var(--border-light);
   box-shadow: var(--shadow-xs);
@@ -1466,7 +1466,7 @@ body.dark-theme .prayer-card-date {
 }
 
 .icon-btn {
-  background: #FFFFFF;
+  background: var(--bg-card);
   border: 1px solid var(--border-light);
   padding: 6px 10px;
   border-radius: var(--radius-sm);
@@ -1523,7 +1523,7 @@ body.dark-theme .prayer-card-date {
   border-radius: var(--radius-sm);
   font-size: 14px;
   color: var(--text-primary);
-  background: #FFFFFF;
+  background: var(--bg-card);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -1558,7 +1558,7 @@ body.dark-theme .prayer-card-date {
 }
 
 .prayer-status-pill {
-  background: #FFFFFF;
+  background: var(--bg-card);
   border: 1px solid var(--border-light);
   padding: 6px 14px;
   border-radius: var(--radius-pill);
@@ -1652,7 +1652,7 @@ body.dark-theme .prayer-card-date {
 }
 
 .admin-subnav-btn {
-  background: #FFFFFF;
+  background: var(--bg-card);
   border: 1px solid var(--border-light);
   padding: 9px 14px;
   border-radius: var(--radius-sm);
@@ -1695,7 +1695,7 @@ body.dark-theme .prayer-card-date {
 
 .admin-table-container {
   overflow-x: auto;
-  background: #FFFFFF;
+  background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
   margin-bottom: 18px;
@@ -1731,7 +1731,7 @@ body.dark-theme .prayer-card-date {
 }
 
 .access-denied-card {
-  background: #FFFFFF;
+  background: var(--bg-card);
   border: 1px solid #FECDD3;
   border-radius: var(--radius-lg);
   padding: 40px 24px;
@@ -1799,7 +1799,7 @@ body.dark-theme .prayer-card-date {
 
 /* Streak & History */
 .streak-box {
-  background: #FFFFFF;
+  background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
   padding: 24px;
@@ -1858,7 +1858,7 @@ body.dark-theme .prayer-card-date {
 }
 
 .history-record-card {
-  background: #FFFFFF;
+  background: var(--bg-card);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
   padding: 12px 16px;
@@ -1872,7 +1872,7 @@ body.dark-theme .prayer-card-date {
 .empty-state-card {
   text-align: center;
   padding: 44px 20px;
-  background: #FFFFFF;
+  background: var(--bg-card);
   border: 1px dashed var(--border-light);
   border-radius: var(--radius-md);
   color: var(--text-muted);
@@ -2168,7 +2168,7 @@ body.dark-theme .art-quote strong {
 }
 
 .modal-card {
-  background: #FFFFFF;
+  background: var(--bg-card);
   border-radius: var(--radius-lg);
   max-width: 520px;
   width: 100%;
@@ -2677,6 +2677,9 @@ body.dark-theme {
 
   background-color: var(--bg-app);
   color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body.dark-theme .app-header {
@@ -2758,6 +2761,63 @@ body.dark-theme .empty-state-card p {
 
 body.dark-theme .empty-state-icon {
   background: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .community-supporters-banner {
+  background: rgba(30, 41, 59, 0.7) !important;
+  border-color: #334155 !important;
+}
+
+body.dark-theme .supporters-badge {
+  color: #38BDF8 !important;
+}
+
+body.dark-theme .supporters-badge svg {
+  color: #38BDF8 !important;
+}
+
+body.dark-theme .badge-answered {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34D399 !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+body.dark-theme .badge-thanksgiving {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #FCD34D !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+body.dark-theme .admin-subnav-btn {
+  background: var(--bg-card);
+  border-color: var(--border-light);
+  color: var(--text-secondary);
+}
+
+body.dark-theme .admin-subnav-btn:hover {
+  background: var(--bg-hover);
+  color: #38BDF8;
+}
+
+body.dark-theme .admin-subnav-btn.active {
+  background: #0284C7 !important;
+  border-color: #0284C7 !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-theme .admin-table-container {
+  background: var(--bg-card) !important;
+  border-color: var(--border-light) !important;
+}
+
+body.dark-theme .admin-table tr:hover {
+  background: #273449 !important;
+}
+
+body.dark-theme .access-denied-card {
+  background: var(--bg-card) !important;
+  border-color: #7F1D1D !important;
+  color: #FCA5A5 !important;
 }
 
 body.dark-theme .pwa-banner {

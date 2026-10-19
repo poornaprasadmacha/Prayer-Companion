@@ -4,7 +4,7 @@
  * and Cache-First strategy for static assets.
  */
 
-const CACHE_NAME = 'prayerly-v40';
+const CACHE_NAME = 'prayerly-v41';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -117,27 +117,42 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static Assets: Network-First strategy (with Cache Fallback for offline)
+  // Static Assets: Stale-While-Revalidate / Cache-First strategy for instant (<15ms) app launch
   event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-        }
-        return networkResponse;
-      })
-      .catch(() => {
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
+    caches.match(event.request).then((cachedResponse) => {
+      // Revalidate in background to keep cache fresh without delaying initial paint
+      const fetchPromise = fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
           }
-          if (event.request.mode === 'navigate') {
-            return caches.match('./index.html');
-          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // Network offline / unreachable; cached version continues to serve safely
         });
-      })
+
+      // If asset is already cached, return immediately for instant app opening
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      // If not in cache, wait for network fetch and fallback to index.html for navigation
+      return fetchPromise.then((networkResponse) => {
+        if (networkResponse) {
+          return networkResponse;
+        }
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      }).catch(() => {
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      });
+    })
   );
 });
