@@ -68,6 +68,16 @@ const App = {
       console.warn('BiblePlan init note:', err);
     }
 
+    // 4.6. Initialize Bible Reader Module
+    try {
+      const reader = (typeof window !== 'undefined' && window.BibleReader) ? window.BibleReader : ((typeof BibleReader !== 'undefined') ? BibleReader : null);
+      if (reader && typeof reader.init === 'function') {
+        reader.init();
+      }
+    } catch (err) {
+      console.warn('BibleReader init note:', err);
+    }
+
     // 5. Render Local-First Interface Immediately (< 50ms)
     this.renderHeader();
     this.renderDailyScripture();
@@ -112,8 +122,9 @@ const App = {
       const action = params.get('action');
 
       if (tab === 'bible') {
-        if (typeof BibleReader !== 'undefined' && typeof BibleReader.open === 'function') {
-          setTimeout(() => BibleReader.open(), 50);
+        const reader = (typeof window !== 'undefined' && window.BibleReader) ? window.BibleReader : ((typeof BibleReader !== 'undefined') ? BibleReader : null);
+        if (reader && typeof reader.open === 'function') {
+          setTimeout(() => reader.open(), 50);
         }
       } else if (tab && this.tabs && this.tabs.includes(tab)) {
         this.switchTab(tab);
@@ -448,8 +459,9 @@ const App = {
 
   openMoreBibleReader() {
     this.closeAllModals();
-    if (typeof BibleReader !== 'undefined') {
-      BibleReader.openChapter('genesis', 1);
+    const reader = (typeof window !== 'undefined' && window.BibleReader) ? window.BibleReader : ((typeof BibleReader !== 'undefined') ? BibleReader : null);
+    if (reader && typeof reader.openChapter === 'function') {
+      reader.openChapter('genesis', 1);
     }
   },
 
@@ -2617,8 +2629,9 @@ const App = {
       document.body.classList.remove('bible-full-page-active');
       document.body.style.overflow = '';
     }
-    if (typeof BibleReader !== 'undefined' && BibleReader.closePicker) {
-      BibleReader.closePicker();
+    const reader = (typeof window !== 'undefined' && window.BibleReader) ? window.BibleReader : ((typeof BibleReader !== 'undefined') ? BibleReader : null);
+    if (reader && reader.closePicker) {
+      reader.closePicker();
     }
   },
 

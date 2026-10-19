@@ -369,6 +369,18 @@
         }
       } catch (e) {}
 
+      // Ensure picker dialog is strictly hidden upon initialization
+      try {
+        const pickerEl = (typeof document !== 'undefined') ? document.getElementById('bible-picker-dialog') : null;
+        if (pickerEl && pickerEl.style) {
+          if (typeof pickerEl.style.setProperty === 'function') {
+            pickerEl.style.setProperty('display', 'none', 'important');
+          } else {
+            pickerEl.style.display = 'none';
+          }
+        }
+      } catch (e) {}
+
       // Initialize offline status UI
       this.updateOfflineUI();
 
@@ -625,6 +637,14 @@
 
     openChapter(bookId, chapterNum, options = {}) {
       this.closePicker();
+      const pickerEl = (typeof document !== 'undefined') ? document.getElementById('bible-picker-dialog') : null;
+      if (pickerEl && pickerEl.style) {
+        if (typeof pickerEl.style.setProperty === 'function') {
+          pickerEl.style.setProperty('display', 'none', 'important');
+        } else {
+          pickerEl.style.display = 'none';
+        }
+      }
       const book = BOOK_BY_ID.get(bookId) || BIBLE_BOOKS[0];
       this.currentBookId = book.id;
       this.currentChapter = Math.max(1, Math.min(book.chapters, parseInt(chapterNum, 10) || 1));
@@ -681,6 +701,13 @@
       const modal = document.getElementById('modal-bible-reader');
       if (modal) {
         modal.classList.add('active');
+        if (modal.style) {
+          if (typeof modal.style.setProperty === 'function') {
+            modal.style.setProperty('display', 'flex', 'important');
+          } else {
+            modal.style.display = 'flex';
+          }
+        }
         if (typeof document !== 'undefined' && document.body) {
           document.body.classList.add('bible-full-page-active');
           document.body.style.overflow = 'hidden';
@@ -701,6 +728,13 @@
       const modal = document.getElementById('modal-bible-reader');
       if (modal) {
         modal.classList.remove('active');
+        if (modal.style) {
+          if (typeof modal.style.setProperty === 'function') {
+            modal.style.setProperty('display', 'none', 'important');
+          } else {
+            modal.style.display = 'none';
+          }
+        }
         if (typeof document !== 'undefined' && document.body) {
           document.body.classList.remove('bible-full-page-active');
           document.body.style.overflow = '';
@@ -1364,7 +1398,13 @@
       const pickerEl = document.getElementById('bible-picker-dialog');
       if (!pickerEl) return;
       if (pickerEl.classList) pickerEl.classList.add('active');
-      if (pickerEl.style) pickerEl.style.display = 'flex';
+      if (pickerEl.style) {
+        if (typeof pickerEl.style.setProperty === 'function') {
+          pickerEl.style.setProperty('display', 'flex', 'important');
+        } else {
+          pickerEl.style.display = 'flex';
+        }
+      }
       if (typeof document !== 'undefined' && document.body && document.body.style) {
         document.body.style.overflow = 'hidden';
       }
@@ -1388,7 +1428,13 @@
       const pickerEl = document.getElementById('bible-picker-dialog');
       if (pickerEl) {
         if (pickerEl.classList) pickerEl.classList.remove('active');
-        if (pickerEl.style) pickerEl.style.display = 'none';
+        if (pickerEl.style) {
+          if (typeof pickerEl.style.setProperty === 'function') {
+            pickerEl.style.setProperty('display', 'none', 'important');
+          } else {
+            pickerEl.style.display = 'none';
+          }
+        }
       }
       if (typeof document !== 'undefined' && document.body && document.body.style) {
         document.body.style.overflow = '';
@@ -2227,8 +2273,12 @@
   // Expose globally
   if (typeof window !== 'undefined') {
     window.BibleReader = BibleReader;
-    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
-      document.addEventListener('DOMContentLoaded', () => BibleReader.init());
+    if (typeof document !== 'undefined') {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => BibleReader.init());
+      } else {
+        BibleReader.init();
+      }
     }
   }
 
