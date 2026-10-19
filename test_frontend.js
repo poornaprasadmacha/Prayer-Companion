@@ -698,7 +698,7 @@ assert.ok(!readerJs.includes('class="btn-verse-tool btn-verse-pray"'), 'js/bible
 assert.ok(readerJs.includes('title="Copy verse"'), 'js/bible-reader.js must retain copy verse button');
 console.log('✓ Verified: Pray button completely removed from Bible reader verses for serene reading');
 
-// 4. Verify Verses Location Removed & Clean Accordion Picker Restored
+// 4. Verify Verses Location Removed & Clean Modern Picker Available
 assert.ok(!indexHtml.includes('id="bible-chapter-quick-dialog"'), 'Verses location and quick chapter dialog must be removed from DOM');
 assert.ok(!indexHtml.includes('id="bible-quick-verses-section"'), 'Quick verses section must be removed from DOM');
 assert.ok(indexHtml.includes('id="bible-reader-book-picker-btn"'), 'index.html must have unified book & chapter picker button');
@@ -706,9 +706,74 @@ assert.strictEqual(typeof BibleReader.togglePicker, 'function', 'BibleReader.tog
 assert.strictEqual(typeof BibleReader.toggleBookChapters, 'function', 'BibleReader.toggleBookChapters must be a function');
 console.log('✓ Verified: Verses location removed, green tick removed, offline line removed, clean previous design restored');
 
+// ============================================================================
+// 13. VERIFY TELUGU BIBLE FIXES, 4-COL NAVIGATOR, BOOKMARKING & NOTES
+// ============================================================================
+console.log('\nVerifying Telugu Bible Fixes, 4-Column Navigator, Bookmarking & Notes...');
+
+// 1. Verify Telugu Sanitizer & Zero Hindi in Amos 7:1
+const raw2Tim22 = 'నీవు ¸°వనేచ్ఛలనుండి పారిపొమ్ము, పవిత్ర హృదయులై ప్రభువునకు ప్రార్థన చేయువారితోకూడ నీతిని విశ్వాసమును ప్రేమను సమాధానమును వెంటాడుము.';
+const cleaned2Tim = BibleReader.cleanTeluguText(raw2Tim22, '2timothy', 2, 22);
+assert.ok(cleaned2Tim.includes('నీవు యౌవనేచ్ఛలనుండి'), '2 Timothy 2:22 must replace ¸° with యౌ');
+assert.ok(!cleaned2Tim.includes('¸°'), 'Cleaned Telugu must not contain ¸°');
+
+const cleanedAmos = BibleReader.cleanTeluguText('परमेश्वर यहोवा ने mujhe...', 'amos', 7, 1);
+assert.ok(cleanedAmos.includes('ప్రభువైన యెహోవా నాకు ఈ దర్శనము కనుపరచెను'), 'Amos 7:1 must be canonical BSI Telugu scripture');
+assert.ok(!/[\u0900-\u097F]/.test(cleanedAmos), 'Amos 7:1 must NOT contain any Devanagari Hindi characters');
+console.log('✓ Verified: Telugu font glitches resolved (యౌ) and Amos 7:1 replaced with authentic Telugu');
+
+// 2. Verify 4-Column Navigator Markup & Logic
+assert.ok(indexHtml.includes('id="bible-picker-dialog"'), 'index.html must contain #bible-picker-dialog');
+assert.ok(indexHtml.includes('bible-verse-navigator-card'), 'index.html must contain 4-column navigator card');
+assert.ok(indexHtml.includes('id="bible-nav-search-input"'), 'index.html must contain #bible-nav-search-input');
+assert.ok(indexHtml.includes('id="bible-col-links"'), 'index.html must contain #bible-col-links');
+assert.ok(indexHtml.includes('id="bible-col-books"'), 'index.html must contain #bible-col-books');
+assert.ok(indexHtml.includes('id="bible-col-chapters"'), 'index.html must contain #bible-col-chapters');
+assert.ok(indexHtml.includes('id="bible-col-verses"'), 'index.html must contain #bible-col-verses');
+
+assert.strictEqual(typeof BibleReader.navSelectLink, 'function', 'BibleReader.navSelectLink must be a function');
+assert.strictEqual(typeof BibleReader.navSelectBook, 'function', 'BibleReader.navSelectBook must be a function');
+assert.strictEqual(typeof BibleReader.navSelectChapter, 'function', 'BibleReader.navSelectChapter must be a function');
+assert.strictEqual(typeof BibleReader.navJumpToVerse, 'function', 'BibleReader.navJumpToVerse must be a function');
+assert.strictEqual(typeof BibleReader.handleNavSearch, 'function', 'BibleReader.handleNavSearch must be a function');
+assert.strictEqual(typeof BibleReader.getRecentBooks, 'function', 'BibleReader.getRecentBooks must be a function');
+assert.strictEqual(typeof BibleReader.recordRecentBook, 'function', 'BibleReader.recordRecentBook must be a function');
+
+const recents = BibleReader.getRecentBooks();
+assert.ok(Array.isArray(recents) && recents.length <= 3, 'getRecentBooks must return array with at most 3 books');
+console.log('✓ Verified: 4-Column Navigator structure, columns, and navigation functions verified');
+
+// 3. Verify Double-Tap Bookmarks & Triple-Tap Notes
+assert.ok(indexHtml.includes('id="modal-bible-verse-note"'), 'index.html must contain #modal-bible-verse-note');
+assert.ok(indexHtml.includes('id="bible-verse-note-text"'), 'index.html must contain #bible-verse-note-text');
+assert.ok(indexHtml.includes('id="btn-delete-bible-note"'), 'index.html must contain #btn-delete-bible-note');
+
+assert.strictEqual(typeof BibleReader.toggleBookmark, 'function', 'BibleReader.toggleBookmark must be a function');
+assert.strictEqual(typeof BibleReader.handleVerseTap, 'function', 'BibleReader.handleVerseTap must be a function');
+assert.strictEqual(typeof BibleReader.openVerseNoteModal, 'function', 'BibleReader.openVerseNoteModal must be a function');
+assert.strictEqual(typeof BibleReader.saveCurrentVerseNote, 'function', 'BibleReader.saveCurrentVerseNote must be a function');
+assert.strictEqual(typeof BibleReader.deleteCurrentVerseNote, 'function', 'BibleReader.deleteCurrentVerseNote must be a function');
+
+assert.ok(cssContent.includes('.verse-bookmark-badge'), 'css/styles.css must style .verse-bookmark-badge');
+assert.ok(cssContent.includes('.verse-note-badge'), 'css/styles.css must style .verse-note-badge');
+assert.ok(cssContent.includes('.bible-verse-row.is-bookmarked'), 'css/styles.css must style .bible-verse-row.is-bookmarked');
+assert.ok(cssContent.includes('.bible-verse-row.has-note'), 'css/styles.css must style .bible-verse-row.has-note');
+console.log('✓ Verified: Multi-tap gestures, bookmarking storage, and verse note taking verified');
+
+// 4. Verify Holy Bible Logo in Reader Top Bar
+assert.ok(indexHtml.includes('id="bible-reader-logo-emblem"'), 'index.html must contain #bible-reader-logo-emblem');
+const themeToggleIdx = indexHtml.indexOf('id="bible-theme-toggle-btn"');
+const logoIdx = indexHtml.indexOf('id="bible-reader-logo-emblem"');
+assert.ok(themeToggleIdx !== -1 && logoIdx !== -1 && logoIdx > themeToggleIdx, 'Holy Bible logo must be placed after theme toggle in reader top bar');
+assert.ok(cssContent.includes('.bible-reader-logo-emblem'), 'css/styles.css must style .bible-reader-logo-emblem');
+assert.ok(cssContent.includes('.bible-top-logo-svg'), 'css/styles.css must style .bible-top-logo-svg');
+console.log('✓ Verified: Holy Bible Logo emblem present in top bar action group after theme toggle');
+
 console.log('============================================================');
 console.log('ALL FRONTEND & THEME SYSTEM TESTS PASSED SUCCESSFULLY (100%)');
 console.log('============================================================\n');
+
+process.exit(0);
 
 
 

@@ -100,6 +100,78 @@
   });
 
   // =========================================================================
+  // 1b. CANONICAL TELUGU SCRIPTURE PATCHES & TEXT SANITIZER
+  // Completely eliminates font-glitch artifacts (¸°, ,º -> యౌ), broken accents (é),
+  // and replaces mistranslated Devanagari Hindi (Amos 7:1) with authentic BSI Telugu.
+  // =========================================================================
+
+  const CANONICAL_TELUGU_PATCHES = {
+    'amos_7_1': 'ప్రభువైన యెహోవా నాకు ఈ దర్శనము కనుపరచెను; రాజునకు రావలసిన కోత తీరిన తరువాత పచ్చిక మరల మొలచుచుండగా ఆయన మిడతలను పుట్టించెను.',
+    'genesis_27_37': 'అందుకు ఇస్సాకు ఇదిగో అతని నీకు ఏలికనుగా నియమించి అతని బంధుజను లందరిని అతనికి దాసులుగా ఇచ్చితిని; ధాన్యమును ద్రాక్షారస మును ఇచ్చి అతని పోషించితిని గనుక నా కుమారుడా, నీకేమి చేతును?',
+    'genesis_33_2': 'అప్పుడతడు తన పిల్లలను లేయా రాహేలుల కును ఇద్దరు దాసీలకును పంచి అప్పగించెను. అతడు ముందర దాసీలను, వారి పిల్లలను వారి వెనుక లేయాను ఆమె పిల్లలను ఆ వెనుక రాహేలును యోసేపును ఉంచెను.',
+    'exodus_8_17': 'అహరోను తన కఱ్ఱను పట్టుకొని చెయ్యి చాపి ఆ దేశపు ధూళిని కొట్టినప్పుడు పేలు మనుష్యులమీదను జంతువులమీదను ఉండెను; ఐగుప్తు దేశమందంతటను ఆ దేశపు ధూళి అంతయు పేలాయెను.',
+    'deuteronomy_12_17': 'నీ ధాన్యములో నేమి నీ ద్రాక్షారసములోనేమి నీ నూనెలోనేమి దశమభాగమును, నీ గోవులలోనిదేమి నీ గొఱ్ఱ మేకల మందలోని దేమి తొలిచూలు పిల్లలను నీవు మ్రొక్కుకొను మ్రొక్కుబళ్లలో దేనిని నీ స్వేచ్ఛార్పణమును ప్రతిష్ఠార్పణమును నీ యింట తినక',
+    '1kings_7_26': 'అది బెత్తెడు దళసరిగలదై యుండెను; దాని పై అంచు పాత్రకు పై అంచువలె తామర పుష్పములవంటి పని కలిగి యుండెను; అది తొమి్మది గరిసెలు పట్టును.',
+    '2kings_15_16': 'మెనహేము రాగా తిప్సహు పట్టణపు వారు తమ గుమ్మములు తీయలేదు గనుక అతడు వారినంద రిని హతము చేసి, తిర్సాను దాని చేరువ గ్రామములనన్నిటిని కొల్లపెట్టి అచ్చట గర్భిణులందరి గర్భములను చింపెను.',
+    '1chronicles_15_28': 'ఇశ్రాయేలీయులందరును ఆర్భాటము చేయుచు, కొమ్ములు బూరలు ఊదుచు, తాళములు కొట్టుచు, స్వరమండలములు సితారాలు వాయించుచు యెహోవా నిబంధన మందసమును తీసికొనివచ్చిరి.',
+    'job_11_9': 'దాని పరిమాణము భూమికంటె అధికమైనది దాని వెడల్పు సముద్రముకంటె అధికమైనది',
+    'ecclesiastes_11_5': 'చూలాలి గర్భమందు ఎముకలు ఏరీతిగా ఎదుగునది నీకు తెలియదు, గాలి యే త్రోవను వచ్చునో నీవెరుగవు, ఆలాగునే సమస్తమును జరిగించు దేవుని క్రియలను నీవెరుగవు.',
+    'ezekiel_44_26': 'ఒకడు అంటుపడి శుచిర్భూతుడైన తరువాత ఏడు దినములు లెక్కించి',
+    'daniel_4_17': 'ఈ ఆజ్ఞ జాగరూకు లగు దేవదూతల ప్రకటన ననుసరించి జరుగును, నిర్ణయ మైన పరిశుద్ధుల ప్రకటన ననుసరించి సంభవించును. మహోన్నతుడగు దేవుడు మానవుల రాజ్యముపైని అధికారియైయుండి, తానెవరికి అనుగ్రహింప నిచ్ఛయించునో వారికనుగ్రహించుననియు, ఆ యా రాజ్యము పైన అత్యల్ప మనుష్యులను ఆయన నియమించుచున్నా డనియు మనుష్యులందరు తెలిసికొనునట్లు ఈలాగు జరు గును.',
+    'hosea_1_8': 'లోరూ హామా (జాలినొందనిది) పాలువిడిచిన తరువాత తల్లి గర్భవతియై కుమారుని కనినప్పుడు',
+    'malachi_2_14': 'అది ఎందుకని మీ రడుగగా, యౌవన కాలమందు నీవు పెండ్లి చేసికొని అన్యాయముగా విసర్జించిన నీ భార్య పక్షమున యెహోవా సాక్షియాయెను, అది నీకు తోటిదై నీవు చేసిన నిబంధనకు పాత్రురాలు గదా, నీ పెండ్లి భార్య గదా.',
+    'matthew_21_21': 'అందుకు యేసు—మీరు విశ్వాసముగలిగి సందేహపడకుండిన యెడల, ఈ అంజూరపుచెట్టునకు జరిగిన దానిని చేయుట మాత్రమే కాదు, ఈ కొండను చూచి—నీవు ఎత్తబడి సముద్రములో పడవేయబడుమని చెప్పినను ఆలాగు జరుగును.',
+    'matthew_25_44': 'అందుకు వారును—ప్రభువా, మేమెప్పుడు నీవు ఆకలిగొని యుండుటయైనను, దప్పిగొనియుండుటయైనను, పరదేశివై యుండుటయైనను, దిగంబరివై యుండుటయైనను, రోగివై యుండుటయైనను, చెరసాలలో ఉండుటయైనను చూచి, నీకు ఉపచారము చేయకపోతిమని ఆయనను అడుగుదురు.',
+    'mark_7_19': 'అది వాని హృదయములో ప్రవేశింపక కడుపులోనే ప్రవేశించి బహిర్భూమిలో విడువబడును; ఇట్లు అది భోజనపదార్థము లన్ని టిని పవిత్రపరచును.',
+    'luke_1_22': 'అతడు వెలుపలికి వచ్చినప్పుడు వారితో మాటలాడలేక పోయినందున, ఆలయము నందు అతనికి దర్శనము కలిగిన దని వారు గ్రహించిరి; అప్పుడతడు వారికి సంజ్ఞలు చేయుచు, మూగవాడై యుండెను.',
+    'luke_11_42': 'అయ్యో పరిసయ్యులారా, మీరు పుదీనా సదాప మొదలైన ప్రతి కూరలోను పదియవవంతు చెల్లించు చున్నారే గాని, న్యాయమును దేవుని ప్రేమను విడిచి పెట్టుచున్నారు. వాటిని మానక వీటిని చేయవలసియుండెను.',
+    'john_3_2': 'అతడు రాత్రియందు ఆయనయొద్దకు వచ్చి—బోధకుడా, నీవు దేవునియొద్దనుండి వచ్చిన బోధ కుడవని మే మెరుగుదుము; దేవుడతనికి తోడైయుంటేనే గాని నీవు చేయుచున్న సూచకక్రియలను ఎవడును చేయనేరడని ఆయనతో చెప్పెను.',
+    'john_3_4': 'అందుకు నీకొదేము—ముసలివాడైన మనుష్యుడేలాగు జన్మింపగలడు? రెండవమారు తల్లి గర్భమందు ప్రవేశించి జన్మింపగలడా అని ఆయనను అడుగగా',
+    'acts_3_13': 'అబ్రాహాము ఇస్సాకు యాకోబు అనువారి దేవుడు, అనగా మన పితరుల దేవుడు తన సేవకుడైన యేసును మహిమపరచియున్నాడు; మీరాయనను అప్పగించితిరి, పిలాతు ఆయనను విడుదల చేయుటకు నిశ్చయించినప్పుడు మీరు అతని యెదుట ఆయనను నిరాకరించితిరి.',
+    'acts_14_17': 'అయినను ఆయన ఆకాశమునుండి మీకు వర్షమును, ఫలవంతములైన రుతువులను దయచేయుచు, ఆహారము ననుగ్రహించుచు, ఉల్లాసముతో మీ హృదయ ములను నింపుచు, మేలుచేయుచునే యుండెను.',
+    'romans_4_19': 'మరియు అతడు విశ్వాసమునందు బల హీనుడు కాక, రమారమి నూరేండ్ల వయస్సుగలవాడై యుండి, అప్పటికి తన శరీరము మృతతుల్యమైనట్టును, శారాగర్భమును మృతతుల్యమైనట్టును ఆలోచించెను గాని,',
+    'romans_9_22': 'ఆలాగు దేవుడు తన ఉగ్రతను అగపరచుటకును, తన ప్రభావమును చూపుటకును, ఇచ్ఛయించినవాడై, నాశనమునకు సిద్ధపడి ఉగ్రతాపాత్రమైన ఘటములను ఆయన బహు దీర్ఘశాంతముతో సహించిన నేమి?',
+    '1corinthians_3_2': 'అప్పటిలో మీకు బలము చాలకపోయినందున పాలతోనే మిమ్మును పెంచితినిగాని అన్నముతో మిమ్మును పెంచలేదు. మీరింకను శరీరసంబంధులై యుండుటవలన ఇప్పుడును మీరు బలహీనులై యున్నారు.',
+    '2corinthians_8_19': 'అంతేకాక మన ప్రభువునకు మహిమ కలుగు నిమిత్తమును మా సిద్ధమైన మనస్సు కనుపరచు నిమిత్తమును ఈ ఉపకారద్రవ్యము విషయమై పరిచారకులమైన మాతోకూడ అతడు ప్రయాణము చేసెను.',
+    '2corinthians_11_12': 'అతిశయకారణము వెదకువారు ఏవిషయములో అతిశయించుచున్నారో, ఆ విషయములో వారును మావలెనే యున్నారని కనబడునిమిత్తము వారికి కారణము దొరకకుండ కొట్టివేయుటకు, నేను చేయుచున్నట్లే ఇకముందును చేయుదును.',
+    '1timothy_3_15': 'అయినను నేను ఆలస్యముచేసినయెడల దేవుని మందిర ములో, అనగా జీవముగల దేవుని సంఘములో, జనులేలాగు ప్రవర్తింపవలెనో అది నీకు తెలియవలెనని యీ సంగతులను నీకు వ్రాయుచున్నాను.',
+    'hebrews_8_8': 'అయితే ఆయన ఆక్షేపించి వారితో ఈలాగు చెప్పుచున్నాడు ప్రభువు ఇట్లనెను—ఇదిగో యొక కాలము వచ్చు చున్నది. అప్పటిలో ఇశ్రాయేలు ఇంటివారితోను యూదా ఇంటివారితోను నేను క్రొత్తనిబంధన చేతును.',
+    'revelation_6_4': 'అప్పుడు ఎఱ్ఱనిదైన వేరొక గుఱ్ఱము బయలువెళ్ళెను; మనుష్యులు ఒకని ఒకడు చంపు కొనునట్లు భూలోకములో సమాధానము లేకుండ చేయుటకు ఈ గుఱ్ఱముమీద కూర్చున్నవానికి అధికార మియ్యబడెను; మరియు అతనికి ఒక పెద్ద ఖడ్గము ఇయ్యబడెను.',
+    'revelation_18_8': 'అందుచేత ఒక్క దినముననే దాని తెగుళ్లు, అనగా మరణమును దుఃఖమును కరవును వచ్చును; దానికి తీర్పుతీర్చుచున్న దేవుడైన ప్రభువు బలిష్ఠుడు గనుక అది అగ్నిచేత బొత్తిగా కాల్చివేయబడును.',
+    'revelation_19_18': 'అతడు గొప్ప శబ్దముతో ఆర్భటించి—రండి, రాజుల మాంసమును సహస్రాధిపతుల మాంసమును బలిష్ఠుల మాంసమును గుఱ్ఱముల మాంసమును వాటిమీద కూర్చుండువారి మాంసమును, స్వతంత్రులదేమి దాసులదేమి చిన్నవారిదేమి పెద్దవారిదేమి అందరి మాంసమును తినుటకై దేవుని గొప్ప విందుకు కూడిరండని ఆకాశమధ్యమున ఎగురుచున్న సమస్త పక్షులను పిలిచెను.'
+  };
+
+  function cleanTeluguText(text, bookId, ch, v) {
+    const key = `${bookId}_${ch}_${v}`;
+    if (CANONICAL_TELUGU_PATCHES[key]) {
+      return CANONICAL_TELUGU_PATCHES[key];
+    }
+    if (!text || typeof text !== 'string') return '';
+    let s = text;
+    // Replace ¸° and ,º and ¸° with యౌ
+    s = s.replace(/¸°|,º|¸\s*°/g, 'యౌ');
+    s = s.replace(/¸(?=వ)/g, 'యౌ');
+    s = s.replace(/¸యవన/g, 'యౌవన');
+    // Common glyph corruption replacements
+    s = s.replace(/స్వేచ్చా\s*éర్పణమును/g, 'స్వేచ్ఛార్పణమును');
+    s = s.replace(/పుష్ప\s*éములవంటి/g, 'పుష్పములవంటి');
+    s = s.replace(/గర్భిéణులందరి/g, 'గర్భిణులందరి');
+    s = s.replace(/ఆర్బా\s*éటము/g, 'ఆర్భాటము');
+    s = s.replace(/బ\s*³ూమి/g, 'భూమి');
+    s = s.replace(/గర్బ\s*éమందు/g, 'గర్భమందు');
+    s = s.replace(/శుచిర్భూéతుడైన/g, 'శుచిర్భూతుడైన');
+    s = s.replace(/నిచ్ఛ\s*éయించునో/g, 'నిచ్ఛయించునో');
+    s = s.replace(/గర్బ\s*éవతియై/g, 'గర్భవతియై');
+    s = s.replace(/బహిర్బూ\\s*éమిలో/g, 'బహిర్భూమిలో');
+    s = s.replace(/శారాగర్భéమును/g, 'శారాగర్భమును');
+    s = s.replace(/ఇచ్చ\\s*éయించినవాడై/g, 'ఇచ్ఛయించినవాడై');
+    s = s.replace(/ఆర్భ\\s*éటించి/g, 'ఆర్భటించి');
+    // Strip standalone ¸
+    s = s.replace(/¸/g, '');
+    return s.trim();
+  }
+
+  // =========================================================================
   // 2. OFFLINE INDEXEDDB CACHE (prayerly_bible_v1)
   // Ensures once a book is loaded, it is available offline forever.
   // =========================================================================
@@ -252,6 +324,23 @@
     isDownloadingOffline: false,
     offlineProgress: { current: 0, total: 132, percent: 0 },
 
+    // Multi-tap gesture detection state for Bookmarking (2 taps) & Notes (3 taps)
+    _tapCount: 0,
+    _lastTapVerse: null,
+    _lastTapTime: 0,
+    _tapTimer: null,
+    currentNoteTarget: null,
+
+    // 4-Column Navigator State (Figure 2)
+    navLinkFilter: 'OT',
+    navSelectedBookId: 'genesis',
+    navSelectedChapter: 1,
+    navSearchQuery: '',
+
+    cleanTeluguText(text, bookId, ch, v) {
+      return cleanTeluguText(text, bookId, ch, v);
+    },
+
     init() {
       // Load user preferences
       try {
@@ -321,7 +410,7 @@
       const book = BOOK_BY_ID.get(bookId);
       if (!book) throw new Error(`Unknown book id: ${bookId}`);
 
-      const cacheKey = `${translation}_${bookId}`;
+      const cacheKey = (translation === 'telugu') ? `telugu_v2_${bookId}` : `${translation}_${bookId}`;
       if (MEM_CACHE.has(cacheKey)) {
         return MEM_CACHE.get(cacheKey);
       }
@@ -363,13 +452,23 @@
         bookName: book.name,
         teluguName: book.telugu,
         translation,
-        chapters: rawData.chapters.map(ch => ({
-          chapter: parseInt(ch.chapter, 10),
-          verses: (ch.verses || []).map(v => ({
-            verse: parseInt(v.verse, 10),
-            text: (v.text || '').trim()
-          }))
-        }))
+        chapters: rawData.chapters.map(ch => {
+          const chNum = parseInt(ch.chapter, 10);
+          return {
+            chapter: chNum,
+            verses: (ch.verses || []).map(v => {
+              const vNum = parseInt(v.verse, 10);
+              const rawText = (v.text || '').trim();
+              const cleaned = (translation === 'telugu')
+                ? cleanTeluguText(rawText, book.id, chNum, vNum)
+                : rawText;
+              return {
+                verse: vNum,
+                text: cleaned
+              };
+            })
+          };
+        })
       };
 
       MEM_CACHE.set(cacheKey, normalized);
@@ -414,8 +513,11 @@
 
       const pairedVerses = [];
       for (let i = 1; i <= maxVerseNum; i++) {
-        const tText = teluguMap.get(i);
+        let tText = teluguMap.get(i);
         const eText = englishMap.get(i);
+        if (tText) {
+          tText = cleanTeluguText(tText, book.id, chapterNum, i);
+        }
         if (tText || eText) {
           pairedVerses.push({
             verse: i,
@@ -590,6 +692,7 @@
       this.closePicker();
       this.closeFastChapterPicker();
       this.closeOfflineModal();
+      this.closeVerseNoteModal();
       try {
         if (!isPopState && typeof window !== 'undefined' && window.location && window.location.hash === '#bible') {
           if (window.history.state && window.history.state.page === 'bible') {
@@ -754,8 +857,277 @@
     },
 
     // -----------------------------------------------------------------------
-    // Book & Chapter Picker Dialog
+    // Bookmarking (Double-Tap) & Verse Notes (Triple-Tap)
     // -----------------------------------------------------------------------
+
+    getBookmarks() {
+      try {
+        const raw = localStorage.getItem('prayerly_bible_bookmarks');
+        if (raw) {
+          const list = JSON.parse(raw);
+          if (Array.isArray(list)) return new Set(list);
+        }
+      } catch (e) {}
+      return new Set();
+    },
+
+    saveBookmarks(bookmarksSet) {
+      try {
+        localStorage.setItem('prayerly_bible_bookmarks', JSON.stringify(Array.from(bookmarksSet)));
+      } catch (e) {}
+    },
+
+    isBookmarked(bookId, ch, v) {
+      return this.getBookmarks().has(`${bookId}_${ch}_${v}`);
+    },
+
+    toggleBookmark(verseNum) {
+      const key = `${this.currentBookId}_${this.currentChapter}_${verseNum}`;
+      const bookmarks = this.getBookmarks();
+      let isNowMarked = false;
+
+      if (bookmarks.has(key)) {
+        bookmarks.delete(key);
+        isNowMarked = false;
+      } else {
+        bookmarks.add(key);
+        isNowMarked = true;
+      }
+
+      this.saveBookmarks(bookmarks);
+
+      const rowEl = document.getElementById(`verse-row-${verseNum}`);
+      if (rowEl) {
+        if (isNowMarked) {
+          rowEl.classList.add('is-bookmarked');
+        } else {
+          rowEl.classList.remove('is-bookmarked');
+        }
+      }
+
+      if (typeof UI !== 'undefined' && UI.toast) {
+        UI.toast(isNowMarked ? 'Verse bookmarked' : 'Bookmark removed', 'info');
+      }
+    },
+
+    getNotesMap() {
+      try {
+        const raw = localStorage.getItem('prayerly_bible_notes');
+        if (raw) {
+          const map = JSON.parse(raw);
+          if (map && typeof map === 'object') return map;
+        }
+      } catch (e) {}
+      return {};
+    },
+
+    saveNotesMap(notesMap) {
+      try {
+        localStorage.setItem('prayerly_bible_notes', JSON.stringify(notesMap));
+      } catch (e) {}
+    },
+
+    getVerseNote(bookId, ch, v) {
+      const map = this.getNotesMap();
+      return map[`${bookId}_${ch}_${v}`] || null;
+    },
+
+    hasVerseNote(bookId, ch, v) {
+      return !!this.getVerseNote(bookId, ch, v);
+    },
+
+    openVerseNoteModal(verseNum) {
+      const book = BOOK_BY_ID.get(this.currentBookId) || BIBLE_BOOKS[0];
+      const modal = document.getElementById('modal-bible-verse-note');
+      if (!modal) return;
+
+      const rowEl = document.getElementById(`verse-row-${verseNum}`);
+      let teluguText = '';
+      let englishText = '';
+      if (rowEl) {
+        const tEl = rowEl.querySelector('.verse-text-telugu');
+        const eEl = rowEl.querySelector('.verse-text-english');
+        if (tEl) teluguText = tEl.textContent.trim();
+        if (eEl) englishText = eEl.textContent.trim();
+      }
+
+      this.currentNoteTarget = {
+        bookId: this.currentBookId,
+        chapter: this.currentChapter,
+        verse: verseNum,
+        bookName: book.name,
+        teluguBookName: book.telugu,
+        teluguText,
+        englishText
+      };
+
+      const titleEl = document.getElementById('bible-verse-note-title');
+      const subEl = document.getElementById('bible-verse-note-sub');
+      const snippetEl = document.getElementById('bible-verse-note-snippet');
+      const textareaEl = document.getElementById('bible-verse-note-text');
+      const deleteBtn = document.getElementById('btn-delete-bible-note');
+
+      if (titleEl) {
+        titleEl.textContent = `${book.name} ${this.currentChapter}:${verseNum}`;
+      }
+      if (subEl) {
+        subEl.textContent = `${book.telugu} • Personal Note`;
+      }
+      if (snippetEl) {
+        snippetEl.innerHTML = `
+          ${teluguText ? `<p style="margin-bottom: 4px; font-weight: 500;">"${this.escapeHtml(teluguText)}"</p>` : ''}
+          ${englishText ? `<p style="font-size: 12px; color: var(--text-muted); font-style: italic;">"${this.escapeHtml(englishText)}"</p>` : ''}
+        `;
+      }
+
+      const existingNote = this.getVerseNote(this.currentBookId, this.currentChapter, verseNum);
+      if (textareaEl) {
+        textareaEl.value = existingNote ? existingNote.note : '';
+      }
+
+      if (deleteBtn) {
+        deleteBtn.style.display = existingNote ? 'inline-block' : 'none';
+      }
+
+      modal.classList.add('active');
+      if (textareaEl) {
+        setTimeout(() => textareaEl.focus(), 80);
+      }
+    },
+
+    closeVerseNoteModal() {
+      const modal = document.getElementById('modal-bible-verse-note');
+      if (modal) modal.classList.remove('active');
+      this.currentNoteTarget = null;
+    },
+
+    saveCurrentVerseNote() {
+      if (!this.currentNoteTarget) return;
+      const textareaEl = document.getElementById('bible-verse-note-text');
+      const text = textareaEl ? textareaEl.value.trim() : '';
+      const { bookId, chapter, verse, bookName, teluguBookName, teluguText, englishText } = this.currentNoteTarget;
+
+      if (!text) {
+        this.deleteCurrentVerseNote();
+        return;
+      }
+
+      const notes = this.getNotesMap();
+      const key = `${bookId}_${chapter}_${verse}`;
+      notes[key] = {
+        bookId,
+        chapter,
+        verse,
+        bookName,
+        teluguBookName,
+        ref: `${bookName} ${chapter}:${verse}`,
+        snippet: teluguText || englishText,
+        note: text,
+        updatedAt: new Date().toISOString()
+      };
+      this.saveNotesMap(notes);
+
+      const rowEl = document.getElementById(`verse-row-${verse}`);
+      if (rowEl) {
+        rowEl.classList.add('has-note');
+      }
+
+      this.closeVerseNoteModal();
+
+      if (typeof UI !== 'undefined' && UI.toast) {
+        UI.toast('Note saved for verse', 'success');
+      }
+    },
+
+    deleteCurrentVerseNote() {
+      if (!this.currentNoteTarget) return;
+      const { bookId, chapter, verse } = this.currentNoteTarget;
+      const notes = this.getNotesMap();
+      const key = `${bookId}_${chapter}_${verse}`;
+
+      if (notes[key]) {
+        delete notes[key];
+        this.saveNotesMap(notes);
+      }
+
+      const rowEl = document.getElementById(`verse-row-${verse}`);
+      if (rowEl) {
+        rowEl.classList.remove('has-note');
+      }
+
+      this.closeVerseNoteModal();
+
+      if (typeof UI !== 'undefined' && UI.toast) {
+        UI.toast('Note deleted', 'info');
+      }
+    },
+
+    handleVerseTap(verseNum, event) {
+      if (event) {
+        if (event.target && event.target.closest('button.btn-verse-tool, .verse-note-badge')) {
+          return;
+        }
+      }
+
+      const now = Date.now();
+      if (this._lastTapVerse === verseNum && (now - this._lastTapTime) < 380) {
+        this._tapCount = (this._tapCount || 1) + 1;
+      } else {
+        this._tapCount = 1;
+        this._lastTapVerse = verseNum;
+      }
+      this._lastTapTime = now;
+
+      if (this._tapTimer) {
+        clearTimeout(this._tapTimer);
+        this._tapTimer = null;
+      }
+
+      if (this._tapCount >= 3) {
+        this._tapCount = 0;
+        this._lastTapVerse = null;
+        this.openVerseNoteModal(verseNum);
+      } else if (this._tapCount === 2) {
+        this._tapTimer = setTimeout(() => {
+          if (this._lastTapVerse === verseNum && this._tapCount === 2) {
+            this.toggleBookmark(verseNum);
+          }
+          this._tapCount = 0;
+          this._lastTapVerse = null;
+        }, 260);
+      } else {
+        this._tapTimer = setTimeout(() => {
+          this._tapCount = 0;
+          this._lastTapVerse = null;
+        }, 320);
+      }
+    },
+
+    // -----------------------------------------------------------------------
+    // 4-Column "Select Verse" Navigator (Figure 2)
+    // -----------------------------------------------------------------------
+
+    getRecentBooks() {
+      try {
+        const raw = localStorage.getItem('prayerly_bible_recent_books');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed.filter(id => BOOK_BY_ID.has(id)).slice(0, 3);
+          }
+        }
+      } catch (e) {}
+      return ['matthew', 'john', 'psalms'];
+    },
+
+    recordRecentBook(bookId) {
+      if (!BOOK_BY_ID.has(bookId)) return;
+      try {
+        let recent = this.getRecentBooks();
+        recent = [bookId, ...recent.filter(id => id !== bookId)].slice(0, 3);
+        localStorage.setItem('prayerly_bible_recent_books', JSON.stringify(recent));
+      } catch (e) {}
+    },
 
     togglePicker() {
       const pickerEl = document.getElementById('bible-picker-dialog');
@@ -771,9 +1143,19 @@
       const pickerEl = document.getElementById('bible-picker-dialog');
       if (!pickerEl) return;
       pickerEl.style.display = 'block';
-      const curBook = BOOK_BY_ID.get(this.currentBookId);
-      const testament = curBook ? curBook.testament : 'OT';
-      this.renderPicker(testament);
+
+      const curBook = BOOK_BY_ID.get(this.currentBookId) || BIBLE_BOOKS[0];
+      this.navSelectedBookId = curBook.id;
+      this.navSelectedChapter = this.currentChapter;
+      this.navLinkFilter = curBook.testament;
+      this.navSearchQuery = '';
+
+      const searchInput = document.getElementById('bible-nav-search-input');
+      if (searchInput) searchInput.value = '';
+      const searchClear = document.getElementById('bible-nav-search-clear');
+      if (searchClear) searchClear.style.display = 'none';
+
+      this.render4ColNavigator();
       this.triggerBackgroundDownloadIfPending();
     },
 
@@ -782,79 +1164,262 @@
       if (pickerEl) pickerEl.style.display = 'none';
     },
 
-    // Backward-compatibility stubs for safety
-    toggleFastChapterPicker() { this.togglePicker(); },
-    openFastChapterPicker() { this.openPicker(); },
-    closeFastChapterPicker() { this.closePicker(); },
-    showBookChapters(bookId) { this.toggleBookChapters(bookId); },
-    scrollToVerse(v) {
-      const rowEl = document.getElementById(`verse-row-${v}`);
-      if (rowEl) rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    },
-    toggleQuickVerses() {},
-
-    // Clean Accordion Book & Chapter Picker
-    renderPicker(activeTestament = 'OT', filterQuery = '') {
-      const container = document.getElementById('bible-picker-content');
-      if (!container) return;
-
-      const q = (filterQuery || '').trim().toLowerCase();
-      const filtered = BIBLE_BOOKS.filter(b => {
-        if (q) {
-          return b.name.toLowerCase().includes(q) ||
-                 b.telugu.toLowerCase().includes(q) ||
-                 b.id.toLowerCase().includes(q) ||
-                 (b.aliases && b.aliases.some(a => a.toLowerCase().includes(q)));
+    navSelectLink(type) {
+      this.navLinkFilter = type;
+      if (type === 'PS') {
+        this.navSelectedBookId = 'psalms';
+      } else if (type === 'PROV') {
+        this.navSelectedBookId = 'proverbs';
+      } else if (type === 'OT') {
+        const cur = BOOK_BY_ID.get(this.navSelectedBookId);
+        if (!cur || cur.testament !== 'OT') {
+          this.navSelectedBookId = 'genesis';
         }
-        return b.testament === activeTestament;
-      });
-
-      container.innerHTML = `
-        <div class="bible-picker-tabs">
-          <button class="bible-picker-tab ${!q && activeTestament === 'OT' ? 'active' : ''}" onclick="BibleReader.renderPicker('OT')">
-            Old Testament (39)
-          </button>
-          <button class="bible-picker-tab ${!q && activeTestament === 'NT' ? 'active' : ''}" onclick="BibleReader.renderPicker('NT')">
-            New Testament (27)
-          </button>
-        </div>
-        <div class="bible-picker-search-wrap">
-          <input type="text" class="bible-picker-search-input" placeholder="Search book (e.g. Genesis, Matthew)..." value="${filterQuery}" oninput="BibleReader.renderPicker('${activeTestament}', this.value)" />
-        </div>
-        <div class="bible-picker-grid">
-          ${filtered.map(b => `
-            <div class="bible-picker-book-card ${b.id === this.currentBookId ? 'current-book' : ''}">
-              <div class="bible-picker-book-header" onclick="BibleReader.toggleBookChapters('${b.id}')">
-                <div class="bible-picker-book-names">
-                  <span class="bible-picker-telugu">${b.telugu}</span>
-                  <span class="bible-picker-english">${b.name} (${b.chapters})</span>
-                </div>
-                <span class="bible-picker-arrow">&darr;</span>
-              </div>
-              <div id="chapters-grid-${b.id}" class="bible-picker-chapters-grid" style="${b.id === this.currentBookId ? 'display: flex;' : 'display: none;'}">
-                ${Array.from({ length: b.chapters }, (_, i) => i + 1).map(ch => `
-                  <button class="bible-picker-ch-btn ${b.id === this.currentBookId && ch === this.currentChapter ? 'active-ch' : ''}" onclick="BibleReader.selectChapter('${b.id}', ${ch})">
-                    ${ch}
-                  </button>
-                `).join('')}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
+      } else if (type === 'NT') {
+        const cur = BOOK_BY_ID.get(this.navSelectedBookId);
+        if (!cur || cur.testament !== 'NT') {
+          this.navSelectedBookId = 'matthew';
+        }
+      }
+      this.navSelectedChapter = 1;
+      this.render4ColNavigator();
     },
 
-    toggleBookChapters(bookId) {
-      const el = document.getElementById(`chapters-grid-${bookId}`);
-      if (el) {
-        el.style.display = (el.style.display === 'none') ? 'flex' : 'none';
+    navSelectBook(bookId) {
+      const book = BOOK_BY_ID.get(bookId);
+      if (!book) return;
+      this.navSelectedBookId = book.id;
+      this.navSelectedChapter = 1;
+      this.render4ColNavigator();
+      this.fetchBook(this.englishVersion, book.id).then(() => {
+        this.render4ColVerses();
+      }).catch(() => {});
+    },
+
+    navSelectChapter(ch) {
+      const book = BOOK_BY_ID.get(this.navSelectedBookId);
+      const maxCh = book ? book.chapters : 50;
+      this.navSelectedChapter = Math.max(1, Math.min(maxCh, ch));
+
+      const chCol = document.getElementById('bible-col-chapters');
+      if (chCol) {
+        chCol.querySelectorAll('.bible-nav-num-cell').forEach(btn => {
+          if (parseInt(btn.textContent.trim(), 10) === this.navSelectedChapter) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+      }
+
+      this.render4ColVerses();
+      if (book) {
+        this.fetchBook(this.englishVersion, book.id).then(() => {
+          this.render4ColVerses();
+        }).catch(() => {});
       }
     },
 
-    selectChapter(bookId, ch) {
+    getChapterVerseCount(bookId, ch) {
+      const cached = MEM_CACHE.get(`telugu_v2_${bookId}`) || MEM_CACHE.get(`telugu_${bookId}`) || MEM_CACHE.get(`niv_${bookId}`);
+      if (cached && cached.chapters) {
+        const found = cached.chapters.find(c => c.chapter === ch);
+        if (found && found.verses) return found.verses.length;
+      }
+      return 35; // Standard fallback until book is loaded
+    },
+
+    render4ColNavigator() {
+      // 1. Column 1: Links (OT, NT, Psalms, Proverbs, and 3 Recent books)
+      const linksCol = document.getElementById('bible-col-links');
+      if (linksCol) {
+        const recents = this.getRecentBooks();
+        linksCol.innerHTML = `
+          <div class="bible-col-section-label">Links</div>
+          <button class="bible-nav-link-btn ${this.navLinkFilter === 'OT' ? 'active' : ''}" onclick="BibleReader.navSelectLink('OT')">
+            OT
+          </button>
+          <button class="bible-nav-link-btn ${this.navLinkFilter === 'NT' ? 'active' : ''}" onclick="BibleReader.navSelectLink('NT')">
+            NT
+          </button>
+          <button class="bible-nav-link-btn ${this.navSelectedBookId === 'psalms' ? 'active' : ''}" onclick="BibleReader.navSelectLink('PS')">
+            Psalms
+          </button>
+          <button class="bible-nav-link-btn ${this.navSelectedBookId === 'proverbs' ? 'active' : ''}" onclick="BibleReader.navSelectLink('PROV')">
+            Proverbs
+          </button>
+
+          <div class="bible-col-section-label" style="margin-top: 10px;">Recent</div>
+          ${recents.map(rId => {
+            const b = BOOK_BY_ID.get(rId);
+            if (!b) return '';
+            const isActive = (this.navSelectedBookId === b.id);
+            return `
+              <button class="bible-nav-link-btn bible-recent-link-btn ${isActive ? 'active' : ''}" onclick="BibleReader.navSelectBook('${b.id}')" title="${b.telugu} (${b.name})">
+                ${b.name.length > 7 ? b.name.substring(0, 6) + '.' : b.name}
+              </button>
+            `;
+          }).join('')}
+        `;
+      }
+
+      // 2. Column 2: Books (Telugu & English)
+      const booksCol = document.getElementById('bible-col-books');
+      if (booksCol) {
+        const q = (this.navSearchQuery || '').trim().toLowerCase();
+        let filtered = BIBLE_BOOKS;
+
+        if (q) {
+          filtered = BIBLE_BOOKS.filter(b => {
+            return b.name.toLowerCase().includes(q) ||
+                   b.telugu.toLowerCase().includes(q) ||
+                   b.id.toLowerCase().includes(q) ||
+                   (b.aliases && b.aliases.some(a => a.toLowerCase().includes(q)));
+          });
+        } else if (this.navLinkFilter === 'OT') {
+          filtered = BIBLE_BOOKS.filter(b => b.testament === 'OT');
+        } else if (this.navLinkFilter === 'NT') {
+          filtered = BIBLE_BOOKS.filter(b => b.testament === 'NT');
+        } else if (this.navLinkFilter === 'PS') {
+          filtered = BIBLE_BOOKS.filter(b => b.id === 'psalms');
+        } else if (this.navLinkFilter === 'PROV') {
+          filtered = BIBLE_BOOKS.filter(b => b.id === 'proverbs');
+        }
+
+        if (filtered.length > 0 && !filtered.some(b => b.id === this.navSelectedBookId)) {
+          this.navSelectedBookId = filtered[0].id;
+          this.navSelectedChapter = 1;
+        }
+
+        booksCol.innerHTML = filtered.map(b => `
+          <div class="bible-nav-book-row ${b.id === this.navSelectedBookId ? 'active' : ''}" onclick="BibleReader.navSelectBook('${b.id}')" id="nav-book-row-${b.id}">
+            <span class="nav-book-telugu">${b.telugu}</span>
+            <span class="nav-book-english">${b.name}</span>
+          </div>
+        `).join('');
+
+        // Auto-scroll active book row into view smoothly
+        setTimeout(() => {
+          const activeRow = booksCol.querySelector('.bible-nav-book-row.active');
+          if (activeRow && booksCol.scrollHeight > booksCol.clientHeight) {
+            activeRow.scrollIntoView({ block: 'nearest' });
+          }
+        }, 40);
+      }
+
+      // 3. Column 3: Chapters
+      const chCol = document.getElementById('bible-col-chapters');
+      if (chCol) {
+        const selBook = BOOK_BY_ID.get(this.navSelectedBookId) || BIBLE_BOOKS[0];
+        const totalChapters = selBook.chapters;
+
+        chCol.innerHTML = `
+          <div class="bible-nav-nums-grid">
+            ${Array.from({ length: totalChapters }, (_, i) => i + 1).map(c => `
+              <button class="bible-nav-num-cell ${c === this.navSelectedChapter ? 'active' : ''}" onclick="BibleReader.navSelectChapter(${c})" id="nav-ch-cell-${c}">
+                ${c}
+              </button>
+            `).join('')}
+          </div>
+        `;
+
+        setTimeout(() => {
+          const activeCell = chCol.querySelector('.bible-nav-num-cell.active');
+          if (activeCell && chCol.scrollHeight > chCol.clientHeight) {
+            activeCell.scrollIntoView({ block: 'nearest' });
+          }
+        }, 40);
+      }
+
+      // 4. Column 4: Verses
+      this.render4ColVerses();
+    },
+
+    render4ColVerses() {
+      const vCol = document.getElementById('bible-col-verses');
+      if (!vCol) return;
+      const book = BOOK_BY_ID.get(this.navSelectedBookId) || BIBLE_BOOKS[0];
+      const count = this.getChapterVerseCount(book.id, this.navSelectedChapter);
+
+      vCol.innerHTML = `
+        <div class="bible-nav-nums-grid">
+          ${Array.from({ length: count }, (_, i) => i + 1).map(v => `
+            <button class="bible-nav-num-cell ${v === 1 ? 'initial-v' : ''}" onclick="BibleReader.navJumpToVerse('${book.id}', ${this.navSelectedChapter}, ${v})" id="nav-v-cell-${v}">
+              ${v}
+            </button>
+          `).join('')}
+        </div>
+      `;
+
+      const hintEl = document.getElementById('bible-nav-active-selection-hint');
+      if (hintEl) {
+        hintEl.textContent = `${book.telugu} (${book.name}) Chapter ${this.navSelectedChapter}`;
+      }
+    },
+
+    navJumpToVerse(bookId, ch, verse) {
+      this.recordRecentBook(bookId);
       this.closePicker();
       this.openChapter(bookId, ch, { clearContext: false });
+
+      setTimeout(() => {
+        this.scrollToVerse(verse);
+      }, 260);
     },
+
+    scrollToVerse(v) {
+      const rowEl = document.getElementById(`verse-row-${v}`);
+      if (rowEl) {
+        rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        rowEl.classList.add('verse-row-highlighted');
+        setTimeout(() => {
+          rowEl.classList.remove('verse-row-highlighted');
+        }, 2400);
+      }
+    },
+
+    handleNavSearch(query) {
+      const q = (query || '').trim();
+      this.navSearchQuery = q;
+
+      const clearBtn = document.getElementById('bible-nav-search-clear');
+      if (clearBtn) {
+        clearBtn.style.display = q ? 'block' : 'none';
+      }
+
+      const parsed = this.parseReference(q);
+      if (parsed && parsed.length > 0) {
+        const target = parsed[0];
+        this.navSelectedBookId = target.book.id;
+        this.navSelectedChapter = target.initialChapter;
+      }
+
+      this.render4ColNavigator();
+    },
+
+    clearNavSearch() {
+      const input = document.getElementById('bible-nav-search-input');
+      if (input) input.value = '';
+      this.handleNavSearch('');
+    },
+
+    // Backward-compatibility wrappers
+    renderPicker(testament = 'OT', filterQuery = '') {
+      if (testament) this.navLinkFilter = testament;
+      if (filterQuery) this.navSearchQuery = filterQuery;
+      this.render4ColNavigator();
+    },
+    toggleBookChapters(bookId) {
+      this.navSelectBook(bookId);
+    },
+    selectChapter(bookId, ch) {
+      this.navJumpToVerse(bookId, ch, 1);
+    },
+    toggleFastChapterPicker() { this.togglePicker(); },
+    openFastChapterPicker() { this.openPicker(); },
+    closeFastChapterPicker() { this.closePicker(); },
+    showBookChapters(bookId) { this.navSelectBook(bookId); },
+    toggleQuickVerses() {},
 
     // -----------------------------------------------------------------------
     // Main Reader Renderer
@@ -972,6 +1537,10 @@
         }
 
         // Render Verses
+        const bookmarks = this.getBookmarks();
+        const notes = this.getNotesMap();
+
+        // Render Verses
         const html = `
           <div class="bible-chapter-header">
             <h2 class="bible-chapter-h2">${paired.book.name} Chapter ${paired.chapter}</h2>
@@ -982,10 +1551,16 @@
             `}
           </div>
           <div class="bible-verses-stream">
-            ${paired.verses.map(v => `
-              <div class="bible-verse-row" id="verse-row-${v.verse}">
+            ${paired.verses.map(v => {
+              const vKey = `${book.id}_${paired.chapter}_${v.verse}`;
+              const isMarked = bookmarks.has(vKey);
+              const hasNote = !!notes[vKey];
+              return `
+              <div class="bible-verse-row ${isMarked ? 'is-bookmarked' : ''} ${hasNote ? 'has-note' : ''}" id="verse-row-${v.verse}" onclick="BibleReader.handleVerseTap(${v.verse}, event)">
                 <div class="verse-num-cell">
                   <span class="verse-num-badge">${v.verse}</span>
+                  <span class="verse-bookmark-badge" title="Bookmarked verse">★</span>
+                  <span class="verse-note-badge" title="Verse note" onclick="event.stopPropagation(); BibleReader.openVerseNoteModal(${v.verse})">✎</span>
                 </div>
                 <div class="verse-text-cell">
                   ${(this.viewMode === 'bilingual' || this.viewMode === 'telugu') ? `
@@ -996,12 +1571,12 @@
                   ` : ''}
                 </div>
                 <div class="verse-actions-cell">
-                  <button class="btn-verse-tool" title="Copy verse" onclick="BibleReader.copyVerse(${v.verse}, '${this.escapeJs(v.telugu)}', '${this.escapeJs(v.english)}')">
+                  <button class="btn-verse-tool" title="Copy verse" onclick="event.stopPropagation(); BibleReader.copyVerse(${v.verse}, '${this.escapeJs(v.telugu)}', '${this.escapeJs(v.english)}')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                   </button>
                 </div>
               </div>
-            `).join('')}
+            `;}).join('')}
           </div>
         `;
 
@@ -1045,7 +1620,7 @@
       let kjvCount = 0;
 
       BIBLE_BOOKS.forEach(b => {
-        if (keySet.has(`telugu_${b.id}`)) teluguCount++;
+        if (keySet.has(`telugu_v2_${b.id}`) || keySet.has(`telugu_${b.id}`)) teluguCount++;
         if (keySet.has(`niv_${b.id}`)) nivCount++;
         if (keySet.has(`kjv_${b.id}`)) kjvCount++;
       });
@@ -1242,7 +1817,7 @@
           if (!this.isDownloadingOffline) break;
 
           // 1. Check & Download Telugu
-          if (!keySet.has(`telugu_${book.id}`)) {
+          if (!keySet.has(`telugu_v2_${book.id}`)) {
             try {
               await this.fetchBook('telugu', book.id);
             } catch (e) {}
