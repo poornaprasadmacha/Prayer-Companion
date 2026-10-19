@@ -148,26 +148,37 @@
     }
     if (!text || typeof text !== 'string') return '';
     let s = text;
-    // Replace ¸° and ,º and ¸° with యౌ
-    s = s.replace(/¸°|,º|¸\s*°/g, 'యౌ');
-    s = s.replace(/¸(?=వ)/g, 'యౌ');
+
+    // Detect and replace any unexpected Devanagari Hindi text
+    if (/[\u0900-\u097F]/.test(s)) {
+      if (CANONICAL_TELUGU_PATCHES[key]) {
+        return CANONICAL_TELUGU_PATCHES[key];
+      }
+    }
+
+    // 1. Convert corrupt ¸° and ¸ followed by ° or ,º or before వ/య to యౌ
+    s = s.replace(/¸\s*°/g, 'యౌ');
+    s = s.replace(/¸°|,º/g, 'యౌ');
+    s = s.replace(/¸(?=[వయ])/g, 'యౌ');
     s = s.replace(/¸యవన/g, 'యౌవన');
-    // Common glyph corruption replacements
-    s = s.replace(/స్వేచ్చా\s*éర్పణమును/g, 'స్వేచ్ఛార్పణమును');
-    s = s.replace(/పుష్ప\s*éములవంటి/g, 'పుష్పములవంటి');
-    s = s.replace(/గర్భిéణులందరి/g, 'గర్భిణులందరి');
-    s = s.replace(/ఆర్బా\s*éటము/g, 'ఆర్భాటము');
-    s = s.replace(/బ\s*³ూమి/g, 'భూమి');
-    s = s.replace(/గర్బ\s*éమందు/g, 'గర్భమందు');
-    s = s.replace(/శుచిర్భూéతుడైన/g, 'శుచిర్భూతుడైన');
-    s = s.replace(/నిచ్ఛ\s*éయించునో/g, 'నిచ్ఛయించునో');
-    s = s.replace(/గర్బ\s*éవతియై/g, 'గర్భవతియై');
-    s = s.replace(/బహిర్బూ\\s*éమిలో/g, 'బహిర్భూమిలో');
-    s = s.replace(/శారాగర్భéమును/g, 'శారాగర్భమును');
-    s = s.replace(/ఇచ్చ\\s*éయించినవాడై/g, 'ఇచ్ఛయించినవాడై');
-    s = s.replace(/ఆర్భ\\s*éటించి/g, 'ఆర్భటించి');
-    // Strip standalone ¸
-    s = s.replace(/¸/g, '');
+
+    // 2. Comprehensive Telugu glyph corruption fixes
+    s = s.replace(/స్వేచ్చా\s*é?ర్పణమును/g, 'స్వేచ్ఛార్పణమును');
+    s = s.replace(/పుష్ప\s*é?ములవంటి/g, 'పుష్పములవంటి');
+    s = s.replace(/గర్భిé?ణులందరి/g, 'గర్భిణులందరి');
+    s = s.replace(/ఆర్బా\s*é?టము/g, 'ఆర్భాటము');
+    s = s.replace(/బ\s*³?ూమి/g, 'భూమి');
+    s = s.replace(/గర్బ\s*é?మందు/g, 'గర్భమందు');
+    s = s.replace(/శుచిర్భూé?తుడైన/g, 'శుచిర్భూతుడైన');
+    s = s.replace(/నిచ్ఛ\s*é?యించునో/g, 'నిచ్ఛయించునో');
+    s = s.replace(/గర్బ\s*é?వతియై/g, 'గర్భవతియై');
+    s = s.replace(/బహిర్బూ\s*é?మిలో/g, 'బహిర్భూమిలో');
+    s = s.replace(/శారాగర్భé?మును/g, 'శారాగర్భమును');
+    s = s.replace(/ఇచ్చ\s*é?యించినవాడై/g, 'ఇచ్ఛయించినవాడై');
+    s = s.replace(/ఆర్భ\s*é?టించి/g, 'ఆర్భటించి');
+
+    // 3. Strip any stray non-Telugu corrupt artifacts
+    s = s.replace(/[¸°é³¿ëïâ]/g, '');
     return s.trim();
   }
 
@@ -1126,11 +1137,18 @@
       if (!this._selectedVerseForMenu) return;
       const verseNum = this._selectedVerseForMenu;
       const book = BOOK_BY_ID.get(this.currentBookId) || BIBLE_BOOKS[0];
-      const teluguText = (this.currentTeluguChapter && this.currentTeluguChapter[verseNum]) || '';
-      const englishText = (this.currentEnglishChapter && this.currentEnglishChapter[verseNum]) || '';
+      const rowEl = document.getElementById(`verse-row-${verseNum}`);
+      let teluguText = '';
+      let englishText = '';
+      if (rowEl) {
+        const tEl = rowEl.querySelector('.verse-text-telugu');
+        const eEl = rowEl.querySelector('.verse-text-english');
+        if (tEl) teluguText = tEl.textContent.trim();
+        if (eEl) englishText = eEl.textContent.trim();
+      }
 
       const shareTitle = `${book.name} ${this.currentChapter}:${verseNum} (${book.telugu})`;
-      const shareBody = `${book.telugu} ${this.currentChapter}:${verseNum}\n"${teluguText}"\n\n${book.name} ${this.currentChapter}:${verseNum} (${(this.englishVersion || 'NIV').toUpperCase()})\n"${englishText}"\n\n— via Prayerly (prayerly.ceeras.in)`;
+      const shareBody = `${book.telugu} ${this.currentChapter}:${verseNum}\n"${teluguText}"\n\n${book.name} ${this.currentChapter}:${verseNum} (${(this.englishVersion || 'NIV').toUpperCase()})\n"${englishText}"\n\n— via Prayerly`;
 
       this.closeVerseMenu();
 
@@ -1141,7 +1159,7 @@
           url: window.location.href
         }).catch(() => {});
       } else {
-        this.copyToClipboard(shareBody, 'Verse copied to clipboard!');
+        this.copyVerse(verseNum, teluguText, englishText);
       }
     },
 
@@ -1166,6 +1184,7 @@
         if (pressTimer) clearTimeout(pressTimer);
         pressTimer = setTimeout(() => {
           didTrigger = true;
+          BibleReader._longPressTriggered = true;
           if (typeof navigator !== 'undefined' && navigator.vibrate) {
             try { navigator.vibrate(35); } catch(e) {}
           }
@@ -1230,6 +1249,11 @@
     },
 
     handleVerseTap(verseNum, event) {
+      if (this._longPressTriggered) {
+        this._longPressTriggered = false;
+        return;
+      }
+
       if (event) {
         if (event.target && event.target.closest('button.btn-verse-tool, .verse-note-badge')) {
           return;
@@ -1253,10 +1277,16 @@
       if (this._tapCount >= 3) {
         this._tapCount = 0;
         this._lastTapVerse = null;
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          try { navigator.vibrate(30); } catch(e) {}
+        }
         this.openVerseNoteModal(verseNum);
       } else if (this._tapCount === 2) {
         this._tapTimer = setTimeout(() => {
           if (this._lastTapVerse === verseNum && this._tapCount === 2) {
+            if (typeof navigator !== 'undefined' && navigator.vibrate) {
+              try { navigator.vibrate(25); } catch(e) {}
+            }
             this.toggleBookmark(verseNum);
           }
           this._tapCount = 0;

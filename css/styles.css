@@ -6080,9 +6080,12 @@ body:not(.dark-theme) .bible-theme-toggle .theme-icon-moon {
   transition: background 0.15s ease;
   position: relative;
   border-bottom: 1px solid transparent;
+  cursor: pointer;
+  touch-action: manipulation !important;
 }
 
-.bible-verse-row:hover {
+.bible-verse-row:hover,
+.bible-verse-row:active {
   background: var(--bg-card);
 }
 
